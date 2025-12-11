@@ -6,9 +6,10 @@ interface CardProps {
   className?: string;
   hover?: boolean;
   padding?: 'none' | 'sm' | 'md' | 'lg';
+  onClick?: () => void;
 }
 
-export function Card({ children, className, hover = false, padding = 'md' }: CardProps) {
+export function Card({ children, className, hover = false, padding = 'md', onClick }: CardProps) {
   const paddingClasses = {
     none: '',
     sm: 'p-4',
@@ -18,9 +19,11 @@ export function Card({ children, className, hover = false, padding = 'md' }: Car
 
   return (
     <div
+      onClick={onClick}
       className={clsx(
         'bg-dark-card/80 backdrop-blur-xl border border-dark-border rounded-xl',
         hover && 'transition-all duration-300 hover:border-brand-blue/30 hover:shadow-lg hover:shadow-brand-blue/5',
+        onClick && 'cursor-pointer',
         paddingClasses[padding],
         className
       )}

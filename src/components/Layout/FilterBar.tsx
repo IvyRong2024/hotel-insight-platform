@@ -22,7 +22,6 @@ export function FilterBar({
   const [timeRange, setTimeRange] = useState('近30天');
   const [role, setRole] = useState('brand_ops');
 
-  const currentRole = filterOptions.roles.find((r) => r.id === role);
   const provinces = region !== '全国' ? filterOptions.provinces[region as keyof typeof filterOptions.provinces] || [] : [];
 
   return (

@@ -185,7 +185,7 @@ export function PriceMonitoring() {
                 </tr>
               </thead>
               <tbody>
-                {priceData.platformPrices.platforms.map((platform, idx) => {
+                {priceData.platformPrices.platforms.map((platform) => {
                   const minPrice = Math.min(
                     ...priceData.platformPrices.platforms.map((p) => p.discounted)
                   );
