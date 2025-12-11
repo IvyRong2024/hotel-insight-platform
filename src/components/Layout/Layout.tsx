@@ -11,23 +11,22 @@ interface LayoutProps {
 
 export function Layout({ children, title, subtitle, showFilters = true }: LayoutProps) {
   return (
-    <div className="min-h-screen bg-dark-bg">
+    <div className="min-h-screen">
       <Sidebar />
 
       {/* Main Content */}
-      <div className="ml-56 min-h-screen">
+      <div className="ml-52 min-h-screen">
         {showFilters && <FilterBar />}
 
         {/* Page Header */}
-        <header className="px-8 py-6 border-b border-dark-border/50">
-          <h1 className="text-2xl font-bold text-white">{title}</h1>
-          {subtitle && <p className="text-sm text-zinc-500 mt-1">{subtitle}</p>}
+        <header className="px-5 py-4 border-b border-slate-200/50 bg-white/50">
+          <h1 className="text-lg font-bold text-slate-800">{title}</h1>
+          {subtitle && <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}
         </header>
 
         {/* Page Content */}
-        <main className="p-8">{children}</main>
+        <main className="p-5">{children}</main>
       </div>
     </div>
   );
 }
-

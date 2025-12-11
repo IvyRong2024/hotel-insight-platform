@@ -19,8 +19,8 @@ const colorClasses = {
 
 const sizeClasses = {
   sm: 'h-1',
-  md: 'h-2',
-  lg: 'h-3',
+  md: 'h-1.5',
+  lg: 'h-2',
 };
 
 export function ProgressBar({
@@ -36,12 +36,12 @@ export function ProgressBar({
   return (
     <div className="w-full">
       {(showLabel || label) && (
-        <div className="flex justify-between items-center mb-1.5">
-          {label && <span className="text-sm text-zinc-400">{label}</span>}
-          {showLabel && <span className="text-sm text-zinc-500">{percentage.toFixed(0)}%</span>}
+        <div className="flex justify-between items-center mb-1">
+          {label && <span className="text-xs text-slate-500">{label}</span>}
+          {showLabel && <span className="text-xs text-slate-400">{percentage.toFixed(0)}%</span>}
         </div>
       )}
-      <div className={clsx('w-full bg-dark-border rounded-full overflow-hidden', sizeClasses[size])}>
+      <div className={clsx('w-full bg-slate-100 rounded-full overflow-hidden', sizeClasses[size])}>
         <div
           className={clsx('h-full rounded-full transition-all duration-500', colorClasses[color])}
           style={{ width: `${percentage}%` }}
@@ -50,4 +50,3 @@ export function ProgressBar({
     </div>
   );
 }
-

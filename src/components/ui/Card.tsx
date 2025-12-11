@@ -12,17 +12,17 @@ interface CardProps {
 export function Card({ children, className, hover = false, padding = 'md', onClick }: CardProps) {
   const paddingClasses = {
     none: '',
-    sm: 'p-4',
-    md: 'p-5',
-    lg: 'p-6',
+    sm: 'p-3',
+    md: 'p-4',
+    lg: 'p-5',
   };
 
   return (
     <div
       onClick={onClick}
       className={clsx(
-        'bg-dark-card/80 backdrop-blur-xl border border-dark-border rounded-xl',
-        hover && 'transition-all duration-300 hover:border-brand-blue/30 hover:shadow-lg hover:shadow-brand-blue/5',
+        'bg-white border border-slate-200 rounded-xl shadow-sm',
+        hover && 'transition-all duration-300 hover:border-brand-blue/30 hover:shadow-md',
         onClick && 'cursor-pointer',
         paddingClasses[padding],
         className
@@ -41,13 +41,12 @@ interface CardHeaderProps {
 
 export function CardHeader({ title, subtitle, action }: CardHeaderProps) {
   return (
-    <div className="flex items-start justify-between mb-4">
+    <div className="flex items-start justify-between mb-3">
       <div>
-        <h3 className="text-lg font-semibold text-white">{title}</h3>
-        {subtitle && <p className="text-sm text-zinc-500 mt-0.5">{subtitle}</p>}
+        <h3 className="text-sm font-semibold text-slate-800">{title}</h3>
+        {subtitle && <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}
       </div>
       {action}
     </div>
   );
 }
-

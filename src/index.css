@@ -4,10 +4,12 @@
 
 :root {
   --brand-blue: #0066FF;
-  --brand-gold: #FFB800;
-  --dark-bg: #0a0a0f;
-  --dark-card: #12121a;
-  --dark-border: #1e1e2e;
+  --brand-gold: #D4AF37;
+  --dark-bg: #f8fafc;
+  --dark-card: #ffffff;
+  --dark-border: #e2e8f0;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
 }
 
 * {
@@ -18,8 +20,8 @@
 
 body {
   font-family: 'DM Sans', system-ui, sans-serif;
-  background: var(--dark-bg);
-  color: #e4e4e7;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  color: var(--text-primary);
   min-height: 100vh;
 }
 
@@ -30,70 +32,70 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--dark-bg);
+  background: #f1f5f9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--dark-border);
+  background: #cbd5e1;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #2a2a3a;
+  background: #94a3b8;
 }
 
 /* Glass Card */
 @layer components {
   .glass-card {
-    @apply bg-dark-card/80 backdrop-blur-xl border border-dark-border rounded-xl;
+    @apply bg-white/90 backdrop-blur-xl border border-slate-200 rounded-xl shadow-sm;
   }
 
   .glass-card-hover {
-    @apply glass-card transition-all duration-300 hover:border-brand-blue/30 hover:shadow-lg hover:shadow-brand-blue/5;
+    @apply glass-card transition-all duration-300 hover:border-brand-blue/30 hover:shadow-md;
   }
 
   .stat-card {
-    @apply glass-card p-5 flex flex-col gap-2;
+    @apply glass-card p-4 flex flex-col gap-1.5;
   }
 
   .metric-value {
-    @apply text-3xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent;
+    @apply text-2xl font-bold text-slate-800;
   }
 
   .metric-label {
-    @apply text-sm text-zinc-500 font-medium;
+    @apply text-xs text-slate-500 font-medium;
   }
 
   .badge {
-    @apply px-2.5 py-1 rounded-full text-xs font-medium;
+    @apply px-2 py-0.5 rounded-full text-xs font-medium;
   }
 
   .badge-success {
-    @apply badge bg-emerald-500/10 text-emerald-400 border border-emerald-500/20;
+    @apply badge bg-emerald-50 text-emerald-600 border border-emerald-200;
   }
 
   .badge-warning {
-    @apply badge bg-amber-500/10 text-amber-400 border border-amber-500/20;
+    @apply badge bg-amber-50 text-amber-600 border border-amber-200;
   }
 
   .badge-danger {
-    @apply badge bg-red-500/10 text-red-400 border border-red-500/20;
+    @apply badge bg-red-50 text-red-600 border border-red-200;
   }
 
   .badge-info {
-    @apply badge bg-brand-blue/10 text-brand-blue border border-brand-blue/20;
+    @apply badge bg-blue-50 text-brand-blue border border-blue-200;
   }
 
   .btn-primary {
-    @apply px-4 py-2 bg-brand-blue text-white rounded-lg font-medium transition-all duration-200 hover:bg-brand-blue/90 hover:shadow-lg hover:shadow-brand-blue/25;
+    @apply px-4 py-2 bg-brand-blue text-white rounded-lg font-medium transition-all duration-200 hover:bg-blue-600 hover:shadow-md;
   }
 
   .btn-secondary {
-    @apply px-4 py-2 bg-dark-border text-zinc-300 rounded-lg font-medium transition-all duration-200 hover:bg-dark-hover hover:text-white;
+    @apply px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-medium transition-all duration-200 hover:bg-slate-200;
   }
 
   .input-field {
-    @apply w-full px-4 py-2.5 bg-dark-bg border border-dark-border rounded-lg text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-brand-blue/50 focus:ring-1 focus:ring-brand-blue/25 transition-all;
+    @apply w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-700 placeholder-slate-400 focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/10 transition-all text-sm;
   }
 
   .select-field {
@@ -104,10 +106,10 @@ body {
 /* Animations */
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.3);
   }
   50% {
-    box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+    box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
   }
 }
 
@@ -118,7 +120,7 @@ body {
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -127,21 +129,20 @@ body {
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.5s ease-out forwards;
+  animation: fadeIn 0.4s ease-out forwards;
 }
 
 .animate-fade-in-delay-1 {
-  animation: fadeIn 0.5s ease-out 0.1s forwards;
+  animation: fadeIn 0.4s ease-out 0.1s forwards;
   opacity: 0;
 }
 
 .animate-fade-in-delay-2 {
-  animation: fadeIn 0.5s ease-out 0.2s forwards;
+  animation: fadeIn 0.4s ease-out 0.2s forwards;
   opacity: 0;
 }
 
 .animate-fade-in-delay-3 {
-  animation: fadeIn 0.5s ease-out 0.3s forwards;
+  animation: fadeIn 0.4s ease-out 0.3s forwards;
   opacity: 0;
 }
-

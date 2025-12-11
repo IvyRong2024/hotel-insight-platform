@@ -6,6 +6,7 @@ import {
   hotelBarriersData,
   userNeedsData,
   newOpeningData,
+  platformConfig,
 } from '../data/mockData';
 import {
   RadarChart,
@@ -25,11 +26,10 @@ import {
   Pie,
   Cell,
 } from 'recharts';
-import { TrendingUp, TrendingDown, Minus, Star, MapPin, Clock, AlertCircle } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, Star, MapPin, Clock, AlertCircle, Monitor } from 'lucide-react';
 import clsx from 'clsx';
 
 export function HotelView() {
-  // 转换雷达图数据
   const dimensionData = hotelHealthData.dimensions.labels.map((label, idx) => ({
     dimension: label,
     酒店: hotelHealthData.dimensions.hotel[idx],
@@ -37,79 +37,56 @@ export function HotelView() {
     品牌均值: hotelHealthData.dimensions.brandAvg[idx],
   }));
 
-  const pieColors = ['#0066FF', '#8b5cf6', '#f59e0b', '#6b7280'];
+  const pieColors = ['#0066FF', '#8b5cf6', '#f59e0b', '#94a3b8'];
 
   return (
-    <Layout title="Hotel View" subtitle="酒店视角 · 上海外滩旗舰店">
-      {/* 酒店健康度 */}
-      <section className="mb-8 animate-fade-in">
-        <h2 className="text-lg font-semibold text-white mb-4">酒店健康度</h2>
+    <Layout title="Hotel View" subtitle={`${hotelHealthData.hotelName} · ${hotelHealthData.brand}`}>
+      {/* 平台覆盖提示 */}
+      <div className="mb-4 flex items-center gap-2 text-xs text-slate-500">
+        <Monitor size={14} />
+        <span>评论来源：{platformConfig.review.platforms.join('、')}</span>
+      </div>
 
-        {/* 平台评分卡片 */}
-        <div className="grid grid-cols-5 gap-4 mb-6">
+      {/* 酒店健康度 */}
+      <section className="mb-5 animate-fade-in">
+        <h2 className="text-sm font-semibold text-slate-700 mb-3">酒店健康度</h2>
+
+        <div className="grid grid-cols-6 gap-3 mb-4">
           {hotelHealthData.platforms.map((platform) => (
-            <div
-              key={platform.name}
-              className="bg-dark-card/80 backdrop-blur-xl border border-dark-border rounded-xl p-4"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-lg">{platform.icon}</span>
-                <span className="text-xs text-zinc-500">{platform.name}</span>
+            <div key={platform.name} className="bg-white border border-slate-200 rounded-xl p-3 shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-slate-500">{platform.name}</span>
               </div>
-              <div className="text-2xl font-bold text-white mb-1">{platform.score}</div>
-              <div className="flex items-center gap-1 text-xs text-zinc-500">
-                <MapPin size={12} />
-                <span>
-                  城市 #{platform.rank}/{platform.total}
-                </span>
+              <div className="text-xl font-bold text-slate-800 mb-1">{platform.score}</div>
+              <div className="flex items-center gap-1 text-[10px] text-slate-400">
+                <MapPin size={10} />
+                <span>#{platform.rank}/{platform.total}</span>
               </div>
             </div>
           ))}
-          {/* 综合评分 */}
-          <div className="bg-gradient-to-br from-brand-blue/20 to-brand-gold/10 border border-brand-blue/30 rounded-xl p-4">
-            <div className="flex items-center justify-between mb-3">
-              <Star size={18} className="text-brand-gold" />
-              <span className="text-xs text-zinc-400">综合</span>
+          <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-3">
+            <div className="flex items-center justify-between mb-2">
+              <Star size={14} className="text-brand-gold" />
+              <span className="text-xs text-slate-500">综合</span>
             </div>
-            <div className="text-2xl font-bold text-white mb-1">{hotelHealthData.overallScore}</div>
-            <div className="flex items-center gap-1 text-xs text-brand-blue">
-              <span>区域 #{hotelHealthData.overallRank}</span>
-            </div>
+            <div className="text-xl font-bold text-slate-800 mb-1">{hotelHealthData.overallScore}</div>
+            <div className="text-[10px] text-brand-blue">区域 #{hotelHealthData.overallRank}</div>
           </div>
         </div>
 
-        {/* 维度雷达图 */}
-        <Card>
+        <Card padding="sm">
           <CardHeader title="维度评分对比" subtitle="酒店 vs 城市均值 vs 品牌均值" />
-          <div className="h-80">
+          <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart data={dimensionData}>
-                <PolarGrid stroke="#1e1e2e" />
-                <PolarAngleAxis dataKey="dimension" stroke="#71717a" fontSize={12} />
-                <PolarRadiusAxis domain={[3.5, 5]} stroke="#1e1e2e" fontSize={10} />
-                <Radar name="酒店" dataKey="酒店" stroke="#0066FF" fill="#0066FF" fillOpacity={0.3} />
-                <Radar
-                  name="城市均值"
-                  dataKey="城市均值"
-                  stroke="#8b5cf6"
-                  fill="#8b5cf6"
-                  fillOpacity={0.1}
-                />
-                <Radar
-                  name="品牌均值"
-                  dataKey="品牌均值"
-                  stroke="#f59e0b"
-                  fill="#f59e0b"
-                  fillOpacity={0.1}
-                />
-                <Legend />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#12121a',
-                    border: '1px solid #1e1e2e',
-                    borderRadius: '8px',
-                  }}
-                />
+                <PolarGrid stroke="#e2e8f0" />
+                <PolarAngleAxis dataKey="dimension" stroke="#64748b" fontSize={10} />
+                <PolarRadiusAxis domain={[3.5, 5]} stroke="#e2e8f0" fontSize={9} />
+                <Radar name="酒店" dataKey="酒店" stroke="#0066FF" fill="#0066FF" fillOpacity={0.2} />
+                <Radar name="城市均值" dataKey="城市均值" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.1} />
+                <Radar name="品牌均值" dataKey="品牌均值" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.1} />
+                <Legend wrapperStyle={{ fontSize: '11px' }} />
+                <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '11px' }} />
               </RadarChart>
             </ResponsiveContainer>
           </div>
@@ -117,40 +94,30 @@ export function HotelView() {
       </section>
 
       {/* 驱动因素 + 障碍因素 */}
-      <section className="grid grid-cols-2 gap-6 mb-8">
-        {/* 驱动因素 */}
-        <Card className="animate-fade-in-delay-1">
+      <section className="grid grid-cols-2 gap-4 mb-5">
+        <Card padding="sm" className="animate-fade-in-delay-1">
           <CardHeader title="驱动因素" subtitle="正向影响评分的因素" />
-          <div className="space-y-4">
+          <div className="space-y-3">
             {hotelDriversData.map((item) => (
-              <div key={item.dimension} className="p-3 rounded-lg bg-dark-bg/50">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-zinc-200">{item.dimension}</span>
-                    {item.trend === 'up' && <TrendingUp size={14} className="text-emerald-400" />}
-                    {item.trend === 'down' && <TrendingDown size={14} className="text-red-400" />}
-                    {item.trend === 'stable' && <Minus size={14} className="text-zinc-500" />}
+              <div key={item.dimension} className="p-2 rounded-lg bg-slate-50">
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-medium text-slate-700">{item.dimension}</span>
+                    {item.trend === 'up' && <TrendingUp size={12} className="text-emerald-500" />}
+                    {item.trend === 'down' && <TrendingDown size={12} className="text-red-500" />}
+                    {item.trend === 'stable' && <Minus size={12} className="text-slate-400" />}
                   </div>
-                  <div className="flex items-center gap-3 text-xs">
-                    <span className="text-zinc-400">贡献 {item.contribution}%</span>
-                    <span
-                      className={clsx(
-                        item.vsCity.startsWith('+') ? 'text-emerald-400' : 'text-red-400'
-                      )}
-                    >
+                  <div className="flex items-center gap-2 text-[10px]">
+                    <span className="text-slate-400">贡献 {item.contribution}%</span>
+                    <span className={clsx(item.vsCity.startsWith('+') ? 'text-emerald-500' : 'text-red-500')}>
                       vs城市 {item.vsCity}
                     </span>
                   </div>
                 </div>
                 <ProgressBar value={item.contribution} max={30} color="blue" size="sm" />
-                <div className="flex flex-wrap gap-1.5 mt-2">
-                  {item.keywords.map((kw) => (
-                    <span
-                      key={kw}
-                      className="px-2 py-0.5 text-xs bg-brand-blue/10 text-brand-blue rounded"
-                    >
-                      {kw}
-                    </span>
+                <div className="flex flex-wrap gap-1 mt-1.5">
+                  {item.keywords.slice(0, 2).map((kw) => (
+                    <span key={kw} className="px-1.5 py-0.5 text-[10px] bg-blue-50 text-brand-blue rounded">{kw}</span>
                   ))}
                 </div>
               </div>
@@ -158,100 +125,52 @@ export function HotelView() {
           </div>
         </Card>
 
-        {/* 障碍因素 - 链路视图 */}
-        <Card className="animate-fade-in-delay-1">
+        <Card padding="sm" className="animate-fade-in-delay-1">
           <CardHeader title="障碍因素 · 链路视图" subtitle="体验全链路风险分析" />
-
-          {/* 链路流程 */}
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-4">
             {hotelBarriersData.journeyRisks.map((stage, idx) => (
               <div key={stage.stage} className="flex items-center">
                 <div
                   className={clsx(
-                    'flex flex-col items-center gap-2 p-3 rounded-lg border',
-                    stage.risk === 'high'
-                      ? 'bg-red-500/10 border-red-500/30'
-                      : stage.risk === 'medium'
-                      ? 'bg-amber-500/10 border-amber-500/30'
-                      : 'bg-dark-bg/50 border-dark-border'
+                    'flex flex-col items-center gap-1 p-2 rounded-lg border',
+                    stage.risk === 'high' ? 'bg-red-50 border-red-200' : stage.risk === 'medium' ? 'bg-amber-50 border-amber-200' : 'bg-slate-50 border-slate-200'
                   )}
                 >
-                  <span className="text-xl">{stage.icon}</span>
-                  <span className="text-xs text-zinc-400">{stage.stage}</span>
-                  <Badge
-                    variant={
-                      stage.risk === 'high'
-                        ? 'danger'
-                        : stage.risk === 'medium'
-                        ? 'warning'
-                        : 'success'
-                    }
-                    size="sm"
-                  >
+                  <span className="text-base">{stage.icon}</span>
+                  <span className="text-[10px] text-slate-500">{stage.stage}</span>
+                  <Badge variant={stage.risk === 'high' ? 'danger' : stage.risk === 'medium' ? 'warning' : 'success'} size="sm">
                     {stage.count}
                   </Badge>
                 </div>
-                {idx < hotelBarriersData.journeyRisks.length - 1 && (
-                  <div className="w-8 h-0.5 bg-dark-border mx-1" />
-                )}
+                {idx < hotelBarriersData.journeyRisks.length - 1 && <div className="w-4 h-0.5 bg-slate-200 mx-0.5" />}
               </div>
             ))}
           </div>
 
-          {/* 问题聚类 */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-3">
             <div>
-              <h4 className="text-xs text-zinc-500 mb-2">房型分布</h4>
-              <div className="h-32">
+              <h4 className="text-[10px] text-slate-400 mb-1.5">房型分布</h4>
+              <div className="h-24">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie
-                      data={hotelBarriersData.clusters.roomType}
-                      dataKey="percentage"
-                      nameKey="type"
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={25}
-                      outerRadius={45}
-                    >
+                    <Pie data={hotelBarriersData.clusters.roomType} dataKey="percentage" nameKey="type" cx="50%" cy="50%" innerRadius={18} outerRadius={35}>
                       {hotelBarriersData.clusters.roomType.map((_, idx) => (
                         <Cell key={idx} fill={pieColors[idx % pieColors.length]} />
                       ))}
                     </Pie>
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: '#12121a',
-                        border: '1px solid #1e1e2e',
-                        borderRadius: '8px',
-                        fontSize: '12px',
-                      }}
-                    />
+                    <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '6px', fontSize: '10px' }} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-              <div className="space-y-1">
-                {hotelBarriersData.clusters.roomType.map((item, idx) => (
-                  <div key={item.type} className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-1.5">
-                      <span
-                        className="w-2 h-2 rounded-full"
-                        style={{ backgroundColor: pieColors[idx] }}
-                      />
-                      <span className="text-zinc-400">{item.type}</span>
-                    </div>
-                    <span className="text-zinc-300">{item.percentage}%</span>
-                  </div>
-                ))}
-              </div>
             </div>
             <div>
-              <h4 className="text-xs text-zinc-500 mb-2">楼层分布</h4>
-              <div className="space-y-2 mt-4">
+              <h4 className="text-[10px] text-slate-400 mb-1.5">楼层分布</h4>
+              <div className="space-y-1.5 mt-2">
                 {hotelBarriersData.clusters.floor.map((item) => (
                   <div key={item.type}>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-zinc-400">{item.type}</span>
-                      <span className="text-zinc-300">{item.percentage}%</span>
+                    <div className="flex justify-between text-[10px] mb-0.5">
+                      <span className="text-slate-500">{item.type}</span>
+                      <span className="text-slate-600">{item.percentage}%</span>
                     </div>
                     <ProgressBar value={item.percentage} color="red" size="sm" />
                   </div>
@@ -259,13 +178,13 @@ export function HotelView() {
               </div>
             </div>
             <div>
-              <h4 className="text-xs text-zinc-500 mb-2">时段分布</h4>
-              <div className="space-y-2 mt-4">
+              <h4 className="text-[10px] text-slate-400 mb-1.5">时段分布</h4>
+              <div className="space-y-1.5 mt-2">
                 {hotelBarriersData.clusters.timing.map((item) => (
                   <div key={item.type}>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-zinc-400">{item.type}</span>
-                      <span className="text-zinc-300">{item.percentage}%</span>
+                    <div className="flex justify-between text-[10px] mb-0.5">
+                      <span className="text-slate-500">{item.type}</span>
+                      <span className="text-slate-600">{item.percentage}%</span>
                     </div>
                     <ProgressBar value={item.percentage} color="yellow" size="sm" />
                   </div>
@@ -277,37 +196,23 @@ export function HotelView() {
       </section>
 
       {/* 用户需求 */}
-      <section className="mb-8 animate-fade-in-delay-2">
-        <Card>
+      <section className="mb-5 animate-fade-in-delay-2">
+        <Card padding="sm">
           <CardHeader title="用户需求洞察" subtitle="基于评论的需求识别" />
-          <div className="grid grid-cols-6 gap-4">
+          <div className="grid grid-cols-6 gap-3">
             {userNeedsData.map((need) => (
-              <div
-                key={need.category}
-                className="p-4 rounded-lg bg-dark-bg/50 border border-dark-border hover:border-brand-blue/30 transition-all"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-2xl">{need.icon}</span>
-                  <span
-                    className={clsx(
-                      'text-sm',
-                      need.trend === '↑'
-                        ? 'text-emerald-400'
-                        : need.trend === '↓'
-                        ? 'text-red-400'
-                        : 'text-zinc-500'
-                    )}
-                  >
+              <div key={need.category} className="p-3 rounded-lg bg-slate-50 border border-slate-100 hover:border-brand-blue/30 transition-all">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-lg">{need.icon}</span>
+                  <span className={clsx('text-xs', need.trend === '↑' ? 'text-emerald-500' : need.trend === '↓' ? 'text-red-500' : 'text-slate-400')}>
                     {need.trend}
                   </span>
                 </div>
-                <h4 className="text-sm font-medium text-zinc-200 mb-2">{need.category}</h4>
+                <h4 className="text-xs font-medium text-slate-700 mb-1.5">{need.category}</h4>
                 <ProgressBar value={need.intensity} color="gradient" size="sm" />
-                <div className="mt-3 space-y-1">
+                <div className="mt-2 space-y-0.5">
                   {need.items.slice(0, 2).map((item) => (
-                    <div key={item} className="text-xs text-zinc-500 truncate">
-                      • {item}
-                    </div>
+                    <div key={item} className="text-[10px] text-slate-500 truncate">• {item}</div>
                   ))}
                 </div>
               </div>
@@ -318,106 +223,57 @@ export function HotelView() {
 
       {/* 新店评估 */}
       <section className="animate-fade-in-delay-3">
-        <Card>
+        <Card padding="sm">
           <CardHeader
             title="新店开业评估"
             subtitle={`${newOpeningData.hotelName} · 开业 ${newOpeningData.daysOpen} 天`}
-            action={
-              <Badge variant="info">
-                <Clock size={12} className="mr-1" />
-                0-90天追踪
-              </Badge>
-            }
+            action={<Badge variant="info"><Clock size={10} className="mr-1" />0-90天追踪</Badge>}
           />
-          <div className="grid grid-cols-3 gap-6">
-            {/* 稳定性曲线 */}
+          <div className="grid grid-cols-3 gap-4">
             <div className="col-span-2">
-              <h4 className="text-sm text-zinc-400 mb-3">稳定性评分曲线</h4>
-              <div className="h-64">
+              <h4 className="text-xs text-slate-500 mb-2">稳定性评分曲线</h4>
+              <div className="h-48">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={newOpeningData.trajectory}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1e1e2e" />
-                    <XAxis
-                      dataKey="day"
-                      stroke="#71717a"
-                      fontSize={12}
-                      tickFormatter={(v) => `D${v}`}
-                    />
-                    <YAxis domain={[60, 80]} stroke="#71717a" fontSize={12} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: '#12121a',
-                        border: '1px solid #1e1e2e',
-                        borderRadius: '8px',
-                      }}
-                      labelFormatter={(v) => `第 ${v} 天`}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="score"
-                      stroke="#0066FF"
-                      strokeWidth={2}
-                      dot={{ fill: '#0066FF', r: 4 }}
-                    />
-                    {/* 30/60/90 标记线 */}
-                    {[30, 60, 90].map((day) => (
-                      <line
-                        key={day}
-                        x1={day}
-                        y1={60}
-                        x2={day}
-                        y2={80}
-                        stroke="#FFB800"
-                        strokeDasharray="3 3"
-                      />
-                    ))}
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                    <XAxis dataKey="day" stroke="#94a3b8" fontSize={10} tickFormatter={(v) => `D${v}`} />
+                    <YAxis domain={[60, 80]} stroke="#94a3b8" fontSize={10} />
+                    <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '11px' }} labelFormatter={(v) => `第 ${v} 天`} />
+                    <Line type="monotone" dataKey="score" stroke="#0066FF" strokeWidth={2} dot={{ fill: '#0066FF', r: 3 }} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
             </div>
 
-            {/* 亮点与痛点 */}
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div>
-                <h4 className="text-sm text-zinc-400 mb-2 flex items-center gap-1.5">
-                  <TrendingUp size={14} className="text-emerald-400" />
-                  新店亮点
+                <h4 className="text-xs text-slate-500 mb-1.5 flex items-center gap-1">
+                  <TrendingUp size={12} className="text-emerald-500" />新店亮点
                 </h4>
-                <div className="space-y-2">
+                <div className="space-y-1">
                   {newOpeningData.highlights.map((item) => (
-                    <div
-                      key={item}
-                      className="px-3 py-2 text-sm bg-emerald-500/10 text-emerald-400 rounded-lg"
-                    >
-                      {item}
-                    </div>
+                    <div key={item} className="px-2 py-1 text-xs bg-emerald-50 text-emerald-600 rounded">{item}</div>
                   ))}
                 </div>
               </div>
               <div>
-                <h4 className="text-sm text-zinc-400 mb-2 flex items-center gap-1.5">
-                  <AlertCircle size={14} className="text-red-400" />
-                  新店痛点
+                <h4 className="text-xs text-slate-500 mb-1.5 flex items-center gap-1">
+                  <AlertCircle size={12} className="text-red-500" />新店痛点
                 </h4>
-                <div className="space-y-2">
+                <div className="space-y-1">
                   {newOpeningData.painPoints.map((item) => (
-                    <div
-                      key={item}
-                      className="px-3 py-2 text-sm bg-red-500/10 text-red-400 rounded-lg"
-                    >
-                      {item}
-                    </div>
+                    <div key={item} className="px-2 py-1 text-xs bg-red-50 text-red-600 rounded">{item}</div>
                   ))}
                 </div>
               </div>
-              <div className="pt-2 border-t border-dark-border">
-                <div className="flex justify-between text-sm">
-                  <span className="text-zinc-500">vs 老店均值</span>
-                  <span className="text-red-400">{newOpeningData.vsOldHotels}</span>
+              <div className="pt-2 border-t border-slate-100 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-slate-400">vs 老店均值</span>
+                  <span className="text-red-500">{newOpeningData.vsOldHotels}</span>
                 </div>
-                <div className="flex justify-between text-sm mt-1">
-                  <span className="text-zinc-500">vs 区域均值</span>
-                  <span className="text-emerald-400">+{newOpeningData.vsRegionAvg}</span>
+                <div className="flex justify-between mt-1">
+                  <span className="text-slate-400">vs 区域均值</span>
+                  <span className="text-emerald-500">+{newOpeningData.vsRegionAvg}</span>
                 </div>
               </div>
             </div>
@@ -427,4 +283,3 @@ export function HotelView() {
     </Layout>
   );
 }
-

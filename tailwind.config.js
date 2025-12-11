@@ -9,13 +9,13 @@ export default {
       colors: {
         brand: {
           blue: '#0066FF',
-          gold: '#FFB800',
+          gold: '#D4AF37',
         },
         dark: {
-          bg: '#0a0a0f',
-          card: '#12121a',
-          border: '#1e1e2e',
-          hover: '#1a1a25',
+          bg: '#f8fafc',
+          card: '#ffffff',
+          border: '#e2e8f0',
+          hover: '#f1f5f9',
         }
       },
       fontFamily: {
@@ -25,4 +25,3 @@ export default {
   },
   plugins: [],
 }
-
