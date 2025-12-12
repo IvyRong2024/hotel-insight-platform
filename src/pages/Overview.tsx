@@ -1,6 +1,6 @@
 import { Layout } from '../components/Layout';
 import { Card, Badge } from '../components/ui';
-import { brandHealthData, hotelHealthData, actionsData, priceData, insightsData, brandConfig } from '../data/mockData';
+import { brandHealthData, actionsData, priceData, insightsData, brandConfig } from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Building2, Hotel, DollarSign, Zap, TrendingUp, TrendingDown, AlertTriangle, ArrowRight, Star } from 'lucide-react';
