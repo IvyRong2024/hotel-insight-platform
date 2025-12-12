@@ -92,7 +92,7 @@ export function FilterBar({
             <select
               value={role}
               onChange={(e) => setRole(e.target.value)}
-              className="appearance-none bg-slate-50 border border-slate-200 rounded-lg pl-7 pr-7 py-1 text-xs text-slate-600 focus:outline-none focus:border-brand-blue cursor-pointer"
+              className="appearance-none bg-slate-50 border border-slate-200 rounded-lg pl-7 pr-7 py-1 text-xs text-slate-600 focus:outline-none focus:border-ihg-navy cursor-pointer"
             >
               {filterOptions.roles.map((r) => (
                 <option key={r.id} value={r.id}>
@@ -122,7 +122,7 @@ function SelectField({ value, onChange, options, className }: SelectFieldProps) 
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full appearance-none bg-slate-50 border border-slate-200 rounded-lg px-2.5 pr-7 py-1 text-xs text-slate-600 focus:outline-none focus:border-brand-blue cursor-pointer"
+        className="w-full appearance-none bg-slate-50 border border-slate-200 rounded-lg px-2.5 pr-7 py-1 text-xs text-slate-600 focus:outline-none focus:border-ihg-navy cursor-pointer"
       >
         {options.map((opt) => (
           <option key={opt} value={opt}>

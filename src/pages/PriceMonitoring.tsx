@@ -15,7 +15,7 @@ import {
   AreaChart,
   Area,
 } from 'recharts';
-import { TrendingUp, TrendingDown, AlertTriangle, Calendar, Zap, Target, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { AlertTriangle, Calendar, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import clsx from 'clsx';
 
 export function PriceMonitoring() {

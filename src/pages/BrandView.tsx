@@ -20,7 +20,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
-import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, ArrowRight, Target, Users, Star } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, Star } from 'lucide-react';
 import clsx from 'clsx';
 
 export function BrandView() {
