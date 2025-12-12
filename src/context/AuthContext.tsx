@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
 
-export type UserRole = 'brand_ops' | 'region_vp' | 'city_mgr' | 'hotel_mgr' | 'revenue_mgr' | 'new_hotel';
+export type UserRole = 'brand_ops' | 'region_vp' | 'city_mgr' | 'hotel_mgr' | 'revenue_mgr';
 
 interface RoleConfig {
   id: UserRole;
@@ -27,7 +27,7 @@ export const roleConfigs: RoleConfig[] = [
     id: 'region_vp', 
     name: '大区负责人', 
     level: '华东区',
-    description: '为大区负责人提供区域级经营诊断',
+    description: '为大区负责人提供区域级经营诊断，含新店监控',
     region: '华东',
     accessModules: ['overview', 'hotel', 'actions'],
     northStarMetrics: ['regionScore', 'regionRank', 'hotelCount', 'actionPending']
@@ -36,7 +36,7 @@ export const roleConfigs: RoleConfig[] = [
     id: 'city_mgr', 
     name: '城市负责人', 
     level: '上海市',
-    description: '为城市负责人提供城市级经营诊断',
+    description: '为城市负责人提供城市级经营诊断，含新店监控',
     region: '华东',
     city: '上海',
     accessModules: ['overview', 'hotel', 'actions'],
@@ -60,17 +60,6 @@ export const roleConfigs: RoleConfig[] = [
     description: '为定价团队提供价格策略与竞对洞察',
     accessModules: ['overview', 'price'],
     northStarMetrics: ['avgPrice', 'priceGap', 'promoRate', 'valueIndex']
-  },
-  { 
-    id: 'new_hotel', 
-    name: '新店运营', 
-    level: '杭州西湖假日酒店（开业45天）',
-    description: '为新店提供快速稳定化与风险预警能力',
-    region: '华东',
-    city: '杭州',
-    hotel: '杭州西湖假日酒店',
-    accessModules: ['overview', 'hotel'],
-    northStarMetrics: ['stabilityScore', 'openDays', 'riskCount', 'vsOldHotels']
   },
 ];
 

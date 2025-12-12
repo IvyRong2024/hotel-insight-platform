@@ -1,6 +1,6 @@
 import { Layout } from '../components/Layout';
 import { Card, Badge, ProgressBar } from '../components/ui';
-import { brandHealthData, actionsData, priceData, hotelHealthData, newOpeningData, competitorData, promiseFulfillmentData, hotelBarriersData } from '../data/mockData';
+import { brandHealthData, actionsData, priceData, hotelHealthData, competitorData, promiseFulfillmentData, hotelBarriersData } from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
 import { TrendingUp, TrendingDown, AlertTriangle, Star, MapPin, Clock, CheckCircle, ArrowRight, AlertCircle, Zap } from 'lucide-react';
 import clsx from 'clsx';
@@ -18,7 +18,6 @@ export function Overview() {
       {currentRole.id === 'city_mgr' && <CityMgrView />}
       {currentRole.id === 'hotel_mgr' && <HotelMgrView />}
       {currentRole.id === 'revenue_mgr' && <RevenueMgrView />}
-      {currentRole.id === 'new_hotel' && <NewHotelView />}
     </Layout>
   );
 }
@@ -623,119 +622,3 @@ function RevenueMgrView() {
   );
 }
 
-// ========== 新店运营视角 ==========
-// 核心问题：开业进度正常吗？有什么风险？
-function NewHotelView() {
-  const milestones = [
-    { day: 30, target: 65, label: '30天', achieved: true },
-    { day: 60, target: 75, label: '60天', achieved: false, current: true },
-    { day: 90, target: 85, label: '90天', achieved: false },
-  ];
-
-  return (
-    <div className="space-y-6">
-      {/* 新店状态 */}
-      <section className="animate-fade-in-up">
-        <div className="bg-gradient-to-r from-ihg-navy to-ihg-navy-light rounded-2xl p-6 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-white/60 text-sm mb-1">{newOpeningData.hotelName}</p>
-              <div className="flex items-end gap-3">
-                <span className="text-5xl font-bold">{newOpeningData.stabilityScore}</span>
-                <span className="text-white/50 text-xl mb-1">/ 100</span>
-              </div>
-              <p className="text-white/60 mt-2">开业第 {newOpeningData.daysOpen} 天</p>
-            </div>
-            <div className="flex gap-4">
-              {milestones.map((m) => (
-                <div key={m.day} className={clsx(
-                  'px-4 py-3 rounded-xl text-center',
-                  m.achieved ? 'bg-emerald-500/20' : m.current ? 'bg-amber-500/20' : 'bg-white/10'
-                )}>
-                  <p className="text-white/60 text-xs mb-1">{m.label}目标</p>
-                  <p className="text-xl font-bold">{m.target}</p>
-                  {m.achieved && <CheckCircle size={14} className="mx-auto mt-1 text-emerald-400" />}
-                  {m.current && <Clock size={14} className="mx-auto mt-1 text-amber-400" />}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 开业风险预警 */}
-      <section className="animate-fade-in-up delay-100">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-base font-semibold text-slate-800">🚨 开业期风险预警</h3>
-          <Badge variant="danger">3 项需立即处理</Badge>
-        </div>
-        <div className="grid grid-cols-3 gap-4">
-          {newOpeningData.painPoints.map((point, idx) => (
-            <Card key={idx} className="border-l-4 border-l-red-500" padding="sm">
-              <div className="flex items-start gap-3">
-                <AlertTriangle size={18} className="text-red-500 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium text-slate-800">{point}</p>
-                  <button className="text-xs text-ihg-navy hover:underline mt-2 flex items-center gap-1">
-                    立即处理 <ArrowRight size={12} />
-                  </button>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      {/* 新店亮点 */}
-      <section className="animate-fade-in-up delay-200">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-base font-semibold text-slate-800">✨ 新店亮点</h3>
-          <span className="text-sm text-slate-500">可推广到其他新店</span>
-        </div>
-        <div className="grid grid-cols-3 gap-4">
-          {newOpeningData.highlights.map((point, idx) => (
-            <Card key={idx} className="border-l-4 border-l-emerald-500 bg-emerald-50/30" padding="sm">
-              <div className="flex items-start gap-3">
-                <Star size={18} className="text-emerald-500 flex-shrink-0 mt-0.5" />
-                <p className="font-medium text-slate-800">{point}</p>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      {/* 对比老店 */}
-      <section className="animate-fade-in-up delay-300">
-        <Card>
-          <h4 className="font-semibold text-slate-800 mb-4">📊 与成熟门店对比</h4>
-          <div className="grid grid-cols-2 gap-6">
-            <div className="p-4 bg-slate-50 rounded-xl">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-slate-600">vs 区域成熟店均值</span>
-                <span className={clsx(
-                  'text-lg font-bold',
-                  newOpeningData.vsRegionAvg > 0 ? 'text-emerald-600' : 'text-red-600'
-                )}>
-                  {newOpeningData.vsRegionAvg > 0 ? '+' : ''}{newOpeningData.vsRegionAvg}
-                </span>
-              </div>
-              <ProgressBar value={50 + newOpeningData.vsRegionAvg * 100} color="green" size="sm" />
-            </div>
-            <div className="p-4 bg-slate-50 rounded-xl">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-slate-600">vs 品牌成熟店均值</span>
-                <span className={clsx(
-                  'text-lg font-bold',
-                  newOpeningData.vsOldHotels > 0 ? 'text-emerald-600' : 'text-red-600'
-                )}>
-                  {newOpeningData.vsOldHotels}
-                </span>
-              </div>
-              <ProgressBar value={50 + newOpeningData.vsOldHotels * 100} color="red" size="sm" />
-            </div>
-          </div>
-        </Card>
-      </section>
-    </div>
-  );
-}
