@@ -3,30 +3,30 @@ import clsx from 'clsx';
 interface ProgressBarProps {
   value: number;
   max?: number;
-  color?: 'blue' | 'green' | 'yellow' | 'red' | 'gradient';
+  color?: 'blue' | 'green' | 'yellow' | 'red' | 'navy';
   size?: 'sm' | 'md' | 'lg';
   showLabel?: boolean;
   label?: string;
 }
 
 const colorClasses = {
-  blue: 'bg-brand-blue',
+  blue: 'bg-blue-500',
   green: 'bg-emerald-500',
   yellow: 'bg-amber-500',
   red: 'bg-red-500',
-  gradient: 'bg-gradient-to-r from-brand-blue to-brand-gold',
+  navy: 'bg-ihg-navy',
 };
 
 const sizeClasses = {
-  sm: 'h-1',
-  md: 'h-1.5',
-  lg: 'h-2',
+  sm: 'h-1.5',
+  md: 'h-2',
+  lg: 'h-3',
 };
 
 export function ProgressBar({
   value,
   max = 100,
-  color = 'blue',
+  color = 'navy',
   size = 'md',
   showLabel = false,
   label,
@@ -36,9 +36,9 @@ export function ProgressBar({
   return (
     <div className="w-full">
       {(showLabel || label) && (
-        <div className="flex justify-between items-center mb-1">
-          {label && <span className="text-xs text-slate-500">{label}</span>}
-          {showLabel && <span className="text-xs text-slate-400">{percentage.toFixed(0)}%</span>}
+        <div className="flex justify-between items-center mb-1.5">
+          {label && <span className="text-sm text-slate-500">{label}</span>}
+          {showLabel && <span className="text-sm text-slate-400">{percentage.toFixed(0)}%</span>}
         </div>
       )}
       <div className={clsx('w-full bg-slate-100 rounded-full overflow-hidden', sizeClasses[size])}>

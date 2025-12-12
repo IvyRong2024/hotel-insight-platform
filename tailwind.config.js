@@ -7,16 +7,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        brand: {
-          blue: '#0066FF',
-          gold: '#D4AF37',
+        ihg: {
+          navy: '#003B6F',
+          'navy-light': '#0a4a7f',
+          gold: '#C9A227',
+          'gold-light': '#D4B44A',
         },
-        dark: {
-          bg: '#f8fafc',
-          card: '#ffffff',
-          border: '#e2e8f0',
-          hover: '#f1f5f9',
-        }
       },
       fontFamily: {
         sans: ['DM Sans', 'system-ui', 'sans-serif'],
