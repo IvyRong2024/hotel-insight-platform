@@ -84,7 +84,7 @@ export const brandBarriersData = [
 // ==================== 竞对对比 (IHG vs 竞品) ====================
 export const competitorData = {
   brands: ['IHG洲际', '万豪国际', '希尔顿', '雅高集团'],
-  colors: ['#0066FF', '#8b5cf6', '#f59e0b', '#6b7280'],
+  colors: ['#003B6F', '#8b5cf6', '#f59e0b', '#6b7280'],
   metrics: {
     综合评分: [4.52, 4.48, 4.55, 4.41],
     服务评分: [4.65, 4.52, 4.58, 4.45],
@@ -250,7 +250,7 @@ export const actionsData = [
     priority: 'high',
     category: '服务培训',
     title: '前台入住效率提升培训',
-    hotel: '北京金融街洲际酒店',
+    hotel: '上海外滩英迪格酒店',
     source: '入住体验风险',
     impact: '预计缩短等待时间50%',
     deadline: '2024-12-15',
@@ -262,7 +262,7 @@ export const actionsData = [
     priority: 'medium',
     category: '早餐优化',
     title: '热食补餐流程优化',
-    hotel: '广州天河皇冠假日酒店',
+    hotel: '上海外滩英迪格酒店',
     source: '早餐服务风险',
     impact: '预计减少投诉30%',
     deadline: '2024-12-25',
@@ -274,7 +274,7 @@ export const actionsData = [
     priority: 'low',
     category: '运营流程',
     title: '停车场引导标识更新',
-    hotel: '深圳华强北智选假日酒店',
+    hotel: '上海外滩英迪格酒店',
     source: '用户需求识别',
     impact: '提升到店体验',
     deadline: '2025-01-10',
@@ -303,6 +303,60 @@ export const priceData = {
     { brand: '万豪国际', value_index: 1.05, label: '匹配' },
     { brand: '希尔顿', value_index: 0.92, label: '溢价' },
     { brand: '雅高集团', value_index: 1.18, label: '高性价比' },
+  ],
+  // 房型产品 - 只关注基础房型
+  roomProducts: {
+    hotel: '上海外滩英迪格酒店',
+    roomType: '高级大床房',
+    platforms: [
+      { name: '直客通', price: 658, discounted: 628, benefit: '优悦会积分' },
+      { name: '携程', price: 698, discounted: 668, benefit: '双早' },
+      { name: '抖音', price: 618, discounted: 568, benefit: '无' },
+    ],
+  },
+  // 券类产品 - 包含服务明细
+  voucherProducts: [
+    {
+      platform: '抖音',
+      name: '周末双人度假套餐',
+      originalPrice: 1288,
+      salePrice: 888,
+      validity: '2025-03-31',
+      salesVolume: 2341,
+      includes: [
+        { item: '高级大床房1晚', value: 658 },
+        { item: '双人自助早餐', value: 196 },
+        { item: '双人下午茶', value: 168 },
+        { item: '延迟退房至14:00', value: '赠送' },
+      ],
+    },
+    {
+      platform: '携程',
+      name: '亲子欢乐住套餐',
+      originalPrice: 1588,
+      salePrice: 1088,
+      validity: '2025-02-28',
+      salesVolume: 856,
+      includes: [
+        { item: '家庭房1晚', value: 858 },
+        { item: '三人自助早餐', value: 294 },
+        { item: '儿童欢迎礼包', value: 128 },
+        { item: '儿童乐园门票2张', value: 200 },
+      ],
+    },
+    {
+      platform: '直客通',
+      name: '商务尊享住宿券',
+      originalPrice: 798,
+      salePrice: 598,
+      validity: '2025-06-30',
+      salesVolume: 1256,
+      includes: [
+        { item: '高级大床房1晚', value: 658 },
+        { item: '单人自助早餐', value: 98 },
+        { item: '行政酒廊使用', value: '赠送' },
+      ],
+    },
   ],
   platformPrices: {
     hotel: '上海外滩英迪格酒店',
@@ -366,10 +420,11 @@ export const filterOptions = {
   timeRanges: ['近7天', '近30天', '近90天', '自定义'],
   roles: [
     { id: 'brand_ops', name: '品牌运营', level: '全国' },
-    { id: 'region_vp', name: '区域VP', level: '区域' },
-    { id: 'province_mgr', name: '省级经理', level: '省' },
-    { id: 'city_mgr', name: '城市经理', level: '城市' },
+    { id: 'region_vp', name: '大区负责人', level: '区域' },
+    { id: 'city_mgr', name: '城市负责人', level: '城市' },
     { id: 'hotel_mgr', name: '酒店店长', level: '单店' },
+    { id: 'revenue_mgr', name: '定价团队', level: '全国' },
+    { id: 'new_hotel', name: '新店运营', level: '单店' },
   ],
 };
 
