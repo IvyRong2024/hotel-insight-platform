@@ -20,17 +20,58 @@ export const platformConfig = {
   },
 };
 
+// ==================== 品牌类型配置 ====================
+export type BrandTier = 'luxury_lifestyle' | 'premium' | 'essentials' | 'suites';
+
+export const brandTiers: Record<BrandTier, {
+  name: string;
+  nameEn: string;
+  color: string;
+  focusAreas: string[];
+}> = {
+  luxury_lifestyle: {
+    name: 'Luxury & Lifestyle',
+    nameEn: '奢华及生活方式',
+    color: '#7c3aed', // purple
+    focusAreas: ['设计美学', '服务温度', '邻里文化', '高端体验'],
+  },
+  premium: {
+    name: 'Premium',
+    nameEn: '高端',
+    color: '#0ea5e9', // sky blue
+    focusAreas: ['商务效率', '会议设施', '餐饮品质', '地段便利'],
+  },
+  essentials: {
+    name: 'Essentials',
+    nameEn: '精选服务',
+    color: '#22c55e', // green
+    focusAreas: ['入住效率', '性价比', '基础服务稳定性', '隔音'],
+  },
+  suites: {
+    name: 'Suites',
+    nameEn: '长住',
+    color: '#f59e0b', // amber
+    focusAreas: ['长住体验', '厨房设施', '社区感', '空间舒适'],
+  },
+};
+
 // ==================== 品牌配置 (IHG 为主品牌) ====================
 export const brandConfig = {
   main: {
     group: 'IHG洲际酒店集团',
     brands: [
-      { name: '洲际酒店', tier: '高端', code: 'IC' },
-      { name: '华邑酒店', tier: '高端', code: 'HUALUXE' },
-      { name: '皇冠假日', tier: '中高端', code: 'CP' },
-      { name: '假日酒店', tier: '中端', code: 'HI' },
-      { name: '智选假日', tier: '经济型', code: 'HIX' },
-      { name: '英迪格', tier: '精品', code: 'INDIGO' },
+      { name: '洲际酒店', code: 'IC', tier: 'luxury_lifestyle' as BrandTier },
+      { name: '丽晶', code: 'REGENT', tier: 'luxury_lifestyle' as BrandTier },
+      { name: '六善', code: 'SIXSENSES', tier: 'luxury_lifestyle' as BrandTier },
+      { name: '金普顿', code: 'KIMPTON', tier: 'luxury_lifestyle' as BrandTier },
+      { name: '英迪格', code: 'INDIGO', tier: 'luxury_lifestyle' as BrandTier },
+      { name: '皇冠假日', code: 'CP', tier: 'premium' as BrandTier },
+      { name: 'voco', code: 'VOCO', tier: 'premium' as BrandTier },
+      { name: 'EVEN Hotels', code: 'EVEN', tier: 'premium' as BrandTier },
+      { name: '假日酒店', code: 'HI', tier: 'essentials' as BrandTier },
+      { name: '智选假日', code: 'HIX', tier: 'essentials' as BrandTier },
+      { name: '馨乐庭', code: 'STAYBRIDGE', tier: 'suites' as BrandTier },
+      { name: 'Atwell Suites', code: 'ATWELL', tier: 'suites' as BrandTier },
     ],
   },
   competitors: [
@@ -41,17 +82,236 @@ export const brandConfig = {
   ],
 };
 
+// ==================== 层级数据结构 ====================
+export interface HotelData {
+  id: string;
+  name: string;
+  brand: string;
+  tier: BrandTier;
+  score: number;
+  trend: string;
+  status: 'good' | 'warning' | 'danger';
+  isNew?: boolean;
+  daysOpen?: number;
+  issues?: string[];
+}
+
+export interface CityData {
+  name: string;
+  score: number;
+  trend: string;
+  hotelCount: number;
+  issueCount: number;
+  tierScores: Record<BrandTier, { score: number; count: number; trend: string }>;
+  hotels: HotelData[];
+}
+
+export interface ProvinceData {
+  name: string;
+  score: number;
+  trend: string;
+  hotelCount: number;
+  issueCount: number;
+  cities: CityData[];
+}
+
+export interface RegionData {
+  name: string;
+  score: number;
+  trend: string;
+  rank: number;
+  hotelCount: number;
+  issueCount: number;
+  tierScores: Record<BrandTier, { score: number; count: number; trend: string }>;
+  provinces: ProvinceData[];
+}
+
+// ==================== 区域层级数据 ====================
+export const regionHierarchy: RegionData[] = [
+  {
+    name: '华东区',
+    score: 4.48,
+    trend: '+0.03',
+    rank: 2,
+    hotelCount: 156,
+    issueCount: 12,
+    tierScores: {
+      luxury_lifestyle: { score: 4.62, count: 18, trend: '+0.05' },
+      premium: { score: 4.52, count: 35, trend: '+0.02' },
+      essentials: { score: 4.22, count: 85, trend: '-0.08' },
+      suites: { score: 4.45, count: 18, trend: '+0.01' },
+    },
+    provinces: [
+      {
+        name: '上海',
+        score: 4.58,
+        trend: '+0.05',
+        hotelCount: 28,
+        issueCount: 3,
+        cities: [
+          {
+            name: '上海市',
+            score: 4.58,
+            trend: '+0.05',
+            hotelCount: 28,
+            issueCount: 3,
+            tierScores: {
+              luxury_lifestyle: { score: 4.65, count: 5, trend: '+0.06' },
+              premium: { score: 4.52, count: 8, trend: '+0.02' },
+              essentials: { score: 4.28, count: 12, trend: '-0.05' },
+              suites: { score: 4.42, count: 3, trend: '+0.01' },
+            },
+            hotels: [
+              { id: 'h1', name: '上海浦东丽晶酒店', brand: '丽晶', tier: 'luxury_lifestyle', score: 4.72, trend: '+0.05', status: 'good' },
+              { id: 'h2', name: '上海外滩洲际酒店', brand: '洲际酒店', tier: 'luxury_lifestyle', score: 4.68, trend: '+0.03', status: 'good' },
+              { id: 'h3', name: '上海外滩英迪格酒店', brand: '英迪格', tier: 'luxury_lifestyle', score: 4.55, trend: '-0.02', status: 'warning' },
+              { id: 'h4', name: '上海静安金普顿酒店', brand: '金普顿', tier: 'luxury_lifestyle', score: 4.58, trend: '+0.01', status: 'good' },
+              { id: 'h5', name: '上海新天地朗廷酒店', brand: '洲际酒店', tier: 'luxury_lifestyle', score: 4.62, trend: '+0.02', status: 'good' },
+              { id: 'h6', name: '上海虹桥皇冠假日酒店', brand: '皇冠假日', tier: 'premium', score: 4.48, trend: '-0.03', status: 'warning' },
+              { id: 'h7', name: '上海浦东voco酒店', brand: 'voco', tier: 'premium', score: 4.58, trend: '+0.04', status: 'good' },
+              { id: 'h8', name: '上海静安皇冠假日酒店', brand: '皇冠假日', tier: 'premium', score: 4.52, trend: '+0.01', status: 'good' },
+              { id: 'h9', name: '上海浦东假日酒店', brand: '假日酒店', tier: 'essentials', score: 4.28, trend: '-0.08', status: 'danger', issues: ['隔音问题', '入住效率'] },
+              { id: 'h10', name: '上海徐汇智选假日酒店', brand: '智选假日', tier: 'essentials', score: 4.08, trend: '-0.12', status: 'danger', issues: ['隔音严重', '设施老化'] },
+              { id: 'h11', name: '上海陆家嘴智选假日酒店', brand: '智选假日', tier: 'essentials', score: 4.15, trend: '-0.05', status: 'warning', isNew: true, daysOpen: 45 },
+              { id: 'h12', name: '上海古北馨乐庭酒店', brand: '馨乐庭', tier: 'suites', score: 4.42, trend: '+0.01', status: 'good' },
+            ],
+          },
+        ],
+      },
+      {
+        name: '浙江',
+        score: 4.52,
+        trend: '+0.02',
+        hotelCount: 35,
+        issueCount: 4,
+        cities: [
+          {
+            name: '杭州市',
+            score: 4.55,
+            trend: '+0.03',
+            hotelCount: 15,
+            issueCount: 2,
+            tierScores: {
+              luxury_lifestyle: { score: 4.58, count: 3, trend: '+0.04' },
+              premium: { score: 4.48, count: 4, trend: '+0.01' },
+              essentials: { score: 4.32, count: 6, trend: '-0.02' },
+              suites: { score: 4.38, count: 2, trend: '+0.02' },
+            },
+            hotels: [
+              { id: 'h13', name: '杭州西湖洲际酒店', brand: '洲际酒店', tier: 'luxury_lifestyle', score: 4.65, trend: '+0.04', status: 'good' },
+              { id: 'h14', name: '杭州西溪丽晶酒店', brand: '丽晶', tier: 'luxury_lifestyle', score: 4.58, trend: '+0.02', status: 'good', issues: ['服务响应延迟'] },
+              { id: 'h15', name: '杭州滨江皇冠假日酒店', brand: '皇冠假日', tier: 'premium', score: 4.52, trend: '+0.03', status: 'good' },
+              { id: 'h16', name: '杭州西湖假日酒店', brand: '假日酒店', tier: 'essentials', score: 4.42, trend: '-0.03', status: 'warning', isNew: true, daysOpen: 58 },
+            ],
+          },
+          {
+            name: '宁波市',
+            score: 4.48,
+            trend: '+0.01',
+            hotelCount: 8,
+            issueCount: 1,
+            tierScores: {
+              luxury_lifestyle: { score: 0, count: 0, trend: '' },
+              premium: { score: 4.42, count: 3, trend: '+0.01' },
+              essentials: { score: 4.28, count: 4, trend: '-0.02' },
+              suites: { score: 0, count: 0, trend: '' },
+            },
+            hotels: [
+              { id: 'h17', name: '宁波皇冠假日酒店', brand: '皇冠假日', tier: 'premium', score: 4.45, trend: '+0.02', status: 'good' },
+              { id: 'h18', name: '宁波假日酒店', brand: '假日酒店', tier: 'essentials', score: 4.28, trend: '-0.03', status: 'warning' },
+            ],
+          },
+        ],
+      },
+      {
+        name: '江苏',
+        score: 4.45,
+        trend: '-0.08',
+        hotelCount: 42,
+        issueCount: 8,
+        cities: [
+          {
+            name: '南京市',
+            score: 4.45,
+            trend: '-0.08',
+            hotelCount: 12,
+            issueCount: 5,
+            tierScores: {
+              luxury_lifestyle: { score: 4.52, count: 2, trend: '+0.01' },
+              premium: { score: 4.45, count: 3, trend: '-0.02' },
+              essentials: { score: 4.15, count: 6, trend: '-0.15' },
+              suites: { score: 4.35, count: 1, trend: '+0.01' },
+            },
+            hotels: [
+              { id: 'h19', name: '南京紫峰洲际酒店', brand: '洲际酒店', tier: 'luxury_lifestyle', score: 4.58, trend: '+0.02', status: 'good' },
+              { id: 'h20', name: '南京河西皇冠假日酒店', brand: '皇冠假日', tier: 'premium', score: 4.48, trend: '-0.01', status: 'good' },
+              { id: 'h21', name: '南京新街口假日酒店', brand: '假日酒店', tier: 'essentials', score: 3.92, trend: '-0.15', status: 'danger', issues: ['隔音问题集中爆发'] },
+              { id: 'h22', name: '南京新街口智选假日酒店', brand: '智选假日', tier: 'essentials', score: 4.05, trend: '-0.10', status: 'danger', issues: ['入住等待过长'] },
+              { id: 'h23', name: '南京江北假日酒店', brand: '假日酒店', tier: 'essentials', score: 4.18, trend: '-0.05', status: 'warning', isNew: true, daysOpen: 32 },
+            ],
+          },
+          {
+            name: '苏州市',
+            score: 4.48,
+            trend: '+0.01',
+            hotelCount: 8,
+            issueCount: 1,
+            tierScores: {
+              luxury_lifestyle: { score: 4.60, count: 1, trend: '+0.03' },
+              premium: { score: 4.50, count: 2, trend: '+0.02' },
+              essentials: { score: 4.25, count: 4, trend: '-0.03' },
+              suites: { score: 4.40, count: 1, trend: '+0.01' },
+            },
+            hotels: [
+              { id: 'h24', name: '苏州金鸡湖洲际酒店', brand: '洲际酒店', tier: 'luxury_lifestyle', score: 4.60, trend: '+0.03', status: 'good' },
+              { id: 'h25', name: '苏州皇冠假日酒店', brand: '皇冠假日', tier: 'premium', score: 4.52, trend: '+0.02', status: 'good' },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: '华南区',
+    score: 4.52,
+    trend: '+0.03',
+    rank: 1,
+    hotelCount: 142,
+    issueCount: 5,
+    tierScores: {
+      luxury_lifestyle: { score: 4.68, count: 15, trend: '+0.04' },
+      premium: { score: 4.55, count: 32, trend: '+0.03' },
+      essentials: { score: 4.28, count: 78, trend: '-0.02' },
+      suites: { score: 4.48, count: 17, trend: '+0.02' },
+    },
+    provinces: [],
+  },
+  {
+    name: '华北区',
+    score: 4.41,
+    trend: '-0.02',
+    rank: 4,
+    hotelCount: 128,
+    issueCount: 12,
+    tierScores: {
+      luxury_lifestyle: { score: 4.58, count: 12, trend: '+0.01' },
+      premium: { score: 4.48, count: 28, trend: '-0.01' },
+      essentials: { score: 4.18, count: 72, trend: '-0.05' },
+      suites: { score: 4.42, count: 16, trend: '+0.01' },
+    },
+    provinces: [],
+  },
+];
+
 // ==================== 品牌健康指数 ====================
 export const brandHealthData = {
   overallScore: 4.52,
   sentimentIndex: 78.5,
   experienceIndex: 82.1,
-  above45Ratio: 67.8,
   trends: {
     overallScore: '+3.2%',
     sentimentIndex: '+2.1%',
     experienceIndex: '+1.8%',
-    above45Ratio: '+4.5%',
   },
   trendData: [
     { date: '11-11', score: 4.45, sentiment: 75 },
@@ -60,15 +320,21 @@ export const brandHealthData = {
     { date: '12-02', score: 4.51, sentiment: 78 },
     { date: '12-09', score: 4.52, sentiment: 78.5 },
   ],
+  tierPerformance: {
+    luxury_lifestyle: { score: 4.65, trend: '+0.04', highlights: ['邻里文化差异化明显'], concerns: ['部分门店服务响应延迟'] },
+    premium: { score: 4.52, trend: '+0.02', highlights: ['商务设施完善'], concerns: ['早餐高峰拥挤'] },
+    essentials: { score: 4.22, trend: '-0.08', highlights: ['性价比认可'], concerns: ['隔音问题集中', '入住效率待提升'] },
+    suites: { score: 4.45, trend: '+0.01', highlights: ['长住满意度高'], concerns: ['厨房设备维护'] },
+  },
 };
 
 // ==================== 品牌承诺验证 ====================
 export const promiseFulfillmentData = [
-  { promise: '高效入住', score: 85, status: 'fulfilled', mentions: 2341, icon: '⚡' },
-  { promise: '温暖服务', score: 72, status: 'partial', mentions: 1856, icon: '❤️' },
-  { promise: '设计美学', score: 68, status: 'partial', mentions: 1203, icon: '🎨' },
-  { promise: '智能体验', score: 45, status: 'unfulfilled', mentions: 892, icon: '🤖' },
-  { promise: '安心卫生', score: 91, status: 'fulfilled', mentions: 3102, icon: '✨' },
+  { promise: '高效入住', score: 85, status: 'fulfilled', mentions: 2341, icon: '⚡', action: null },
+  { promise: '温暖服务', score: 72, status: 'partial', mentions: 1856, icon: '❤️', action: '强化服务培训' },
+  { promise: '设计美学', score: 68, status: 'partial', mentions: 1203, icon: '🎨', action: '加强品牌传播' },
+  { promise: '智能体验', score: 45, status: 'unfulfilled', mentions: 892, icon: '🤖', action: 'App引导+自助机使用率提升' },
+  { promise: '安心卫生', score: 91, status: 'fulfilled', mentions: 3102, icon: '✨', action: null },
 ];
 
 // ==================== 品牌驱动因素 ====================
@@ -82,14 +348,14 @@ export const brandDriversData = [
 
 // ==================== 品牌障碍因素 ====================
 export const brandBarriersData = [
-  { barrier: '隔音问题', severity: 'high', mentions: 1245, trend: '↑', rooms: ['走廊房', '电梯旁'], impact: -0.28 },
-  { barrier: '设施老化', severity: 'medium', mentions: 892, trend: '→', items: ['空调', '淋浴'], impact: -0.18 },
-  { barrier: '入住等待', severity: 'medium', mentions: 756, trend: '↓', peak: '14:00-16:00', impact: -0.15 },
-  { barrier: '早餐单一', severity: 'low', mentions: 534, trend: '→', category: '热食', impact: -0.08 },
-  { barrier: '停车困难', severity: 'low', mentions: 423, trend: '→', type: '市区门店', impact: -0.05 },
+  { barrier: '隔音问题', severity: 'high', mentions: 1245, trend: '↑', affectedTier: 'essentials', rooms: ['走廊房', '电梯旁'], impact: -0.28 },
+  { barrier: '设施老化', severity: 'medium', mentions: 892, trend: '→', affectedTier: 'essentials', items: ['空调', '淋浴'], impact: -0.18 },
+  { barrier: '入住等待', severity: 'medium', mentions: 756, trend: '↓', affectedTier: 'essentials', peak: '14:00-16:00', impact: -0.15 },
+  { barrier: '早餐拥挤', severity: 'low', mentions: 534, trend: '→', affectedTier: 'premium', category: '高峰时段', impact: -0.08 },
+  { barrier: '服务响应', severity: 'low', mentions: 423, trend: '→', affectedTier: 'luxury_lifestyle', type: '延迟', impact: -0.05 },
 ];
 
-// ==================== 竞对对比 (IHG vs 竞品) ====================
+// ==================== 竞对对比 ====================
 export const competitorData = {
   brands: ['IHG洲际', '万豪国际', '希尔顿', '雅高集团'],
   colors: ['#003B6F', '#8b5cf6', '#f59e0b', '#6b7280'],
@@ -106,12 +372,30 @@ export const competitorData = {
     '希尔顿': ['设施新', '数字化体验'],
     '雅高集团': ['性价比', '本土化'],
   },
+  promos: [
+    { competitor: '万豪', campaign: '双12狂欢', discount: '5折起', dates: '12/10-15', channels: ['抖音', '携程'], threat: 'high' as const },
+    { competitor: '希尔顿', campaign: '荣誉客会员日', discount: '8折', dates: '12/12', channels: ['直客通'], threat: 'low' as const },
+    { competitor: '雅高', campaign: '圣诞特惠', discount: '7折', dates: '12/20-26', channels: ['携程', '飞猪'], threat: 'medium' as const },
+  ],
 };
 
-// ==================== 酒店健康度 ====================
-export const hotelHealthData = {
+// ==================== 单店详情数据 ====================
+export const hotelDetailData = {
   hotelName: '上海外滩英迪格酒店',
   brand: '英迪格',
+  tier: 'luxury_lifestyle' as BrandTier,
+  score: 4.55,
+  rankings: {
+    city: { rank: 12, total: 28, name: '上海' },
+    region: { rank: 45, total: 156, name: '华东区' },
+    brand: { rank: 8, total: 42, name: '英迪格' },
+    tier: { rank: 15, total: 68, name: 'L&L' },
+  },
+  comparisons: {
+    vsCityTier: '+0.10',
+    vsRegionTier: '+0.05',
+    vsNationalTier: '-0.02',
+  },
   platforms: [
     { name: '携程', score: 4.6, rank: 12, total: 156 },
     { name: '美团', score: 4.5, rank: 18, total: 156 },
@@ -119,110 +403,92 @@ export const hotelHealthData = {
     { name: 'Booking', score: 8.8, rank: 15, total: 156 },
     { name: 'Agoda', score: 8.6, rank: 22, total: 156 },
   ],
-  overallScore: 4.55,
-  overallRank: 45,
-  dimensions: {
-    labels: ['清洁', '服务', '早餐', '设施', '舒适度', '位置'],
-    hotel: [4.8, 4.6, 4.3, 4.2, 4.5, 4.7],
-    cityAvg: [4.5, 4.4, 4.2, 4.3, 4.4, 4.5],
-    brandAvg: [4.6, 4.5, 4.4, 4.4, 4.5, 4.4],
-  },
-};
-
-// ==================== 酒店驱动因素 ====================
-export const hotelDriversData = [
-  {
-    dimension: '服务响应',
-    score: 4.7,
-    contribution: 28,
-    vsCity: '+0.3',
-    vsBrand: '+0.2',
-    keywords: ['前台小姐姐很热情', '行李员主动帮忙', '问题响应快'],
-    trend: 'stable',
-  },
-  {
-    dimension: '房间舒适度',
-    score: 4.5,
-    contribution: 22,
-    vsCity: '+0.1',
-    vsBrand: '0',
-    keywords: ['床很软', '枕头舒服', '安静'],
-    trend: 'up',
-  },
-  {
-    dimension: '位置交通',
-    score: 4.8,
-    contribution: 18,
-    vsCity: '+0.4',
-    vsBrand: '+0.3',
-    keywords: ['地铁口', '商圈近', '出行方便'],
-    trend: 'stable',
-  },
-  {
-    dimension: '品牌信任',
-    score: 4.4,
-    contribution: 15,
-    vsCity: '+0.2',
-    vsBrand: '-0.1',
-    keywords: ['IHG会员', '品质稳定', '优悦会积分'],
-    trend: 'up',
-  },
-  {
-    dimension: '价格合理',
-    score: 4.2,
-    contribution: 12,
-    vsCity: '-0.1',
-    vsBrand: '0',
-    keywords: ['性价比', '会员折扣', '物有所值'],
-    trend: 'down',
-  },
-];
-
-// ==================== 酒店障碍因素 ====================
-export const hotelBarriersData = {
   journeyRisks: [
-    { stage: '预订', risk: 'low', issues: ['价格波动'], count: 12, icon: '📅' },
-    { stage: '入住', risk: 'medium', issues: ['排队等待', '证件识别慢'], count: 45, icon: '🚪' },
-    { stage: '房间', risk: 'high', issues: ['隔音差', '空调异响', '热水不稳'], count: 89, icon: '🛏️' },
-    { stage: '服务', risk: 'low', issues: ['早餐补餐慢'], count: 23, icon: '🍳' },
-    { stage: '退房', risk: 'low', issues: ['发票等待'], count: 8, icon: '✅' },
+    { stage: '预订', risk: 'low' as const, issues: ['价格波动'], count: 12, icon: '📅' },
+    { stage: '入住', risk: 'medium' as const, issues: ['排队等待', '证件识别慢'], count: 45, icon: '🚪' },
+    { stage: '房间', risk: 'high' as const, issues: ['隔音差', '空调异响', '热水不稳'], count: 89, icon: '🛏️' },
+    { stage: '服务', risk: 'low' as const, issues: ['早餐补餐慢'], count: 23, icon: '🍳' },
+    { stage: '退房', risk: 'low' as const, issues: ['发票等待'], count: 8, icon: '✅' },
   ],
-  clusters: {
-    roomType: [
-      { type: '大床房', percentage: 35 },
-      { type: '双床房', percentage: 28 },
-      { type: '套房', percentage: 12 },
-      { type: '其他', percentage: 25 },
-    ],
-    floor: [
-      { type: '低楼层', percentage: 42 },
-      { type: '中楼层', percentage: 40 },
-      { type: '高楼层', percentage: 18 },
-    ],
-    timing: [
-      { type: '节假日', percentage: 55 },
-      { type: '工作日', percentage: 45 },
-    ],
-  },
+  drivers: [
+    { dimension: '服务响应', score: 4.7, vsCity: '+0.3', vsBrand: '+0.2', keywords: ['前台热情', '行李员主动', '响应快'], trend: 'stable' as const },
+    { dimension: '位置交通', score: 4.8, vsCity: '+0.4', vsBrand: '+0.3', keywords: ['地铁口', '商圈近', '出行方便'], trend: 'stable' as const },
+    { dimension: '设计美学', score: 4.6, vsCity: '+0.2', vsBrand: '+0.1', keywords: ['现代', '时尚', '邻里文化'], trend: 'up' as const },
+    { dimension: '房间舒适', score: 4.5, vsCity: '+0.1', vsBrand: '0', keywords: ['床软', '枕头舒服'], trend: 'up' as const },
+  ],
 };
 
-// ==================== 用户需求 ====================
+// ==================== 用户需求数据 ====================
 export const userNeedsData = [
-  { category: '效率需求', icon: '⚡', items: ['快速入住', '自助办理', '无接触服务'], intensity: 85, trend: '↑' },
-  { category: '舒适需求', icon: '🛏️', items: ['隔音好', '床品升级', '遮光窗帘'], intensity: 78, trend: '↑' },
-  { category: '服务需求', icon: '🙋', items: ['响应速度', '态度温度', '问题解决'], intensity: 72, trend: '→' },
-  { category: '早餐需求', icon: '🍳', items: ['品种丰富', '补餐及时', '健康选项'], intensity: 68, trend: '→' },
-  { category: '性价比需求', icon: '💰', items: ['价格透明', '优悦会权益', '升房体验'], intensity: 82, trend: '↑' },
-  { category: '文化共鸣', icon: '🎨', items: ['在地设计', '品牌调性', '邻里文化'], intensity: 45, trend: '↑' },
+  { 
+    category: '效率需求', 
+    icon: '⚡', 
+    items: ['快速入住', '自助办理', '无接触服务'], 
+    intensity: 85, 
+    trend: '↑',
+    positive: ['"自助入住机很方便，2分钟搞定" - 携程', '"前台效率很高，不用排队" - 美团'],
+    negative: ['"排队等了20分钟才办好入住" - 携程', '"自助机老是识别不了身份证" - 美团'],
+  },
+  { 
+    category: '舒适需求', 
+    icon: '🛏️', 
+    items: ['隔音好', '床品升级', '遮光窗帘'], 
+    intensity: 78, 
+    trend: '↑',
+    positive: ['"床垫很舒服，睡眠质量很好" - 携程', '"房间隔音不错，很安静" - 美团'],
+    negative: ['"隔壁说话听得一清二楚" - 携程', '"空调声音太大" - 美团'],
+  },
+  { 
+    category: '服务需求', 
+    icon: '🙋', 
+    items: ['响应速度', '态度温度', '问题解决'], 
+    intensity: 72, 
+    trend: '→',
+    positive: ['"前台小姐姐很热情" - 携程', '"客房服务响应很快" - 美团'],
+    negative: ['"打了3次电话才送来毛巾" - 携程', '"服务态度一般" - 美团'],
+  },
+  { 
+    category: '早餐需求', 
+    icon: '🍳', 
+    items: ['品种丰富', '补餐及时', '健康选项'], 
+    intensity: 68, 
+    trend: '→',
+    positive: ['"早餐品种很丰富" - 携程', '"水果很新鲜" - 美团'],
+    negative: ['"热菜补餐太慢" - 携程', '"早餐品种太少" - 美团'],
+  },
+  { 
+    category: '性价比需求', 
+    icon: '💰', 
+    items: ['价格透明', '优悦会权益', '升房体验'], 
+    intensity: 82, 
+    trend: '↑',
+    positive: ['"会员价很划算" - 携程', '"活动价性价比超高" - 抖音'],
+    negative: ['"节假日涨价太狠" - 携程', '"和OTA价差太大" - 直客通'],
+  },
+  { 
+    category: '文化共鸣', 
+    icon: '🎨', 
+    items: ['在地设计', '品牌调性', '邻里文化'], 
+    intensity: 45, 
+    trend: '↑',
+    positive: ['"酒店设计很有当地特色" - 携程', '"邻里文化活动很有趣" - Booking'],
+    negative: ['"装修风格太普通" - 携程', '"感觉和其他连锁没区别" - 美团'],
+  },
 ];
 
-// ==================== 新店评估 ====================
+// ==================== 新店数据 ====================
 export const newOpeningData = {
   hotelName: '杭州西湖假日酒店',
   brand: '假日酒店',
+  tier: 'essentials' as BrandTier,
   openDate: '2024-10-15',
   daysOpen: 58,
   stabilityScore: 72,
+  milestones: [
+    { day: 30, target: 65, achieved: true },
+    { day: 60, target: 75, achieved: false, current: true },
+    { day: 90, target: 85, achieved: false },
+  ],
   trajectory: [
     { day: 7, score: 65 },
     { day: 14, score: 68 },
@@ -239,60 +505,125 @@ export const newOpeningData = {
   vsRegionAvg: +0.08,
 };
 
-// ==================== 行动中心 ====================
+// ==================== 行动中心数据 ====================
 export const actionsData = [
   {
     id: 'ACT-001',
-    priority: 'urgent',
+    priority: 'urgent' as const,
     category: '设施维护',
     title: '3楼走廊隔音板加装',
     hotel: '上海外滩英迪格酒店',
+    hotelId: 'h3',
+    tier: 'luxury_lifestyle' as BrandTier,
+    city: '上海',
+    region: '华东',
     source: '房间体验风险',
     impact: '预计提升0.2分',
     deadline: '2024-12-20',
-    status: 'pending',
+    status: 'pending' as const,
     assignee: '工程部',
   },
   {
     id: 'ACT-002',
-    priority: 'high',
+    priority: 'high' as const,
     category: '服务培训',
     title: '前台入住效率提升培训',
-    hotel: '上海外滩英迪格酒店',
+    hotel: '上海浦东假日酒店',
+    hotelId: 'h9',
+    tier: 'essentials' as BrandTier,
+    city: '上海',
+    region: '华东',
     source: '入住体验风险',
     impact: '预计缩短等待时间50%',
     deadline: '2024-12-15',
-    status: 'in_progress',
+    status: 'in_progress' as const,
     assignee: '培训部',
   },
   {
     id: 'ACT-003',
-    priority: 'medium',
-    category: '早餐优化',
-    title: '热食补餐流程优化',
-    hotel: '上海外滩英迪格酒店',
-    source: '早餐服务风险',
-    impact: '预计减少投诉30%',
+    priority: 'urgent' as const,
+    category: '设施维护',
+    title: '全楼层隔音专项整改',
+    hotel: '南京新街口假日酒店',
+    hotelId: 'h21',
+    tier: 'essentials' as BrandTier,
+    city: '南京',
+    region: '华东',
+    source: '隔音投诉激增',
+    impact: '预计提升0.3分',
     deadline: '2024-12-25',
-    status: 'pending',
-    assignee: '餐饮部',
+    status: 'pending' as const,
+    assignee: '工程部',
   },
   {
     id: 'ACT-004',
-    priority: 'low',
+    priority: 'high' as const,
+    category: '运营流程',
+    title: '高峰期前台增员',
+    hotel: '南京新街口智选假日酒店',
+    hotelId: 'h22',
+    tier: 'essentials' as BrandTier,
+    city: '南京',
+    region: '华东',
+    source: '入住等待过长',
+    impact: '预计等待时间-40%',
+    deadline: '2024-12-18',
+    status: 'pending' as const,
+    assignee: '运营部',
+  },
+  {
+    id: 'ACT-005',
+    priority: 'medium' as const,
+    category: '服务培训',
+    title: '服务响应速度提升',
+    hotel: '杭州西溪丽晶酒店',
+    hotelId: 'h14',
+    tier: 'luxury_lifestyle' as BrandTier,
+    city: '杭州',
+    region: '华东',
+    source: '服务延迟反馈',
+    impact: '提升L&L服务标准',
+    deadline: '2024-12-30',
+    status: 'pending' as const,
+    assignee: '培训部',
+  },
+  {
+    id: 'ACT-006',
+    priority: 'low' as const,
     category: '运营流程',
     title: '停车场引导标识更新',
     hotel: '上海外滩英迪格酒店',
+    hotelId: 'h3',
+    tier: 'luxury_lifestyle' as BrandTier,
+    city: '上海',
+    region: '华东',
     source: '用户需求识别',
     impact: '提升到店体验',
     deadline: '2025-01-10',
-    status: 'completed',
+    status: 'completed' as const,
     assignee: '运营部',
   },
 ];
 
 // ==================== 价格数据 ====================
 export const priceData = {
+  overview: {
+    avgPrice: 658,
+    change: '+5.2%',
+    valueIndex: 1.12,
+    valueLabel: '高性价比',
+  },
+  vsCompetitors: [
+    { competitor: '万豪', priceDiff: '+¥33', percentage: '+5%', status: 'warning' as const },
+    { competitor: '希尔顿', priceDiff: '-¥54', percentage: '-8%', status: 'good' as const },
+    { competitor: '雅高', priceDiff: '+¥160', percentage: '+32%', status: 'neutral' as const },
+  ],
+  tierPricing: {
+    luxury_lifestyle: { ihg: 1580, competitor: 1650, diff: '-4%', status: 'good' as const },
+    premium: { ihg: 658, competitor: 625, diff: '+5%', status: 'warning' as const },
+    essentials: { ihg: 318, competitor: 298, diff: '+7%', status: 'warning' as const },
+    suites: { ihg: 488, competitor: 520, diff: '-6%', status: 'good' as const },
+  },
   regions: [
     { name: '华东', avgPrice: 658, change: '+5.2%', promoRate: 32 },
     { name: '华南', avgPrice: 712, change: '+3.8%', promoRate: 28 },
@@ -300,29 +631,10 @@ export const priceData = {
     { name: '西南', avgPrice: 478, change: '+2.1%', promoRate: 38 },
     { name: '华中', avgPrice: 492, change: '+0.5%', promoRate: 35 },
   ],
-  brandPricing: {
-    brands: ['IHG洲际', '万豪国际', '希尔顿', '雅高集团'],
-    高端: [1580, 1650, 1720, 1380],
-    中端: [658, 625, 712, 498],
-    经济型: [318, 298, 345, 268],
-  },
-  valueIndex: [
-    { brand: 'IHG洲际', value_index: 1.12, label: '高性价比' },
-    { brand: '万豪国际', value_index: 1.05, label: '匹配' },
-    { brand: '希尔顿', value_index: 0.92, label: '溢价' },
-    { brand: '雅高集团', value_index: 1.18, label: '高性价比' },
+  channelAlerts: [
+    { channel: '抖音', ourPrice: 568, competitorPrice: 498, competitor: '万豪', diff: '+14%', urgency: 'high' as const },
+    { channel: '携程', ourPrice: 668, competitorPrice: 625, competitor: '希尔顿', diff: '+7%', urgency: 'medium' as const },
   ],
-  // 房型产品 - 只关注基础房型
-  roomProducts: {
-    hotel: '上海外滩英迪格酒店',
-    roomType: '高级大床房',
-    platforms: [
-      { name: '直客通', price: 658, discounted: 628, benefit: '优悦会积分' },
-      { name: '携程', price: 698, discounted: 668, benefit: '双早' },
-      { name: '抖音', price: 618, discounted: 568, benefit: '无' },
-    ],
-  },
-  // 券类产品 - 包含服务明细
   voucherProducts: [
     {
       platform: '抖音',
@@ -332,9 +644,9 @@ export const priceData = {
       validity: '2025-03-31',
       salesVolume: 2341,
       includes: [
-        { item: '高级大床房1晚', value: 658 },
-        { item: '双人自助早餐', value: 196 },
-        { item: '双人下午茶', value: 168 },
+        { item: '高级大床房1晚', value: '¥658' },
+        { item: '双人自助早餐', value: '¥196' },
+        { item: '双人下午茶', value: '¥168' },
         { item: '延迟退房至14:00', value: '赠送' },
       ],
     },
@@ -346,10 +658,10 @@ export const priceData = {
       validity: '2025-02-28',
       salesVolume: 856,
       includes: [
-        { item: '家庭房1晚', value: 858 },
-        { item: '三人自助早餐', value: 294 },
-        { item: '儿童欢迎礼包', value: 128 },
-        { item: '儿童乐园门票2张', value: 200 },
+        { item: '家庭房1晚', value: '¥858' },
+        { item: '三人自助早餐', value: '¥294' },
+        { item: '儿童欢迎礼包', value: '¥128' },
+        { item: '儿童乐园门票2张', value: '¥200' },
       ],
     },
     {
@@ -360,92 +672,32 @@ export const priceData = {
       validity: '2025-06-30',
       salesVolume: 1256,
       includes: [
-        { item: '高级大床房1晚', value: 658 },
-        { item: '单人自助早餐', value: 98 },
+        { item: '高级大床房1晚', value: '¥658' },
+        { item: '单人自助早餐', value: '¥98' },
         { item: '行政酒廊使用', value: '赠送' },
       ],
     },
   ],
-  platformPrices: {
-    hotel: '上海外滩英迪格酒店',
-    roomType: '高级大床房',
-    platforms: [
-      { name: '直客通', price: 658, discounted: 628, benefit: '优悦会积分' },
-      { name: '携程', price: 698, discounted: 668, benefit: '双早' },
-      { name: '抖音', price: 618, discounted: 568, benefit: '次卡', validity: '90天' },
-    ],
-  },
-  competitorPromos: [
-    {
-      competitor: '万豪国际',
-      campaign: '双12狂欢',
-      discount: '5折起',
-      startDate: '2024-12-10',
-      endDate: '2024-12-15',
-      channels: ['抖音', '携程'],
-      threat: 'high',
-    },
-    {
-      competitor: '希尔顿',
-      campaign: '希尔顿荣誉客会员日',
-      discount: '8折',
-      startDate: '2024-12-12',
-      endDate: '2024-12-12',
-      channels: ['直客通'],
-      threat: 'low',
-    },
-    {
-      competitor: '雅高集团',
-      campaign: '圣诞特惠',
-      discount: '7折',
-      startDate: '2024-12-20',
-      endDate: '2024-12-26',
-      channels: ['携程', '飞猪'],
-      threat: 'medium',
-    },
-  ],
   trendData: [
-    { date: '11-11', 'IHG洲际': 645, '万豪国际': 618, '希尔顿': 702, '雅高集团': 488 },
-    { date: '11-18', 'IHG洲际': 652, '万豪国际': 622, '希尔顿': 708, '雅高集团': 492 },
-    { date: '11-25', 'IHG洲际': 648, '万豪国际': 615, '希尔顿': 698, '雅高集团': 485 },
-    { date: '12-02', 'IHG洲际': 655, '万豪国际': 620, '希尔顿': 705, '雅高集团': 495 },
-    { date: '12-09', 'IHG洲际': 658, '万豪国际': 625, '希尔顿': 712, '雅高集团': 498 },
+    { date: '11-11', 'IHG': 645, '万豪': 618, '希尔顿': 702, '雅高': 488 },
+    { date: '11-18', 'IHG': 652, '万豪': 622, '希尔顿': 708, '雅高': 492 },
+    { date: '11-25', 'IHG': 648, '万豪': 615, '希尔顿': 698, '雅高': 485 },
+    { date: '12-02', 'IHG': 655, '万豪': 620, '希尔顿': 705, '雅高': 495 },
+    { date: '12-09', 'IHG': 658, '万豪': 625, '希尔顿': 712, '雅高': 498 },
   ],
+  competitorPromos: competitorData.promos,
 };
+
+// ==================== 关注清单 ====================
+export const watchlistData = [
+  { hotelId: 'h9', name: '上海浦东假日酒店', reason: '评分持续下滑', score: 4.28, trend: '-0.08', tier: 'essentials' as BrandTier },
+  { hotelId: 'h21', name: '南京新街口假日酒店', reason: '隔音投诉激增', score: 3.92, trend: '-0.15', tier: 'essentials' as BrandTier },
+  { hotelId: 'h16', name: '杭州西湖假日酒店', reason: '新店稳定化监控', score: 4.42, trend: '-0.03', tier: 'essentials' as BrandTier, isNew: true, daysOpen: 58 },
+];
 
 // ==================== 筛选器选项 ====================
 export const filterOptions = {
   regions: ['全国', '华东', '华南', '华北', '西南', '华中'],
-  provinces: {
-    华东: ['上海', '江苏', '浙江', '安徽', '山东'],
-    华南: ['广东', '广西', '海南', '福建'],
-    华北: ['北京', '天津', '河北', '山西', '内蒙古'],
-    西南: ['四川', '重庆', '云南', '贵州', '西藏'],
-    华中: ['湖北', '湖南', '河南', '江西'],
-  },
-  brands: ['全部品牌', '洲际酒店', '华邑酒店', '皇冠假日', '假日酒店', '智选假日', '英迪格'],
-  hotelTypes: ['全部', '高端', '中端', '经济型'],
+  tiers: Object.entries(brandTiers).map(([key, value]) => ({ id: key, name: value.name })),
   timeRanges: ['近7天', '近30天', '近90天', '自定义'],
-  roles: [
-    { id: 'brand_ops', name: '品牌运营', level: '全国' },
-    { id: 'region_vp', name: '大区负责人', level: '区域' },
-    { id: 'city_mgr', name: '城市负责人', level: '城市' },
-    { id: 'hotel_mgr', name: '酒店店长', level: '单店' },
-    { id: 'revenue_mgr', name: '定价团队', level: '全国' },
-    { id: 'new_hotel', name: '新店运营', level: '单店' },
-  ],
-};
-
-// ==================== 洞察文案 ====================
-export const insightsData = {
-  opportunities: [
-    '英迪格品牌"邻里文化"提及率上升23%，差异化优势明显',
-    '商务客群对"智能入住"期待度持续攀升，IHG App使用率提升',
-    '皇冠假日新一线城市早餐满意度高于一线城市8%',
-  ],
-  risks: [
-    '智选假日"隔音"差评率连续3月上升，需重点关注',
-    '万豪双12促销力度大，价格敏感用户流失风险增加',
-    '假日酒店节假日前台效率投诉激增35%',
-  ],
 };

@@ -1,179 +1,340 @@
 import { useState } from 'react';
 import { Layout } from '../components/Layout';
 import { Card, Badge } from '../components/ui';
-import { actionsData } from '../data/mockData';
-import { AlertCircle, Clock, CheckCircle2, Circle, User, ArrowRight, Filter, Building2 } from 'lucide-react';
+import { actionsData, brandTiers, BrandTier } from '../data/mockData';
+import { useAuth } from '../context/AuthContext';
+import { Zap, Clock, CheckCircle, Filter, ChevronDown, AlertTriangle } from 'lucide-react';
 import clsx from 'clsx';
 
-type ActionStatus = 'all' | 'pending' | 'in_progress' | 'completed';
-type ActionPriority = 'all' | 'urgent' | 'high' | 'medium' | 'low';
-
 export function ActionCenter() {
-  const [statusFilter, setStatusFilter] = useState<ActionStatus>('all');
-  const [priorityFilter, setPriorityFilter] = useState<ActionPriority>('all');
+  const { currentRole } = useAuth();
+  const [priorityFilter, setPriorityFilter] = useState<string>('all');
+  const [tierFilter, setTierFilter] = useState<BrandTier | 'all'>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
 
-  const filteredActions = actionsData.filter((action) => {
-    if (statusFilter !== 'all' && action.status !== statusFilter) return false;
-    if (priorityFilter !== 'all' && action.priority !== priorityFilter) return false;
-    return true;
-  });
+  if (!currentRole) return null;
 
-  const statusCounts = {
-    all: actionsData.length,
-    pending: actionsData.filter((a) => a.status === 'pending').length,
-    in_progress: actionsData.filter((a) => a.status === 'in_progress').length,
-    completed: actionsData.filter((a) => a.status === 'completed').length,
+  // 根据角色筛选行动
+  const getActionsForRole = () => {
+    let filtered = [...actionsData];
+
+    // 酒店店长只看自己酒店的
+    if (currentRole.id === 'hotel_mgr' && currentRole.hotelId) {
+      filtered = filtered.filter(a => a.hotelId === currentRole.hotelId);
+    }
+    // 城市负责人看自己城市的
+    else if (currentRole.id === 'city_mgr' && currentRole.city) {
+      filtered = filtered.filter(a => a.city === '上海'); // 模拟数据用上海
+    }
+    // 大区负责人看自己区域的
+    else if (currentRole.id === 'region_vp' && currentRole.region) {
+      filtered = filtered.filter(a => a.region === '华东'); // 模拟数据用华东
+    }
+
+    // 应用筛选器
+    if (priorityFilter !== 'all') {
+      filtered = filtered.filter(a => a.priority === priorityFilter);
+    }
+    if (tierFilter !== 'all') {
+      filtered = filtered.filter(a => a.tier === tierFilter);
+    }
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(a => a.status === statusFilter);
+    }
+
+    return filtered;
   };
 
-  const priorityConfig = {
-    urgent: { label: '紧急', color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200' },
-    high: { label: '高优', color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-200' },
-    medium: { label: '中等', color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200' },
-    low: { label: '低', color: 'text-slate-500', bg: 'bg-slate-50', border: 'border-slate-200' },
-  };
+  const actions = getActionsForRole();
+  const pendingCount = actions.filter(a => a.status === 'pending').length;
+  const inProgressCount = actions.filter(a => a.status === 'in_progress').length;
+  const completedCount = actions.filter(a => a.status === 'completed').length;
 
-  const statusConfig = {
-    pending: { label: '待处理', icon: Circle, color: 'text-slate-400', bg: 'bg-slate-100' },
-    in_progress: { label: '进行中', icon: Clock, color: 'text-ihg-navy', bg: 'bg-ihg-navy/10' },
-    completed: { label: '已完成', icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-  };
+  const urgentActions = actions.filter(a => a.priority === 'urgent' && a.status !== 'completed');
+  const highActions = actions.filter(a => a.priority === 'high' && a.status !== 'completed');
+  const otherActions = actions.filter(a => (a.priority === 'medium' || a.priority === 'low') && a.status !== 'completed');
+  const completedActions = actions.filter(a => a.status === 'completed');
 
   return (
-    <Layout title="Action Center" subtitle="行动中心 · IHG酒店运营改进建议" requiredModule="actions">
-      
-      {/* 状态统计 */}
-      <section className="mb-6 animate-fade-in-up">
-        <div className="grid grid-cols-4 gap-4">
-          {(['all', 'pending', 'in_progress', 'completed'] as const).map((status) => {
-            const config = status === 'all' ? null : statusConfig[status];
-            const Icon = config?.icon || AlertCircle;
-            const isActive = statusFilter === status;
-            
-            return (
-              <button
-                key={status}
-                onClick={() => setStatusFilter(status)}
-                className={clsx(
-                  'p-5 rounded-2xl border-2 text-left transition-all',
-                  isActive ? 'border-ihg-navy bg-ihg-navy/5' : 'border-slate-100 bg-white hover:border-slate-200'
-                )}
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm text-slate-500">
-                    {status === 'all' ? '全部行动' : config?.label}
-                  </span>
-                  <div className={clsx('w-8 h-8 rounded-lg flex items-center justify-center', config?.bg || 'bg-slate-100')}>
-                    <Icon size={16} className={config?.color || 'text-slate-500'} />
-                  </div>
+    <Layout title="Action Center" subtitle="可执行行动管理与追踪" requiredModule="actions">
+      <div className="space-y-6">
+        {/* 统计概览 */}
+        <section className="animate-fade-in-up">
+          <div className="grid grid-cols-4 gap-4">
+            <Card className="bg-gradient-to-br from-ihg-navy to-ihg-navy-light text-white">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                  <Zap size={24} />
                 </div>
-                <div className={clsx('text-3xl font-bold', isActive ? 'text-ihg-navy' : 'text-slate-800')}>
-                  {statusCounts[status]}
+                <div>
+                  <p className="text-white/60 text-sm">待处理</p>
+                  <p className="text-3xl font-bold">{pendingCount + inProgressCount}</p>
                 </div>
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* 优先级筛选 */}
-      <section className="mb-6 animate-fade-in-up delay-100">
-        <div className="flex items-center gap-3 bg-white rounded-xl p-3 border border-slate-100">
-          <Filter size={16} className="text-slate-400" />
-          <span className="text-sm text-slate-500">优先级筛选：</span>
-          <div className="flex gap-2">
-            {(['all', 'urgent', 'high', 'medium', 'low'] as const).map((priority) => (
-              <button
-                key={priority}
-                onClick={() => setPriorityFilter(priority)}
-                className={clsx(
-                  'px-4 py-2 text-sm font-medium rounded-lg transition-all',
-                  priorityFilter === priority
-                    ? 'bg-ihg-navy text-white'
-                    : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
-                )}
-              >
-                {priority === 'all' ? '全部' : priorityConfig[priority].label}
-              </button>
-            ))}
+              </div>
+            </Card>
+            <Card>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+                  <AlertTriangle size={24} className="text-red-600" />
+                </div>
+                <div>
+                  <p className="text-slate-500 text-sm">紧急</p>
+                  <p className="text-3xl font-bold text-red-600">{urgentActions.length}</p>
+                </div>
+              </div>
+            </Card>
+            <Card>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
+                  <Clock size={24} className="text-amber-600" />
+                </div>
+                <div>
+                  <p className="text-slate-500 text-sm">进行中</p>
+                  <p className="text-3xl font-bold text-amber-600">{inProgressCount}</p>
+                </div>
+              </div>
+            </Card>
+            <Card>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
+                  <CheckCircle size={24} className="text-emerald-600" />
+                </div>
+                <div>
+                  <p className="text-slate-500 text-sm">已完成</p>
+                  <p className="text-3xl font-bold text-emerald-600">{completedCount}</p>
+                </div>
+              </div>
+            </Card>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* 行动列表 */}
-      <section className="animate-fade-in-up delay-200">
-        <Card padding="none">
-          <div className="p-5 border-b border-slate-100">
-            <h3 className="text-base font-semibold text-slate-800">行动建议列表</h3>
-            <p className="text-sm text-slate-500">共 {filteredActions.length} 项行动建议</p>
-          </div>
-          <div className="divide-y divide-slate-100">
-            {filteredActions.map((action) => {
-              const priority = priorityConfig[action.priority as keyof typeof priorityConfig];
-              const status = statusConfig[action.status as keyof typeof statusConfig];
-              const StatusIcon = status.icon;
-
-              return (
-                <div 
-                  key={action.id} 
-                  className={clsx(
-                    'p-5 hover:bg-slate-50 transition-all',
-                    action.priority === 'urgent' && 'border-l-4 border-l-red-500'
-                  )}
+        {/* 筛选器 */}
+        <section className="animate-fade-in-up delay-50">
+          <Card padding="sm">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 text-sm text-slate-500">
+                <Filter size={16} />
+                筛选：
+              </div>
+              
+              {/* 优先级筛选 */}
+              <div className="relative">
+                <select
+                  value={priorityFilter}
+                  onChange={(e) => setPriorityFilter(e.target.value)}
+                  className="appearance-none bg-slate-100 border-0 rounded-lg px-4 py-2 pr-8 text-sm focus:ring-2 focus:ring-ihg-navy"
                 >
-                  <div className="flex items-start gap-4">
-                    {/* 优先级标识 */}
-                    <div className={clsx('w-12 h-12 rounded-xl flex items-center justify-center border-2', priority.bg, priority.border)}>
-                      <span className={clsx('text-sm font-bold', priority.color)}>{priority.label}</span>
-                    </div>
+                  <option value="all">全部优先级</option>
+                  <option value="urgent">紧急</option>
+                  <option value="high">高</option>
+                  <option value="medium">中</option>
+                  <option value="low">低</option>
+                </select>
+                <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+              </div>
 
-                    {/* 主要内容 */}
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs text-slate-400">{action.id}</span>
-                        <Badge variant="info">{action.category}</Badge>
-                      </div>
-                      <h4 className="text-base font-semibold text-slate-800 mb-1">{action.title}</h4>
-                      <div className="flex items-center gap-2 text-sm text-slate-500 mb-2">
-                        <Building2 size={14} />
-                        <span>{action.hotel}</span>
-                      </div>
-                      <div className="flex items-center gap-4 text-sm">
-                        <span className="text-slate-400">来源: {action.source}</span>
-                        <span className="text-emerald-600">预期: {action.impact}</span>
-                      </div>
-                    </div>
+              {/* 品牌类型筛选 */}
+              <div className="relative">
+                <select
+                  value={tierFilter}
+                  onChange={(e) => setTierFilter(e.target.value as BrandTier | 'all')}
+                  className="appearance-none bg-slate-100 border-0 rounded-lg px-4 py-2 pr-8 text-sm focus:ring-2 focus:ring-ihg-navy"
+                >
+                  <option value="all">全部类型</option>
+                  {Object.entries(brandTiers).map(([key, tier]) => (
+                    <option key={key} value={key}>{tier.name}</option>
+                  ))}
+                </select>
+                <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+              </div>
 
-                    {/* 右侧信息 */}
-                    <div className="text-right">
-                      <div className={clsx('flex items-center gap-1.5 mb-2', status.color)}>
-                        <StatusIcon size={14} />
-                        <span className="text-sm font-medium">{status.label}</span>
-                      </div>
-                      <div className="flex items-center gap-1 text-xs text-slate-400 mb-1">
-                        <Clock size={12} />
-                        <span>截止 {action.deadline}</span>
-                      </div>
-                      <div className="flex items-center gap-1 text-xs text-slate-400">
-                        <User size={12} />
-                        <span>{action.assignee}</span>
-                      </div>
-                    </div>
-                  </div>
+              {/* 状态筛选 */}
+              <div className="relative">
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="appearance-none bg-slate-100 border-0 rounded-lg px-4 py-2 pr-8 text-sm focus:ring-2 focus:ring-ihg-navy"
+                >
+                  <option value="all">全部状态</option>
+                  <option value="pending">待处理</option>
+                  <option value="in_progress">进行中</option>
+                  <option value="completed">已完成</option>
+                </select>
+                <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+              </div>
 
-                  {action.status !== 'completed' && (
-                    <div className="mt-4 pt-4 border-t border-slate-100 flex justify-end">
-                      <button className="flex items-center gap-2 px-4 py-2 bg-ihg-navy text-white rounded-lg hover:bg-ihg-navy-light transition-all text-sm font-medium">
-                        {action.status === 'pending' ? '开始处理' : '标记完成'}
-                        <ArrowRight size={14} />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </Card>
-      </section>
+              {(priorityFilter !== 'all' || tierFilter !== 'all' || statusFilter !== 'all') && (
+                <button
+                  onClick={() => {
+                    setPriorityFilter('all');
+                    setTierFilter('all');
+                    setStatusFilter('all');
+                  }}
+                  className="text-sm text-ihg-navy hover:underline"
+                >
+                  清除筛选
+                </button>
+              )}
+            </div>
+          </Card>
+        </section>
+
+        {/* 紧急行动 */}
+        {urgentActions.length > 0 && (
+          <section className="animate-fade-in-up delay-100">
+            <div className="flex items-center gap-2 mb-4">
+              <h3 className="text-base font-semibold text-slate-800">🔴 紧急</h3>
+              <Badge variant="danger">{urgentActions.length}</Badge>
+            </div>
+            <div className="space-y-3">
+              {urgentActions.map((action) => (
+                <ActionCard key={action.id} action={action} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* 高优先级 */}
+        {highActions.length > 0 && (
+          <section className="animate-fade-in-up delay-150">
+            <div className="flex items-center gap-2 mb-4">
+              <h3 className="text-base font-semibold text-slate-800">🟡 高优先级</h3>
+              <Badge variant="warning">{highActions.length}</Badge>
+            </div>
+            <div className="space-y-3">
+              {highActions.map((action) => (
+                <ActionCard key={action.id} action={action} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* 中低优先级 */}
+        {otherActions.length > 0 && (
+          <section className="animate-fade-in-up delay-200">
+            <div className="flex items-center gap-2 mb-4">
+              <h3 className="text-base font-semibold text-slate-800">🟢 中/低优先级</h3>
+              <Badge variant="info">{otherActions.length}</Badge>
+            </div>
+            <div className="space-y-3">
+              {otherActions.map((action) => (
+                <ActionCard key={action.id} action={action} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* 已完成 */}
+        {completedActions.length > 0 && (
+          <section className="animate-fade-in-up delay-250">
+            <div className="flex items-center gap-2 mb-4">
+              <h3 className="text-base font-semibold text-slate-800">✅ 已完成</h3>
+              <Badge variant="success">{completedActions.length}</Badge>
+            </div>
+            <div className="space-y-3">
+              {completedActions.map((action) => (
+                <ActionCard key={action.id} action={action} completed />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* 空状态 */}
+        {actions.length === 0 && (
+          <Card className="text-center py-12">
+            <div className="text-4xl mb-4">🎉</div>
+            <h3 className="text-lg font-semibold text-slate-800 mb-2">暂无待办行动</h3>
+            <p className="text-slate-500">所有行动已完成或不在当前筛选范围内</p>
+          </Card>
+        )}
+      </div>
     </Layout>
+  );
+}
+
+// 行动卡片组件
+function ActionCard({ action, completed = false }: { action: typeof actionsData[0], completed?: boolean }) {
+  return (
+    <Card 
+      className={clsx(
+        'border-l-4 transition-all',
+        completed ? 'border-l-emerald-500 bg-emerald-50/30 opacity-75' :
+        action.priority === 'urgent' ? 'border-l-red-500 bg-red-50/30' : 
+        action.priority === 'high' ? 'border-l-amber-500' : 'border-l-slate-300'
+      )} 
+      padding="sm"
+    >
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className={clsx(
+            'w-12 h-12 rounded-xl flex items-center justify-center',
+            completed ? 'bg-emerald-100' :
+            action.priority === 'urgent' ? 'bg-red-100' : 
+            action.priority === 'high' ? 'bg-amber-100' : 'bg-slate-100'
+          )}>
+            {completed ? (
+              <CheckCircle size={24} className="text-emerald-600" />
+            ) : action.status === 'in_progress' ? (
+              <Clock size={24} className="text-amber-600" />
+            ) : (
+              <Zap size={24} className={clsx(
+                action.priority === 'urgent' ? 'text-red-600' : 
+                action.priority === 'high' ? 'text-amber-600' : 'text-slate-600'
+              )} />
+            )}
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className={clsx(
+                'font-semibold',
+                completed ? 'text-slate-500 line-through' : 'text-slate-800'
+              )}>
+                {action.title}
+              </span>
+              <span className="text-xs px-2 py-0.5 rounded" style={{ 
+                backgroundColor: brandTiers[action.tier].color + '20', 
+                color: brandTiers[action.tier].color 
+              }}>
+                {brandTiers[action.tier].name}
+              </span>
+              {action.status === 'in_progress' && (
+                <Badge variant="warning">进行中</Badge>
+              )}
+            </div>
+            <div className="text-sm text-slate-500">
+              {action.hotel} · {action.category}
+            </div>
+            <div className="text-xs text-slate-400 mt-1">
+              {action.impact}
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="text-right">
+            <div className="text-xs text-slate-400">截止日期</div>
+            <div className={clsx(
+              'text-sm font-medium',
+              completed ? 'text-slate-400' : 'text-slate-700'
+            )}>
+              {action.deadline}
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="text-xs text-slate-400">负责人</div>
+            <div className="text-sm font-medium text-slate-700">{action.assignee}</div>
+          </div>
+          {!completed && (
+            <button className={clsx(
+              'px-4 py-2 rounded-lg text-sm font-medium',
+              action.priority === 'urgent' ? 'bg-red-600 text-white hover:bg-red-700' :
+              action.priority === 'high' ? 'bg-amber-500 text-white hover:bg-amber-600' :
+              'bg-ihg-navy text-white hover:bg-ihg-navy-light'
+            )}>
+              {action.status === 'in_progress' ? '查看进度' : '开始处理'}
+            </button>
+          )}
+        </div>
+      </div>
+    </Card>
   );
 }

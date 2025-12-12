@@ -1,294 +1,333 @@
 import { Layout } from '../components/Layout';
-import { Card, CardHeader, Badge, ProgressBar } from '../components/ui';
-import {
-  brandHealthData,
-  promiseFulfillmentData,
-  brandDriversData,
-  brandBarriersData,
+import { Card, Badge, ProgressBar } from '../components/ui';
+import { 
+  brandHealthData, 
+  promiseFulfillmentData, 
+  brandDriversData, 
+  brandBarriersData, 
   competitorData,
-  insightsData,
+  brandTiers,
+  BrandTier
 } from '../data/mockData';
-import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
-import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, Star } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertTriangle, ChevronDown, ChevronRight } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend, BarChart, Bar } from 'recharts';
 import clsx from 'clsx';
+import { useState } from 'react';
 
 export function BrandView() {
-  const isScoreUp = brandHealthData.trends.overallScore.startsWith('+');
-  
-  const competitorChartData = Object.entries(competitorData.metrics).map(([metric, values]) => ({
-    metric,
-    'IHG洲际': values[0],
-    '万豪国际': values[1],
-    '希尔顿': values[2],
-    '雅高集团': values[3],
-  }));
+  const [expandedPromise, setExpandedPromise] = useState<string | null>(null);
 
   return (
-    <Layout title="Brand View" subtitle="IHG洲际酒店集团 · 品牌健康诊断" requiredModule="brand">
-      
-      {/* Step 1: 核心指标总览 */}
-      <section className="mb-8 animate-fade-in-up">
-        <div className="grid grid-cols-4 gap-5">
-          {/* 主评分卡片 */}
-          <div className="col-span-2 bg-gradient-to-br from-ihg-navy to-ihg-navy-light rounded-2xl p-6 text-white">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <p className="text-white/60 text-sm mb-1">品牌综合评分</p>
-                <div className="flex items-end gap-3">
-                  <span className="text-5xl font-bold">{brandHealthData.overallScore}</span>
-                  <span className="text-xl text-white/50 mb-1">/ 5.0</span>
-                </div>
-              </div>
-              <div className={clsx(
-                'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium',
-                isScoreUp ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-300'
-              )}>
-                {isScoreUp ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
-                {brandHealthData.trends.overallScore}
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/10">
-              <div>
-                <p className="text-white/50 text-xs mb-1">情绪指数</p>
-                <p className="text-xl font-semibold">{brandHealthData.sentimentIndex}%</p>
-              </div>
-              <div>
-                <p className="text-white/50 text-xs mb-1">体验指数</p>
-                <p className="text-xl font-semibold">{brandHealthData.experienceIndex}</p>
-              </div>
-              <div>
-                <p className="text-white/50 text-xs mb-1">4.5+占比</p>
-                <p className="text-xl font-semibold">{brandHealthData.above45Ratio}%</p>
-              </div>
-            </div>
+    <Layout title="Brand View" subtitle="品牌深度分析：驱动因素、障碍因素、竞品对比" requiredModule="brand">
+      <div className="space-y-6">
+        {/* 品牌健康趋势 */}
+        <section className="animate-fade-in-up">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base font-semibold text-slate-800">📈 品牌健康趋势</h3>
+            <span className="text-sm text-slate-500">近30天</span>
           </div>
-
-          {/* 趋势解读 */}
-          <div className="col-span-2 bg-white rounded-2xl p-6 border border-slate-100">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-ihg-navy/10 flex items-center justify-center">
-                <Target size={16} className="text-ihg-navy" />
-              </div>
-              <h3 className="font-semibold text-slate-800">本期诊断结论</h3>
-            </div>
-            <p className="text-slate-600 text-sm leading-relaxed mb-4">
-              IHG品牌健康指数持续上升，<span className="text-emerald-600 font-medium">服务态度</span>是核心驱动力。
-              但<span className="text-red-600 font-medium">隔音问题</span>成为最大障碍，智选假日品牌尤为突出。
-              建议优先处理设施改善类行动项。
-            </p>
-            <div className="flex gap-3">
-              <span className="px-3 py-1 bg-emerald-50 text-emerald-600 text-xs rounded-full">服务 +0.35</span>
-              <span className="px-3 py-1 bg-red-50 text-red-600 text-xs rounded-full">隔音 -0.28</span>
-              <span className="px-3 py-1 bg-amber-50 text-amber-600 text-xs rounded-full">入住等待 ↓</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Step 2: 趋势追踪 */}
-      <section className="mb-8 animate-fade-in-up delay-100">
-        <Card>
-          <CardHeader title="📈 评分趋势追踪" subtitle="近30天品牌健康指数变化" />
-          <div className="h-56">
-            <ResponsiveContainer width="100%" height="100%">
+          <Card>
+            <ResponsiveContainer width="100%" height={250}>
               <LineChart data={brandHealthData.trendData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="date" stroke="#94a3b8" fontSize={11} />
-                <YAxis domain={[4.3, 4.7]} stroke="#94a3b8" fontSize={11} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', fontSize: '12px' }}
+                <XAxis dataKey="date" stroke="#94a3b8" fontSize={12} />
+                <YAxis domain={[4.4, 4.6]} stroke="#94a3b8" fontSize={12} />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
                 />
-                <Line type="monotone" dataKey="score" stroke="#003B6F" strokeWidth={3} dot={{ fill: '#003B6F', r: 4 }} activeDot={{ r: 6 }} />
+                <Line 
+                  type="monotone" 
+                  dataKey="score" 
+                  stroke="#003B6F" 
+                  strokeWidth={3}
+                  dot={{ fill: '#003B6F', strokeWidth: 2 }}
+                  name="综合评分"
+                />
               </LineChart>
             </ResponsiveContainer>
-          </div>
-        </Card>
-      </section>
+          </Card>
+        </section>
 
-      {/* Step 3: 驱动 vs 障碍 */}
-      <section className="mb-8 grid grid-cols-2 gap-6 animate-fade-in-up delay-200">
-        {/* 驱动因素 */}
-        <Card>
-          <CardHeader 
-            title="✅ 正向驱动因素" 
-            subtitle="推动评分上升的关键因素"
-            action={<Badge variant="success">TOP 5</Badge>}
-          />
-          <div className="space-y-4">
-            {brandDriversData.map((item, idx) => (
-              <div key={item.driver} className="flex items-center gap-4">
-                <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 font-bold text-sm">
-                  {idx + 1}
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium text-slate-700">{item.driver}</span>
-                    <span className="text-sm font-semibold text-emerald-600">{item.impact}</span>
-                  </div>
-                  <ProgressBar value={item.score} color="green" size="sm" />
-                </div>
-              </div>
-            ))}
+        {/* 品牌承诺验证详情 */}
+        <section className="animate-fade-in-up delay-50">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base font-semibold text-slate-800">🎯 品牌承诺验证详情</h3>
+            <span className="text-sm text-slate-500">点击查看改善建议</span>
           </div>
-        </Card>
-
-        {/* 障碍因素 */}
-        <Card>
-          <CardHeader 
-            title="⚠️ 负向障碍因素" 
-            subtitle="拖累评分下降的问题点"
-            action={<Badge variant="danger">需关注</Badge>}
-          />
-          <div className="space-y-4">
-            {brandBarriersData.map((item, idx) => (
-              <div key={item.barrier} className="flex items-center gap-4">
-                <div className={clsx(
-                  'w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm',
-                  item.severity === 'high' ? 'bg-red-50 text-red-600' : 
-                  item.severity === 'medium' ? 'bg-amber-50 text-amber-600' : 'bg-slate-50 text-slate-500'
-                )}>
-                  {idx + 1}
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-slate-700">{item.barrier}</span>
-                      <span className={clsx(
-                        'text-xs',
-                        item.trend === '↑' ? 'text-red-500' : item.trend === '↓' ? 'text-emerald-500' : 'text-slate-400'
-                      )}>{item.trend}</span>
-                    </div>
-                    <span className="text-sm font-semibold text-red-600">{item.impact}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <ProgressBar value={Math.abs(item.impact) * 100} max={30} color="red" size="sm" />
-                    <span className="text-xs text-slate-400">{item.mentions}次</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-      </section>
-
-      {/* Step 4: 品牌承诺验证 */}
-      <section className="mb-8 animate-fade-in-up delay-300">
-        <Card>
-          <CardHeader 
-            title="🎯 品牌承诺验证" 
-            subtitle="用户是否真实感知到IHG的品牌承诺？"
-          />
-          <div className="grid grid-cols-5 gap-4">
+          <div className="space-y-3">
             {promiseFulfillmentData.map((item) => (
-              <div 
+              <Card 
                 key={item.promise}
                 className={clsx(
-                  'p-4 rounded-xl border-2 text-center transition-all',
-                  item.status === 'fulfilled' ? 'border-emerald-200 bg-emerald-50/50' :
-                  item.status === 'partial' ? 'border-amber-200 bg-amber-50/50' :
-                  'border-red-200 bg-red-50/50'
+                  'cursor-pointer transition-all',
+                  expandedPromise === item.promise && 'ring-2 ring-ihg-navy',
+                  item.status === 'unfulfilled' && 'border-l-4 border-l-red-500'
                 )}
+                padding="sm"
+                onClick={() => setExpandedPromise(expandedPromise === item.promise ? null : item.promise)}
               >
-                <div className="text-2xl mb-2">{item.icon}</div>
-                <div className="text-sm font-medium text-slate-700 mb-1">{item.promise}</div>
-                <div className={clsx(
-                  'text-2xl font-bold mb-2',
-                  item.status === 'fulfilled' ? 'text-emerald-600' :
-                  item.status === 'partial' ? 'text-amber-600' : 'text-red-600'
-                )}>
-                  {item.score}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="text-3xl">{item.icon}</div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-slate-800">{item.promise}</span>
+                        <Badge variant={
+                          item.status === 'fulfilled' ? 'success' : 
+                          item.status === 'partial' ? 'warning' : 'danger'
+                        }>
+                          {item.status === 'fulfilled' ? '已兑现' : 
+                           item.status === 'partial' ? '部分兑现' : '未兑现'}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-slate-500">{item.mentions.toLocaleString()} 次用户提及</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-6">
+                    <div className="w-32">
+                      <ProgressBar 
+                        value={item.score} 
+                        color={item.status === 'fulfilled' ? 'green' : item.status === 'partial' ? 'yellow' : 'red'} 
+                        size="md" 
+                      />
+                    </div>
+                    <span className={clsx(
+                      'text-2xl font-bold',
+                      item.status === 'fulfilled' ? 'text-emerald-600' : 
+                      item.status === 'partial' ? 'text-amber-600' : 'text-red-600'
+                    )}>
+                      {item.score}%
+                    </span>
+                    {expandedPromise === item.promise ? (
+                      <ChevronDown size={20} className="text-slate-400" />
+                    ) : (
+                      <ChevronRight size={20} className="text-slate-400" />
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center justify-center gap-1 text-xs">
-                  {item.status === 'fulfilled' ? (
-                    <><CheckCircle size={12} className="text-emerald-500" /><span className="text-emerald-600">达成</span></>
-                  ) : item.status === 'partial' ? (
-                    <><AlertTriangle size={12} className="text-amber-500" /><span className="text-amber-600">部分达成</span></>
-                  ) : (
-                    <><AlertTriangle size={12} className="text-red-500" /><span className="text-red-600">未达成</span></>
-                  )}
-                </div>
-              </div>
+
+                {/* 展开的改善建议 */}
+                {expandedPromise === item.promise && item.action && (
+                  <div className="mt-4 pt-4 border-t border-slate-100 animate-fade-in-up">
+                    <div className="p-3 bg-amber-50 rounded-xl">
+                      <div className="flex items-start gap-2">
+                        <AlertTriangle size={16} className="text-amber-600 mt-0.5" />
+                        <div>
+                          <p className="font-medium text-amber-800">建议行动</p>
+                          <p className="text-sm text-amber-700">{item.action}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </Card>
             ))}
           </div>
-        </Card>
-      </section>
+        </section>
 
-      {/* Step 5: 竞对对比 */}
-      <section className="mb-8 animate-fade-in-up delay-400">
-        <Card>
-          <CardHeader 
-            title="🏆 竞对表现对比" 
-            subtitle="IHG vs 万豪 vs 希尔顿 vs 雅高"
-            action={
-              <div className="flex items-center gap-3">
-                {competitorData.brands.map((brand, idx) => (
-                  <div key={brand} className="flex items-center gap-1.5 text-xs">
-                    <div className="w-3 h-3 rounded" style={{ backgroundColor: competitorData.colors[idx] }} />
-                    <span className="text-slate-600">{brand}</span>
+        {/* 驱动因素 & 障碍因素 */}
+        <div className="grid grid-cols-2 gap-6">
+          {/* 驱动因素 */}
+          <section className="animate-fade-in-up delay-100">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-semibold text-slate-800">✅ 品牌驱动因素</h3>
+            </div>
+            <Card>
+              <div className="space-y-4">
+                {brandDriversData.map((driver) => (
+                  <div key={driver.driver} className="flex items-center gap-4">
+                    <div className="w-24 text-sm font-medium text-slate-700">{driver.driver}</div>
+                    <div className="flex-1">
+                      <ProgressBar value={driver.score} color="green" size="md" />
+                    </div>
+                    <div className="w-12 text-right font-bold text-emerald-600">{driver.score}</div>
+                    <div className="w-16 text-right text-sm text-emerald-600">{driver.impact}</div>
                   </div>
                 ))}
               </div>
-            }
-          />
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={competitorChartData} layout="vertical" barGap={2}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis type="number" domain={[3.8, 5]} stroke="#94a3b8" fontSize={11} />
-                <YAxis dataKey="metric" type="category" width={70} stroke="#94a3b8" fontSize={11} />
-                <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', fontSize: '12px' }} />
-                <Bar dataKey="IHG洲际" fill="#003B6F" radius={[0, 4, 4, 0]} />
-                <Bar dataKey="万豪国际" fill="#8b5cf6" radius={[0, 4, 4, 0]} />
-                <Bar dataKey="希尔顿" fill="#f59e0b" radius={[0, 4, 4, 0]} />
-                <Bar dataKey="雅高集团" fill="#94a3b8" radius={[0, 4, 4, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </Card>
-      </section>
-
-      {/* Step 6: 洞察与建议 */}
-      <section className="grid grid-cols-2 gap-6 animate-fade-in-up delay-400">
-        <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl p-6 text-white">
-          <div className="flex items-center gap-2 mb-4">
-            <TrendingUp size={20} />
-            <h3 className="font-semibold">机会点</h3>
-          </div>
-          <div className="space-y-3">
-            {insightsData.opportunities.map((item, idx) => (
-              <div key={idx} className="flex items-start gap-2">
-                <Star size={14} className="text-emerald-200 mt-0.5 flex-shrink-0" />
-                <p className="text-sm text-emerald-50">{item}</p>
+              <div className="mt-4 pt-4 border-t border-slate-100">
+                <p className="text-sm text-slate-600">
+                  <span className="font-medium">热词云：</span>
+                  {brandDriversData.flatMap(d => d.keywords).slice(0, 8).map((kw, i) => (
+                    <span key={i} className="inline-block mx-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded text-xs">
+                      {kw}
+                    </span>
+                  ))}
+                </p>
               </div>
-            ))}
-          </div>
+            </Card>
+          </section>
+
+          {/* 障碍因素 */}
+          <section className="animate-fade-in-up delay-100">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-semibold text-slate-800">🚨 品牌障碍因素</h3>
+            </div>
+            <Card>
+              <div className="space-y-3">
+                {brandBarriersData.map((barrier) => (
+                  <div key={barrier.barrier} className={clsx(
+                    'p-3 rounded-xl',
+                    barrier.severity === 'high' ? 'bg-red-50' : 
+                    barrier.severity === 'medium' ? 'bg-amber-50' : 'bg-slate-50'
+                  )}>
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-slate-800">{barrier.barrier}</span>
+                        <Badge variant={barrier.severity === 'high' ? 'danger' : barrier.severity === 'medium' ? 'warning' : 'info'}>
+                          {barrier.severity === 'high' ? '高风险' : barrier.severity === 'medium' ? '中风险' : '低风险'}
+                        </Badge>
+                        <span className="text-xs px-2 py-0.5 rounded" style={{ 
+                          backgroundColor: brandTiers[barrier.affectedTier as BrandTier].color + '20', 
+                          color: brandTiers[barrier.affectedTier as BrandTier].color 
+                        }}>
+                          {brandTiers[barrier.affectedTier as BrandTier].name}
+                        </span>
+                      </div>
+                      <span className={clsx(
+                        'text-sm font-bold',
+                        barrier.impact < -0.2 ? 'text-red-600' : 'text-amber-600'
+                      )}>
+                        {barrier.impact}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-4 text-sm text-slate-500">
+                      <span>{barrier.mentions.toLocaleString()} 次提及</span>
+                      <span>趋势 {barrier.trend}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </section>
         </div>
 
-        <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-2xl p-6 text-white">
-          <div className="flex items-center gap-2 mb-4">
-            <AlertTriangle size={20} />
-            <h3 className="font-semibold">风险预警</h3>
+        {/* 品牌 vs 竞品对比 */}
+        <section className="animate-fade-in-up delay-150">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base font-semibold text-slate-800">📊 品牌 vs 竞品对比</h3>
           </div>
-          <div className="space-y-3">
-            {insightsData.risks.map((item, idx) => (
-              <div key={idx} className="flex items-start gap-2">
-                <AlertTriangle size={14} className="text-red-200 mt-0.5 flex-shrink-0" />
-                <p className="text-sm text-red-50">{item}</p>
-              </div>
+          <div className="grid grid-cols-2 gap-6">
+            {/* 雷达图 */}
+            <Card>
+              <h4 className="font-medium text-slate-700 mb-4">多维度对比</h4>
+              <ResponsiveContainer width="100%" height={300}>
+                <RadarChart data={[
+                  { metric: '综合评分', IHG: 4.52, 万豪: 4.48, 希尔顿: 4.55, 雅高: 4.41 },
+                  { metric: '服务评分', IHG: 4.65, 万豪: 4.52, 希尔顿: 4.58, 雅高: 4.45 },
+                  { metric: '性价比', IHG: 4.21, 万豪: 4.15, 希尔顿: 4.12, 雅高: 4.38 },
+                  { metric: '清洁度', IHG: 4.72, 万豪: 4.68, 希尔顿: 4.75, 雅高: 4.62 },
+                  { metric: '设施', IHG: 4.35, 万豪: 4.42, 希尔顿: 4.52, 雅高: 4.28 },
+                ]}>
+                  <PolarGrid stroke="#e2e8f0" />
+                  <PolarAngleAxis dataKey="metric" tick={{ fontSize: 12 }} />
+                  <PolarRadiusAxis domain={[4, 5]} tick={{ fontSize: 10 }} />
+                  <Radar name="IHG" dataKey="IHG" stroke="#003B6F" fill="#003B6F" fillOpacity={0.3} strokeWidth={2} />
+                  <Radar name="万豪" dataKey="万豪" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.1} strokeWidth={2} />
+                  <Radar name="希尔顿" dataKey="希尔顿" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.1} strokeWidth={2} />
+                  <Legend />
+                </RadarChart>
+              </ResponsiveContainer>
+            </Card>
+
+            {/* 柱状图 */}
+            <Card>
+              <h4 className="font-medium text-slate-700 mb-4">综合评分对比</h4>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={competitorData.brands.map((brand, idx) => ({
+                  brand,
+                  score: competitorData.metrics.综合评分[idx],
+                  fill: competitorData.colors[idx]
+                }))}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                  <XAxis dataKey="brand" tick={{ fontSize: 12 }} />
+                  <YAxis domain={[4.3, 4.6]} tick={{ fontSize: 12 }} />
+                  <Tooltip />
+                  <Bar dataKey="score" name="综合评分" radius={[4, 4, 0, 0]}>
+                    {competitorData.brands.map((_, idx) => (
+                      <rect key={idx} fill={competitorData.colors[idx]} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </Card>
+          </div>
+        </section>
+
+        {/* 各品牌竞争优势 */}
+        <section className="animate-fade-in-up delay-200">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base font-semibold text-slate-800">🎯 各品牌竞争优势</h3>
+          </div>
+          <div className="grid grid-cols-4 gap-4">
+            {Object.entries(competitorData.advantages).map(([brand, advantages], idx) => (
+              <Card key={brand} className={idx === 0 ? 'ring-2 ring-ihg-navy bg-ihg-navy/5' : ''}>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: competitorData.colors[idx] }} />
+                  <span className="font-semibold text-slate-800">{brand}</span>
+                </div>
+                <div className="space-y-2">
+                  {advantages.map((adv, i) => (
+                    <div key={i} className="flex items-center gap-2 text-sm">
+                      <span className="text-emerald-500">✓</span>
+                      <span className="text-slate-600">{adv}</span>
+                    </div>
+                  ))}
+                </div>
+              </Card>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* 品牌趋势洞察 */}
+        <section className="animate-fade-in-up delay-250">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base font-semibold text-slate-800">🔮 品牌趋势洞察</h3>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Card className="border-l-4 border-l-emerald-500">
+              <h4 className="font-medium text-emerald-700 mb-3 flex items-center gap-2">
+                <TrendingUp size={18} />
+                机会点
+              </h4>
+              <ul className="space-y-2">
+                <li className="text-sm text-slate-600 flex items-start gap-2">
+                  <span className="text-emerald-500 mt-1">•</span>
+                  英迪格品牌"邻里文化"提及率上升23%，差异化优势明显
+                </li>
+                <li className="text-sm text-slate-600 flex items-start gap-2">
+                  <span className="text-emerald-500 mt-1">•</span>
+                  商务客群对"智能入住"期待度持续攀升，IHG App使用率提升
+                </li>
+                <li className="text-sm text-slate-600 flex items-start gap-2">
+                  <span className="text-emerald-500 mt-1">•</span>
+                  皇冠假日新一线城市早餐满意度高于一线城市8%
+                </li>
+              </ul>
+            </Card>
+            <Card className="border-l-4 border-l-red-500">
+              <h4 className="font-medium text-red-700 mb-3 flex items-center gap-2">
+                <TrendingDown size={18} />
+                风险点
+              </h4>
+              <ul className="space-y-2">
+                <li className="text-sm text-slate-600 flex items-start gap-2">
+                  <span className="text-red-500 mt-1">•</span>
+                  智选假日"隔音"差评率连续3月上升，需重点关注
+                </li>
+                <li className="text-sm text-slate-600 flex items-start gap-2">
+                  <span className="text-red-500 mt-1">•</span>
+                  万豪双12促销力度大，价格敏感用户流失风险增加
+                </li>
+                <li className="text-sm text-slate-600 flex items-start gap-2">
+                  <span className="text-red-500 mt-1">•</span>
+                  假日酒店节假日前台效率投诉激增35%
+                </li>
+              </ul>
+            </Card>
+          </div>
+        </section>
+      </div>
     </Layout>
   );
 }
