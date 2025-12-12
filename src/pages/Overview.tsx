@@ -2,12 +2,11 @@ import { Layout } from '../components/Layout';
 import { Card, Badge, ProgressBar } from '../components/ui';
 import { brandHealthData, actionsData, priceData, hotelHealthData, newOpeningData, competitorData, promiseFulfillmentData, hotelBarriersData } from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
-import { TrendingUp, TrendingDown, AlertTriangle, Star, MapPin, Clock, CheckCircle, ArrowRight, AlertCircle, Target, Zap } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { TrendingUp, TrendingDown, AlertTriangle, Star, MapPin, Clock, CheckCircle, ArrowRight, AlertCircle, Zap } from 'lucide-react';
 import clsx from 'clsx';
 
 export function Overview() {
-  const { currentRole, canAccess } = useAuth();
+  const { currentRole } = useAuth();
   
   if (!currentRole) return null;
 
