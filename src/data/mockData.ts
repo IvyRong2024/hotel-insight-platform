@@ -411,11 +411,11 @@ export const hotelDetailData = {
     { stage: '退房', risk: 'low' as const, issues: ['发票等待'], count: 8, icon: '✅' },
   ],
   drivers: [
-    { dimension: '服务响应', score: 4.7, vsCity: '+0.3', vsBrand: '+0.2', keywords: ['前台热情', '行李员主动', '响应快'], trend: 'stable' as 'stable' | 'up' | 'down' },
-    { dimension: '位置交通', score: 4.8, vsCity: '+0.4', vsBrand: '+0.3', keywords: ['地铁口', '商圈近', '出行方便'], trend: 'stable' as 'stable' | 'up' | 'down' },
-    { dimension: '设计美学', score: 4.6, vsCity: '+0.2', vsBrand: '+0.1', keywords: ['现代', '时尚', '邻里文化'], trend: 'up' as 'stable' | 'up' | 'down' },
-    { dimension: '房间舒适', score: 4.5, vsCity: '+0.1', vsBrand: '0', keywords: ['床软', '枕头舒服'], trend: 'up' as 'stable' | 'up' | 'down' },
-  ],
+    { dimension: '服务响应', score: 4.7, vsCity: '+0.3', vsBrand: '+0.2', keywords: ['前台热情', '行李员主动', '响应快'], trend: 'stable' },
+    { dimension: '位置交通', score: 4.8, vsCity: '+0.4', vsBrand: '+0.3', keywords: ['地铁口', '商圈近', '出行方便'], trend: 'stable' },
+    { dimension: '设计美学', score: 4.6, vsCity: '+0.2', vsBrand: '+0.1', keywords: ['现代', '时尚', '邻里文化'], trend: 'up' },
+    { dimension: '房间舒适', score: 4.5, vsCity: '+0.1', vsBrand: '0', keywords: ['床软', '枕头舒服'], trend: 'up' },
+  ] as Array<{ dimension: string; score: number; vsCity: string; vsBrand: string; keywords: string[]; trend: 'stable' | 'up' | 'down' }>,
 };
 
 // ==================== 用户需求数据 ====================
@@ -506,101 +506,121 @@ export const newOpeningData = {
 };
 
 // ==================== 行动中心数据 ====================
-export const actionsData = [
+type ActionStatus = 'pending' | 'in_progress' | 'completed';
+type ActionPriority = 'urgent' | 'high' | 'medium' | 'low';
+
+interface ActionItem {
+  id: string;
+  priority: ActionPriority;
+  category: string;
+  title: string;
+  hotel: string;
+  hotelId: string;
+  tier: BrandTier;
+  city: string;
+  region: string;
+  source: string;
+  impact: string;
+  deadline: string;
+  status: ActionStatus;
+  assignee: string;
+}
+
+export const actionsData: ActionItem[] = [
   {
     id: 'ACT-001',
-    priority: 'urgent' as const,
+    priority: 'urgent',
     category: '设施维护',
     title: '3楼走廊隔音板加装',
     hotel: '上海外滩英迪格酒店',
     hotelId: 'h3',
-    tier: 'luxury_lifestyle' as BrandTier,
+    tier: 'luxury_lifestyle',
     city: '上海',
     region: '华东',
     source: '房间体验风险',
     impact: '预计提升0.2分',
     deadline: '2024-12-20',
-    status: 'pending' as 'pending' | 'in_progress' | 'completed',
+    status: 'pending',
     assignee: '工程部',
   },
   {
     id: 'ACT-002',
-    priority: 'high' as const,
+    priority: 'high',
     category: '服务培训',
     title: '前台入住效率提升培训',
     hotel: '上海浦东假日酒店',
     hotelId: 'h9',
-    tier: 'essentials' as BrandTier,
+    tier: 'essentials',
     city: '上海',
     region: '华东',
     source: '入住体验风险',
     impact: '预计缩短等待时间50%',
     deadline: '2024-12-15',
-    status: 'in_progress' as 'pending' | 'in_progress' | 'completed',
+    status: 'in_progress',
     assignee: '培训部',
   },
   {
     id: 'ACT-003',
-    priority: 'urgent' as const,
+    priority: 'urgent',
     category: '设施维护',
     title: '全楼层隔音专项整改',
     hotel: '南京新街口假日酒店',
     hotelId: 'h21',
-    tier: 'essentials' as BrandTier,
+    tier: 'essentials',
     city: '南京',
     region: '华东',
     source: '隔音投诉激增',
     impact: '预计提升0.3分',
     deadline: '2024-12-25',
-    status: 'pending' as 'pending' | 'in_progress' | 'completed',
+    status: 'pending',
     assignee: '工程部',
   },
   {
     id: 'ACT-004',
-    priority: 'high' as const,
+    priority: 'high',
     category: '运营流程',
     title: '高峰期前台增员',
     hotel: '南京新街口智选假日酒店',
     hotelId: 'h22',
-    tier: 'essentials' as BrandTier,
+    tier: 'essentials',
     city: '南京',
     region: '华东',
     source: '入住等待过长',
     impact: '预计等待时间-40%',
     deadline: '2024-12-18',
-    status: 'pending' as 'pending' | 'in_progress' | 'completed',
+    status: 'pending',
     assignee: '运营部',
   },
   {
     id: 'ACT-005',
-    priority: 'medium' as const,
+    priority: 'medium',
     category: '服务培训',
     title: '服务响应速度提升',
     hotel: '杭州西溪丽晶酒店',
     hotelId: 'h14',
-    tier: 'luxury_lifestyle' as BrandTier,
+    tier: 'luxury_lifestyle',
     city: '杭州',
     region: '华东',
     source: '服务延迟反馈',
     impact: '提升L&L服务标准',
     deadline: '2024-12-30',
-    status: 'pending' as 'pending' | 'in_progress' | 'completed',
+    status: 'pending',
     assignee: '培训部',
   },
   {
     id: 'ACT-006',
-    priority: 'low' as const,
+    priority: 'low',
     category: '运营流程',
     title: '停车场引导标识更新',
     hotel: '上海外滩英迪格酒店',
     hotelId: 'h3',
-    tier: 'luxury_lifestyle' as BrandTier,
+    tier: 'luxury_lifestyle',
     city: '上海',
     region: '华东',
     source: '用户需求识别',
     impact: '提升到店体验',
     deadline: '2025-01-10',
-    status: 'completed' as 'pending' | 'in_progress' | 'completed',
+    status: 'completed',
     assignee: '运营部',
   },
 ];
@@ -619,11 +639,11 @@ export const priceData = {
     { competitor: '雅高', priceDiff: '+¥160', percentage: '+32%', status: 'neutral' as const },
   ],
   tierPricing: {
-    luxury_lifestyle: { ihg: 1580, competitor: 1650, diff: '-4%', status: 'good' as 'good' | 'warning' | 'neutral' },
-    premium: { ihg: 658, competitor: 625, diff: '+5%', status: 'warning' as 'good' | 'warning' | 'neutral' },
-    essentials: { ihg: 318, competitor: 298, diff: '+7%', status: 'warning' as 'good' | 'warning' | 'neutral' },
-    suites: { ihg: 488, competitor: 520, diff: '-6%', status: 'good' as 'good' | 'warning' | 'neutral' },
-  },
+    luxury_lifestyle: { ihg: 1580, competitor: 1650, diff: '-4%', status: 'good' },
+    premium: { ihg: 658, competitor: 625, diff: '+5%', status: 'warning' },
+    essentials: { ihg: 318, competitor: 298, diff: '+7%', status: 'warning' },
+    suites: { ihg: 488, competitor: 520, diff: '-6%', status: 'good' },
+  } as Record<BrandTier, { ihg: number; competitor: number; diff: string; status: 'good' | 'warning' | 'neutral' }>,
   regions: [
     { name: '华东', avgPrice: 658, change: '+5.2%', promoRate: 32 },
     { name: '华南', avgPrice: 712, change: '+3.8%', promoRate: 28 },

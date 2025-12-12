@@ -8,5 +8,3 @@ createRoot(document.getElementById('root')!).render(
     <App />
   </StrictMode>
 );
-
-// Build trigger Fri Dec 12 17:25:31 CST 2025
