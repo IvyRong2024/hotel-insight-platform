@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Layout } from '../components/Layout';
 import { Card, Badge } from '../components/ui';
 import { priceData, brandTiers, BrandTier } from '../data/mockData';
-import { TrendingUp, TrendingDown, AlertTriangle, ChevronDown, ChevronRight, Tag } from 'lucide-react';
+import { ChevronDown, ChevronRight, Tag } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import clsx from 'clsx';
 

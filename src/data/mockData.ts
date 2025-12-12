@@ -411,10 +411,10 @@ export const hotelDetailData = {
     { stage: '退房', risk: 'low' as const, issues: ['发票等待'], count: 8, icon: '✅' },
   ],
   drivers: [
-    { dimension: '服务响应', score: 4.7, vsCity: '+0.3', vsBrand: '+0.2', keywords: ['前台热情', '行李员主动', '响应快'], trend: 'stable' as const },
-    { dimension: '位置交通', score: 4.8, vsCity: '+0.4', vsBrand: '+0.3', keywords: ['地铁口', '商圈近', '出行方便'], trend: 'stable' as const },
-    { dimension: '设计美学', score: 4.6, vsCity: '+0.2', vsBrand: '+0.1', keywords: ['现代', '时尚', '邻里文化'], trend: 'up' as const },
-    { dimension: '房间舒适', score: 4.5, vsCity: '+0.1', vsBrand: '0', keywords: ['床软', '枕头舒服'], trend: 'up' as const },
+    { dimension: '服务响应', score: 4.7, vsCity: '+0.3', vsBrand: '+0.2', keywords: ['前台热情', '行李员主动', '响应快'], trend: 'stable' as 'stable' | 'up' | 'down' },
+    { dimension: '位置交通', score: 4.8, vsCity: '+0.4', vsBrand: '+0.3', keywords: ['地铁口', '商圈近', '出行方便'], trend: 'stable' as 'stable' | 'up' | 'down' },
+    { dimension: '设计美学', score: 4.6, vsCity: '+0.2', vsBrand: '+0.1', keywords: ['现代', '时尚', '邻里文化'], trend: 'up' as 'stable' | 'up' | 'down' },
+    { dimension: '房间舒适', score: 4.5, vsCity: '+0.1', vsBrand: '0', keywords: ['床软', '枕头舒服'], trend: 'up' as 'stable' | 'up' | 'down' },
   ],
 };
 
@@ -520,7 +520,7 @@ export const actionsData = [
     source: '房间体验风险',
     impact: '预计提升0.2分',
     deadline: '2024-12-20',
-    status: 'pending' as const,
+    status: 'pending' as 'pending' | 'in_progress' | 'completed',
     assignee: '工程部',
   },
   {
@@ -536,7 +536,7 @@ export const actionsData = [
     source: '入住体验风险',
     impact: '预计缩短等待时间50%',
     deadline: '2024-12-15',
-    status: 'in_progress' as const,
+    status: 'in_progress' as 'pending' | 'in_progress' | 'completed',
     assignee: '培训部',
   },
   {
@@ -552,7 +552,7 @@ export const actionsData = [
     source: '隔音投诉激增',
     impact: '预计提升0.3分',
     deadline: '2024-12-25',
-    status: 'pending' as const,
+    status: 'pending' as 'pending' | 'in_progress' | 'completed',
     assignee: '工程部',
   },
   {
@@ -568,7 +568,7 @@ export const actionsData = [
     source: '入住等待过长',
     impact: '预计等待时间-40%',
     deadline: '2024-12-18',
-    status: 'pending' as const,
+    status: 'pending' as 'pending' | 'in_progress' | 'completed',
     assignee: '运营部',
   },
   {
@@ -584,7 +584,7 @@ export const actionsData = [
     source: '服务延迟反馈',
     impact: '提升L&L服务标准',
     deadline: '2024-12-30',
-    status: 'pending' as const,
+    status: 'pending' as 'pending' | 'in_progress' | 'completed',
     assignee: '培训部',
   },
   {
@@ -600,7 +600,7 @@ export const actionsData = [
     source: '用户需求识别',
     impact: '提升到店体验',
     deadline: '2025-01-10',
-    status: 'completed' as const,
+    status: 'completed' as 'pending' | 'in_progress' | 'completed',
     assignee: '运营部',
   },
 ];
@@ -619,10 +619,10 @@ export const priceData = {
     { competitor: '雅高', priceDiff: '+¥160', percentage: '+32%', status: 'neutral' as const },
   ],
   tierPricing: {
-    luxury_lifestyle: { ihg: 1580, competitor: 1650, diff: '-4%', status: 'good' as const },
-    premium: { ihg: 658, competitor: 625, diff: '+5%', status: 'warning' as const },
-    essentials: { ihg: 318, competitor: 298, diff: '+7%', status: 'warning' as const },
-    suites: { ihg: 488, competitor: 520, diff: '-6%', status: 'good' as const },
+    luxury_lifestyle: { ihg: 1580, competitor: 1650, diff: '-4%', status: 'good' as 'good' | 'warning' | 'neutral' },
+    premium: { ihg: 658, competitor: 625, diff: '+5%', status: 'warning' as 'good' | 'warning' | 'neutral' },
+    essentials: { ihg: 318, competitor: 298, diff: '+7%', status: 'warning' as 'good' | 'warning' | 'neutral' },
+    suites: { ihg: 488, competitor: 520, diff: '-6%', status: 'good' as 'good' | 'warning' | 'neutral' },
   },
   regions: [
     { name: '华东', avgPrice: 658, change: '+5.2%', promoRate: 32 },
@@ -698,6 +698,22 @@ export const watchlistData = [
 // ==================== 筛选器选项 ====================
 export const filterOptions = {
   regions: ['全国', '华东', '华南', '华北', '西南', '华中'],
+  provinces: {
+    华东: ['上海', '江苏', '浙江', '安徽', '山东'],
+    华南: ['广东', '广西', '海南', '福建'],
+    华北: ['北京', '天津', '河北', '山西', '内蒙古'],
+    西南: ['四川', '重庆', '云南', '贵州', '西藏'],
+    华中: ['湖北', '湖南', '河南', '江西'],
+  },
+  brands: ['全部品牌', '洲际酒店', '丽晶', '皇冠假日', '假日酒店', '智选假日', '英迪格', 'voco', '馨乐庭'],
+  hotelTypes: ['全部', 'L&L', 'Premium', 'Essentials', 'Suites'],
   tiers: Object.entries(brandTiers).map(([key, value]) => ({ id: key, name: value.name })),
   timeRanges: ['近7天', '近30天', '近90天', '自定义'],
+  roles: [
+    { id: 'brand_ops', name: '品牌运营' },
+    { id: 'region_vp', name: '大区负责人' },
+    { id: 'city_mgr', name: '城市负责人' },
+    { id: 'hotel_mgr', name: '酒店店长' },
+    { id: 'revenue_mgr', name: '定价团队' },
+  ],
 };
