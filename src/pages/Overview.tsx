@@ -1,6 +1,6 @@
 import { Layout } from '../components/Layout';
 import { Card, Badge } from '../components/ui';
-import { brandHealthData, actionsData, priceData, insightsData, hotelHealthData, newOpeningData } from '../data/mockData';
+import { brandHealthData, actionsData, priceData, hotelHealthData, newOpeningData } from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
 import { TrendingUp, TrendingDown, AlertTriangle, Star, MapPin, Calendar, CheckCircle, Clock } from 'lucide-react';
 import clsx from 'clsx';
