@@ -2,7 +2,7 @@ import { Layout } from '../components/Layout';
 import { Card, Badge, ProgressBar } from '../components/ui';
 import { brandHealthData, actionsData, priceData, hotelHealthData, competitorData, promiseFulfillmentData, hotelBarriersData } from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
-import { TrendingUp, TrendingDown, AlertTriangle, Star, MapPin, Clock, CheckCircle, ArrowRight, AlertCircle, Zap } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertTriangle, MapPin, ArrowRight, AlertCircle, Zap } from 'lucide-react';
 import clsx from 'clsx';
 
 export function Overview() {

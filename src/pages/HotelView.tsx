@@ -3,7 +3,7 @@ import { Layout } from '../components/Layout';
 import { Card, Badge, ProgressBar } from '../components/ui';
 import { hotelHealthData, hotelDriversData, hotelBarriersData, userNeedsData, newOpeningData } from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
-import { TrendingUp, TrendingDown, ChevronRight, ChevronDown, Star, AlertTriangle, MapPin, Building, ArrowRight, Plus, X, Clock, CheckCircle } from 'lucide-react';
+import { TrendingUp, TrendingDown, ChevronRight, ChevronDown, Star, AlertTriangle, Building, ArrowRight, Plus, X, Clock, CheckCircle } from 'lucide-react';
 import clsx from 'clsx';
 
 // 模拟层级数据
@@ -143,11 +143,11 @@ export function HotelView() {
   }
 
   // 层级视角 - 大区/城市负责人
-  return <HierarchyView roleId={currentRole.id} />;
+  return <HierarchyView />;
 }
 
 // ========== 层级视角（大区/城市负责人）==========
-function HierarchyView({ roleId }: { roleId: string }) {
+function HierarchyView() {
   const [currentLevel, setCurrentLevel] = useState<'region' | 'province' | 'city' | 'hotel'>('region');
   const [selectedPath, setSelectedPath] = useState<string[]>([]);
   const [selectedHotel, setSelectedHotel] = useState<string | null>(null);
