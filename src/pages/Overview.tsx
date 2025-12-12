@@ -1,365 +1,618 @@
 import { Layout } from '../components/Layout';
-import { Card, Badge } from '../components/ui';
-import { brandHealthData, actionsData, priceData, hotelHealthData, newOpeningData } from '../data/mockData';
+import { Card, Badge, ProgressBar } from '../components/ui';
+import { brandHealthData, actionsData, priceData, hotelHealthData, newOpeningData, competitorData, promiseFulfillmentData, hotelBarriersData } from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
-import { TrendingUp, TrendingDown, AlertTriangle, Star, MapPin, Calendar, CheckCircle, Clock } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertTriangle, Star, MapPin, Clock, CheckCircle, ArrowRight, AlertCircle, Target, Zap } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 
 export function Overview() {
-  const { currentRole } = useAuth();
+  const { currentRole, canAccess } = useAuth();
   
   if (!currentRole) return null;
 
   return (
     <Layout title="Overview" subtitle={currentRole.description} requiredModule="overview">
-      
-      {/* 欢迎区域 */}
-      <section className="mb-8 animate-fade-in-up">
-        <div className="bg-gradient-to-r from-ihg-navy to-ihg-navy-light rounded-2xl p-6 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-white/60 mb-1">欢迎回来</p>
-              <h2 className="text-2xl font-bold">{currentRole.name}</h2>
-              <p className="text-white/70 mt-1">{currentRole.level}</p>
-            </div>
-            <div className="text-right text-white/60 text-sm">
-              <p>数据更新时间</p>
-              <p className="text-white font-medium">2024-12-12 08:00</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 根据角色渲染不同的北极星指标 */}
-      {currentRole.id === 'brand_ops' && <BrandOpsOverview />}
-      {currentRole.id === 'region_vp' && <RegionOverview level="区域" name="华东区" />}
-      {currentRole.id === 'city_mgr' && <RegionOverview level="城市" name="上海市" />}
-      {currentRole.id === 'hotel_mgr' && <HotelMgrOverview />}
-      {currentRole.id === 'revenue_mgr' && <RevenueMgrOverview />}
-      {currentRole.id === 'new_hotel' && <NewHotelOverview />}
+      {/* 根据角色渲染完全不同的界面 */}
+      {currentRole.id === 'brand_ops' && <BrandOpsView />}
+      {currentRole.id === 'region_vp' && <RegionVPView />}
+      {currentRole.id === 'city_mgr' && <CityMgrView />}
+      {currentRole.id === 'hotel_mgr' && <HotelMgrView />}
+      {currentRole.id === 'revenue_mgr' && <RevenueMgrView />}
+      {currentRole.id === 'new_hotel' && <NewHotelView />}
     </Layout>
   );
 }
 
 // ========== 品牌运营视角 ==========
-function BrandOpsOverview() {
-  const isScoreUp = brandHealthData.trends.overallScore.startsWith('+');
-  
+// 核心问题：品牌健康吗？用户感知到我们的承诺了吗？
+function BrandOpsView() {
+  const gap = (brandHealthData.overallScore - competitorData.metrics.综合评分[1]).toFixed(2);
+  const isLeading = parseFloat(gap) > 0;
+
   return (
-    <>
-      {/* 北极星指标 */}
-      <section className="mb-8 animate-fade-in-up delay-100">
-        <h3 className="text-base font-semibold text-slate-800 mb-4">📊 北极星指标</h3>
-        <div className="grid grid-cols-4 gap-4">
-          <MetricCard 
-            label="品牌综合评分" 
-            value={brandHealthData.overallScore.toString()} 
-            suffix="/ 5.0"
-            trend={brandHealthData.trends.overallScore}
-            isUp={isScoreUp}
-          />
-          <MetricCard 
-            label="情绪指数" 
-            value={`${brandHealthData.sentimentIndex}%`}
-            trend={brandHealthData.trends.sentimentIndex}
-            isUp={true}
-          />
-          <MetricCard 
-            label="品牌承诺达成率" 
-            value="72%"
-            trend="+3.2%"
-            isUp={true}
-          />
-          <MetricCard 
-            label="vs 竞对差距" 
-            value="+0.14"
-            subtext="领先万豪"
-            isUp={true}
-          />
+    <div className="space-y-6">
+      {/* 核心问题：我们 vs 竞品 */}
+      <section className="animate-fade-in-up">
+        <div className="bg-gradient-to-r from-ihg-navy to-ihg-navy-light rounded-2xl p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-white/60 text-sm mb-1">IHG 品牌综合评分</p>
+              <div className="flex items-end gap-3">
+                <span className="text-5xl font-bold">{brandHealthData.overallScore}</span>
+                <div className={clsx(
+                  'flex items-center gap-1 px-3 py-1 rounded-full text-sm mb-1',
+                  isLeading ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-300'
+                )}>
+                  {isLeading ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                  {isLeading ? `领先万豪 ${gap}` : `落后万豪 ${Math.abs(parseFloat(gap))}`}
+                </div>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="grid grid-cols-3 gap-6">
+                {competitorData.brands.slice(1).map((brand, idx) => (
+                  <div key={brand} className="text-center">
+                    <p className="text-white/50 text-xs mb-1">{brand}</p>
+                    <p className="text-xl font-semibold">{competitorData.metrics.综合评分[idx + 1]}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* 数据变化总结 */}
-      <section className="animate-fade-in-up delay-200">
-        <h3 className="text-base font-semibold text-slate-800 mb-4">📝 本期变化总结</h3>
-        <div className="grid grid-cols-2 gap-6">
-          <SummaryCard 
-            type="positive"
-            title="正向变化"
-            items={[
-              '品牌综合评分连续3周上升，当前4.52分',
-              '"服务态度"成为核心驱动因素，贡献+0.35',
-              '英迪格品牌"邻里文化"差异化优势显现',
-            ]}
-          />
-          <SummaryCard 
-            type="negative"
-            title="需要关注"
-            items={[
-              '"智能体验"承诺达成率仅45%，需重点改善',
-              '智选假日隔音问题差评率连续上升',
-              '万豪双12促销力度大，价格敏感用户流失风险',
-            ]}
-          />
+      {/* 品牌承诺兑现情况 - 可执行 */}
+      <section className="animate-fade-in-up delay-100">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-base font-semibold text-slate-800">🎯 品牌承诺兑现情况</h3>
+          <span className="text-sm text-slate-500">用户是否真的感知到了？</span>
+        </div>
+        <div className="grid grid-cols-5 gap-4">
+          {promiseFulfillmentData.map((item) => (
+            <Card 
+              key={item.promise}
+              className={clsx(
+                'text-center cursor-pointer transition-all hover:shadow-md',
+                item.status === 'unfulfilled' && 'ring-2 ring-red-300 bg-red-50/50'
+              )}
+              padding="sm"
+            >
+              <div className="text-2xl mb-2">{item.icon}</div>
+              <div className="text-sm font-medium text-slate-700 mb-1">{item.promise}</div>
+              <div className={clsx(
+                'text-2xl font-bold mb-2',
+                item.status === 'fulfilled' ? 'text-emerald-600' :
+                item.status === 'partial' ? 'text-amber-600' : 'text-red-600'
+              )}>
+                {item.score}%
+              </div>
+              {item.status === 'unfulfilled' && (
+                <div className="flex items-center justify-center gap-1 text-xs text-red-600">
+                  <AlertCircle size={12} />
+                  需要行动
+                </div>
+              )}
+            </Card>
+          ))}
+        </div>
+        <div className="mt-4 p-4 bg-red-50 rounded-xl border border-red-100">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="text-red-500 flex-shrink-0 mt-0.5" size={18} />
+            <div>
+              <p className="text-sm font-medium text-red-800">⚡ 建议行动：强化"智能体验"承诺感知</p>
+              <p className="text-xs text-red-600 mt-1">当前仅45%用户感知到智能体验，建议在App引导、自助入住机使用率、智能客房介绍方面加强</p>
+            </div>
+          </div>
         </div>
       </section>
-    </>
+
+      {/* 竞对动态预警 */}
+      <section className="animate-fade-in-up delay-200">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-base font-semibold text-slate-800">⚠️ 竞对动态预警</h3>
+        </div>
+        <Card>
+          <div className="space-y-3">
+            <div className="p-3 bg-red-50 rounded-xl flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Badge variant="danger">高威胁</Badge>
+                <span className="text-sm"><b>万豪</b> 双12促销 <span className="text-ihg-gold font-bold">5折起</span></span>
+              </div>
+              <span className="text-xs text-slate-500">12/10-12/15 · 抖音/携程</span>
+            </div>
+            <div className="p-3 bg-amber-50 rounded-xl flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Badge variant="warning">关注</Badge>
+                <span className="text-sm"><b>希尔顿</b> 数字化体验评分 <span className="text-emerald-600">+0.15</span>，逐步追近</span>
+              </div>
+              <span className="text-xs text-slate-500">近30天趋势</span>
+            </div>
+          </div>
+        </Card>
+      </section>
+    </div>
   );
 }
 
-// ========== 区域/城市负责人视角 ==========
-function RegionOverview({ level, name }: { level: string; name: string }) {
-  const pendingActions = actionsData.filter(a => a.status === 'pending').length;
-  
+// ========== 大区负责人视角 ==========
+// 核心问题：哪个城市需要我关注？哪家店拖后腿？
+function RegionVPView() {
+  const cities = [
+    { name: '上海', score: 4.58, trend: '+0.05', hotels: 28, issues: 3 },
+    { name: '杭州', score: 4.52, trend: '+0.02', hotels: 15, issues: 2 },
+    { name: '南京', score: 4.45, trend: '-0.08', hotels: 12, issues: 5 },
+    { name: '苏州', score: 4.48, trend: '+0.01', hotels: 8, issues: 1 },
+    { name: '宁波', score: 4.41, trend: '-0.03', hotels: 6, issues: 2 },
+  ];
+
+  const problemHotels = [
+    { name: '南京新街口假日酒店', score: 3.92, issue: '隔音问题集中爆发', urgency: 'high' },
+    { name: '南京禄口智选假日', score: 4.05, issue: '早餐投诉增加45%', urgency: 'high' },
+    { name: '杭州萧山皇冠假日', score: 4.12, issue: '入住等待时间过长', urgency: 'medium' },
+  ];
+
   return (
-    <>
-      {/* 北极星指标 */}
-      <section className="mb-8 animate-fade-in-up delay-100">
-        <h3 className="text-base font-semibold text-slate-800 mb-4">📊 北极星指标</h3>
-        <div className="grid grid-cols-4 gap-4">
-          <MetricCard 
-            label={`${level}综合评分`}
-            value="4.48"
-            suffix="/ 5.0"
-            trend="+2.1%"
-            isUp={true}
-          />
-          <MetricCard 
-            label={`${level}排名`}
-            value={level === '区域' ? '#2' : '#5'}
-            subtext={level === '区域' ? '全国5个区域' : '华东区12个城市'}
-          />
-          <MetricCard 
-            label="管辖门店数"
-            value={level === '区域' ? '156' : '28'}
-            suffix="家"
-          />
-          <MetricCard 
-            label="待处理行动"
-            value={pendingActions.toString()}
-            suffix="项"
-            highlight={pendingActions > 0}
-          />
+    <div className="space-y-6">
+      {/* 区域整体状态 */}
+      <section className="animate-fade-in-up">
+        <div className="bg-gradient-to-r from-ihg-navy to-ihg-navy-light rounded-2xl p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-white/60 text-sm mb-1">华东区整体评分</p>
+              <div className="flex items-end gap-3">
+                <span className="text-5xl font-bold">4.48</span>
+                <div className="flex items-center gap-1 px-3 py-1 rounded-full text-sm mb-1 bg-emerald-500/20 text-emerald-300">
+                  <TrendingUp size={14} />
+                  全国排名 #2
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-8 text-center">
+              <div>
+                <p className="text-white/50 text-xs mb-1">管辖门店</p>
+                <p className="text-2xl font-bold">156</p>
+              </div>
+              <div>
+                <p className="text-white/50 text-xs mb-1">问题门店</p>
+                <p className="text-2xl font-bold text-amber-300">8</p>
+              </div>
+              <div>
+                <p className="text-white/50 text-xs mb-1">待处理行动</p>
+                <p className="text-2xl font-bold text-red-300">12</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* 品牌表现汇总 */}
-      <section className="mb-8 animate-fade-in-up delay-200">
-        <h3 className="text-base font-semibold text-slate-800 mb-4">🏨 品牌表现汇总</h3>
-        <Card>
-          <div className="grid grid-cols-5 gap-4">
-            {[
-              { brand: '洲际酒店', score: 4.68, rank: 1, count: 8, trend: '+0.05' },
-              { brand: '皇冠假日', score: 4.52, rank: 2, count: 15, trend: '+0.02' },
-              { brand: '假日酒店', score: 4.35, rank: 3, count: 42, trend: '-0.03' },
-              { brand: '智选假日', score: 4.21, rank: 4, count: 68, trend: '+0.01' },
-              { brand: '英迪格', score: 4.58, rank: 2, count: 23, trend: '+0.08' },
-            ].map((item) => (
-              <div key={item.brand} className="p-4 rounded-xl bg-slate-50 text-center">
-                <div className="text-sm font-medium text-slate-600 mb-2">{item.brand}</div>
-                <div className="text-2xl font-bold text-slate-800 mb-1">{item.score}</div>
-                <div className="flex items-center justify-center gap-2 text-xs">
-                  <span className="text-slate-400">#{item.rank}</span>
-                  <span className={item.trend.startsWith('+') ? 'text-emerald-600' : 'text-red-600'}>
-                    {item.trend}
+      {/* 城市排行榜 - 快速定位问题城市 */}
+      <section className="animate-fade-in-up delay-100">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-base font-semibold text-slate-800">🏙️ 城市表现排行</h3>
+          <span className="text-sm text-slate-500">点击城市查看详情</span>
+        </div>
+        <Card padding="none">
+          <div className="divide-y divide-slate-100">
+            {cities.map((city, idx) => (
+              <div key={city.name} className={clsx(
+                'flex items-center justify-between p-4 hover:bg-slate-50 cursor-pointer transition-all',
+                city.trend.startsWith('-') && 'bg-red-50/50'
+              )}>
+                <div className="flex items-center gap-4">
+                  <span className={clsx(
+                    'w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold',
+                    idx === 0 ? 'bg-ihg-gold text-white' : 'bg-slate-100 text-slate-600'
+                  )}>
+                    {idx + 1}
                   </span>
+                  <div>
+                    <span className="font-medium text-slate-800">{city.name}</span>
+                    <span className="text-xs text-slate-400 ml-2">{city.hotels}家门店</span>
+                  </div>
                 </div>
-                <div className="text-xs text-slate-400 mt-1">{item.count}家门店</div>
+                <div className="flex items-center gap-6">
+                  {city.issues > 0 && (
+                    <span className="text-xs text-red-500 flex items-center gap-1">
+                      <AlertCircle size={12} />
+                      {city.issues}个问题
+                    </span>
+                  )}
+                  <span className={clsx(
+                    'text-sm font-medium',
+                    city.trend.startsWith('+') ? 'text-emerald-600' : 'text-red-600'
+                  )}>
+                    {city.trend}
+                  </span>
+                  <span className="text-xl font-bold text-slate-800">{city.score}</span>
+                  <ArrowRight size={16} className="text-slate-400" />
+                </div>
               </div>
             ))}
           </div>
         </Card>
       </section>
 
-      {/* 数据变化总结 */}
-      <section className="animate-fade-in-up delay-300">
-        <h3 className="text-base font-semibold text-slate-800 mb-4">📝 本期变化总结</h3>
-        <div className="grid grid-cols-2 gap-6">
-          <SummaryCard 
-            type="positive"
-            title="正向变化"
-            items={[
-              `${name}综合评分环比上升2.1%`,
-              '英迪格品牌表现突出，排名上升1位',
-              '服务类投诉较上期减少18%',
-            ]}
-          />
-          <SummaryCard 
-            type="negative"
-            title="需要关注"
-            items={[
-              '假日酒店评分下滑，需重点关注',
-              `${pendingActions}项待处理行动建议`,
-              '3家门店隔音问题集中爆发',
-            ]}
-          />
+      {/* 问题门店预警 - 需要立即关注 */}
+      <section className="animate-fade-in-up delay-200">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-base font-semibold text-slate-800">🚨 需要关注的门店</h3>
+          <Badge variant="danger">{problemHotels.length} 家需督导</Badge>
+        </div>
+        <div className="space-y-3">
+          {problemHotels.map((hotel) => (
+            <Card key={hotel.name} className="border-l-4 border-l-red-500" padding="sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-medium text-slate-800">{hotel.name}</span>
+                    <Badge variant={hotel.urgency === 'high' ? 'danger' : 'warning'}>
+                      {hotel.urgency === 'high' ? '紧急' : '关注'}
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-slate-500">{hotel.issue}</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-red-600">{hotel.score}</div>
+                  <button className="text-xs text-ihg-navy hover:underline flex items-center gap-1 mt-1">
+                    查看详情 <ArrowRight size={12} />
+                  </button>
+                </div>
+              </div>
+            </Card>
+          ))}
         </div>
       </section>
-    </>
+    </div>
+  );
+}
+
+// ========== 城市负责人视角 ==========
+// 核心问题：哪家门店需要帮助？什么问题最突出？
+function CityMgrView() {
+  const hotels = [
+    { name: '上海外滩英迪格', brand: '英迪格', score: 4.68, trend: '+0.05', status: 'good' },
+    { name: '上海静安洲际', brand: '洲际', score: 4.62, trend: '+0.02', status: 'good' },
+    { name: '上海虹桥皇冠假日', brand: '皇冠假日', score: 4.45, trend: '-0.03', status: 'warning' },
+    { name: '上海浦东假日', brand: '假日', score: 4.28, trend: '-0.08', status: 'danger' },
+    { name: '上海徐汇智选假日', brand: '智选假日', score: 4.15, trend: '-0.12', status: 'danger' },
+  ];
+
+  const issueTypes = [
+    { type: '隔音问题', count: 45, percentage: 32 },
+    { type: '入住等待', count: 28, percentage: 20 },
+    { type: '早餐投诉', count: 25, percentage: 18 },
+    { type: '设施故障', count: 22, percentage: 16 },
+    { type: '其他', count: 20, percentage: 14 },
+  ];
+
+  return (
+    <div className="space-y-6">
+      {/* 城市整体状态 */}
+      <section className="animate-fade-in-up">
+        <div className="bg-gradient-to-r from-ihg-navy to-ihg-navy-light rounded-2xl p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-white/60 text-sm mb-1">上海市整体评分</p>
+              <div className="flex items-end gap-3">
+                <span className="text-5xl font-bold">4.48</span>
+                <div className="flex items-center gap-1 px-3 py-1 rounded-full text-sm mb-1 bg-emerald-500/20 text-emerald-300">
+                  <MapPin size={14} />
+                  华东区 #1
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-8 text-center">
+              <div>
+                <p className="text-white/50 text-xs mb-1">管辖门店</p>
+                <p className="text-2xl font-bold">28</p>
+              </div>
+              <div>
+                <p className="text-white/50 text-xs mb-1">表现下滑</p>
+                <p className="text-2xl font-bold text-amber-300">3</p>
+              </div>
+              <div>
+                <p className="text-white/50 text-xs mb-1">待处理</p>
+                <p className="text-2xl font-bold text-red-300">5</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="grid grid-cols-3 gap-6">
+        {/* 门店排行榜 */}
+        <div className="col-span-2 animate-fade-in-up delay-100">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base font-semibold text-slate-800">🏨 门店表现排行</h3>
+          </div>
+          <Card padding="none">
+            <div className="divide-y divide-slate-100">
+              {hotels.map((hotel, idx) => (
+                <div key={hotel.name} className={clsx(
+                  'flex items-center justify-between p-4 hover:bg-slate-50 cursor-pointer',
+                  hotel.status === 'danger' && 'bg-red-50/50'
+                )}>
+                  <div className="flex items-center gap-4">
+                    <span className={clsx(
+                      'w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold',
+                      idx === 0 ? 'bg-ihg-gold text-white' : 'bg-slate-100 text-slate-600'
+                    )}>
+                      {idx + 1}
+                    </span>
+                    <div>
+                      <span className="font-medium text-slate-800">{hotel.name}</span>
+                      <span className="text-xs text-slate-400 ml-2">{hotel.brand}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className={clsx(
+                      'text-sm font-medium',
+                      hotel.trend.startsWith('+') ? 'text-emerald-600' : 'text-red-600'
+                    )}>
+                      {hotel.trend}
+                    </span>
+                    <span className="text-lg font-bold text-slate-800">{hotel.score}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+
+        {/* 问题类型分布 */}
+        <div className="animate-fade-in-up delay-100">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base font-semibold text-slate-800">📊 问题分布</h3>
+          </div>
+          <Card>
+            <div className="space-y-3">
+              {issueTypes.map((issue) => (
+                <div key={issue.type}>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-slate-600">{issue.type}</span>
+                    <span className="text-slate-500">{issue.count}次</span>
+                  </div>
+                  <ProgressBar value={issue.percentage} color="navy" size="sm" />
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 pt-4 border-t border-slate-100">
+              <p className="text-xs text-slate-500">💡 隔音问题占比最高，建议重点关注智选假日品牌</p>
+            </div>
+          </Card>
+        </div>
+      </div>
+    </div>
   );
 }
 
 // ========== 酒店店长视角 ==========
-function HotelMgrOverview() {
-  const pendingActions = actionsData.filter(a => a.status === 'pending').length;
-  
+// 核心问题：用户在抱怨什么？我该先做什么？
+function HotelMgrView() {
+  const myActions = actionsData.filter(a => a.status !== 'completed').slice(0, 4);
+
   return (
-    <>
-      {/* 北极星指标 */}
-      <section className="mb-8 animate-fade-in-up delay-100">
-        <h3 className="text-base font-semibold text-slate-800 mb-4">📊 北极星指标</h3>
-        <div className="grid grid-cols-4 gap-4">
-          <MetricCard 
-            label="酒店综合评分"
-            value={hotelHealthData.overallScore.toString()}
-            suffix="/ 5.0"
-            trend="+1.8%"
-            isUp={true}
-          />
-          <MetricCard 
-            label="城市排名"
-            value={`#${hotelHealthData.overallRank}`}
-            subtext="上海市156家酒店"
-          />
-          <MetricCard 
-            label="区域排名"
-            value="#45"
-            subtext="华东区892家酒店"
-          />
-          <MetricCard 
-            label="全国品牌排名"
-            value="#128"
-            subtext="英迪格品牌全国"
-          />
+    <div className="space-y-6">
+      {/* 我的酒店状态 */}
+      <section className="animate-fade-in-up">
+        <div className="bg-gradient-to-r from-ihg-navy to-ihg-navy-light rounded-2xl p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-white/60 text-sm mb-1">{hotelHealthData.hotelName}</p>
+              <div className="flex items-end gap-3">
+                <span className="text-5xl font-bold">{hotelHealthData.overallScore}</span>
+                <div className="text-white/60 text-sm mb-1">/ 5.0</div>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-6 text-center">
+              <div className="px-4 py-2 bg-white/10 rounded-xl">
+                <p className="text-white/50 text-xs mb-1">城市排名</p>
+                <p className="text-xl font-bold">#{hotelHealthData.overallRank}</p>
+                <p className="text-white/40 text-xs">上海156家</p>
+              </div>
+              <div className="px-4 py-2 bg-white/10 rounded-xl">
+                <p className="text-white/50 text-xs mb-1">区域排名</p>
+                <p className="text-xl font-bold">#89</p>
+                <p className="text-white/40 text-xs">华东892家</p>
+              </div>
+              <div className="px-4 py-2 bg-white/10 rounded-xl">
+                <p className="text-white/50 text-xs mb-1">品牌排名</p>
+                <p className="text-xl font-bold">#12</p>
+                <p className="text-white/40 text-xs">英迪格全国</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* 各平台评分 */}
-      <section className="mb-8 animate-fade-in-up delay-200">
-        <h3 className="text-base font-semibold text-slate-800 mb-4">📱 各平台评分</h3>
+      {/* 用户在抱怨什么 - 链路视图 */}
+      <section className="animate-fade-in-up delay-100">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-base font-semibold text-slate-800">😤 用户在抱怨什么？</h3>
+          <span className="text-sm text-slate-500">近30天差评分布</span>
+        </div>
         <Card>
-          <div className="grid grid-cols-5 gap-4">
-            {hotelHealthData.platforms.map((platform) => (
-              <div key={platform.name} className="text-center p-4 rounded-xl bg-slate-50">
-                <div className="text-sm text-slate-500 mb-2">{platform.name}</div>
-                <div className="text-2xl font-bold text-slate-800">{platform.score}</div>
-                <div className="text-xs text-slate-400 mt-1 flex items-center justify-center gap-1">
-                  <MapPin size={10} />
-                  城市 #{platform.rank}
+          <div className="flex items-center justify-between">
+            {hotelBarriersData.journeyRisks.map((stage, idx) => (
+              <div key={stage.stage} className="flex items-center">
+                <div className="flex flex-col items-center">
+                  <div className={clsx(
+                    'w-14 h-14 rounded-xl flex items-center justify-center text-2xl border-2 mb-2',
+                    stage.risk === 'high' ? 'bg-red-50 border-red-300' : 
+                    stage.risk === 'medium' ? 'bg-amber-50 border-amber-300' : 
+                    'bg-emerald-50 border-emerald-300'
+                  )}>
+                    {stage.icon}
+                  </div>
+                  <span className="text-sm font-medium text-slate-700">{stage.stage}</span>
+                  <span className={clsx(
+                    'text-lg font-bold',
+                    stage.risk === 'high' ? 'text-red-600' : 
+                    stage.risk === 'medium' ? 'text-amber-600' : 'text-emerald-600'
+                  )}>
+                    {stage.count}
+                  </span>
                 </div>
+                {idx < hotelBarriersData.journeyRisks.length - 1 && (
+                  <div className="w-12 h-0.5 bg-slate-200 mx-2" />
+                )}
               </div>
             ))}
+          </div>
+          <div className="mt-4 p-3 bg-red-50 rounded-xl">
+            <p className="text-sm text-red-800">
+              <b>🚨 房间阶段</b>问题最多（89次），主要集中在：隔音差、空调异响、热水不稳
+            </p>
           </div>
         </Card>
       </section>
 
-      {/* 待处理行动 */}
-      <section className="mb-8 animate-fade-in-up delay-300">
-        <h3 className="text-base font-semibold text-slate-800 mb-4">⚡ 待处理行动</h3>
-        <Card>
-          <div className="space-y-3">
-            {actionsData.filter(a => a.status !== 'completed').slice(0, 3).map((action) => (
-              <div key={action.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50">
+      {/* 我该先做什么 - 待办行动 */}
+      <section className="animate-fade-in-up delay-200">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-base font-semibold text-slate-800">⚡ 我该先做什么？</h3>
+          <Badge variant="danger">{myActions.length} 项待处理</Badge>
+        </div>
+        <div className="space-y-3">
+          {myActions.map((action) => (
+            <Card key={action.id} className={clsx(
+              'border-l-4',
+              action.priority === 'urgent' ? 'border-l-red-500 bg-red-50/30' : 
+              action.priority === 'high' ? 'border-l-amber-500' : 'border-l-slate-300'
+            )} padding="sm">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <Badge variant={action.priority === 'urgent' ? 'danger' : action.priority === 'high' ? 'warning' : 'info'}>
-                    {action.priority === 'urgent' ? '紧急' : action.priority === 'high' ? '高优' : '中等'}
-                  </Badge>
-                  <span className="text-sm font-medium text-slate-700">{action.title}</span>
+                  <div className={clsx(
+                    'w-10 h-10 rounded-lg flex items-center justify-center',
+                    action.priority === 'urgent' ? 'bg-red-100' : 
+                    action.priority === 'high' ? 'bg-amber-100' : 'bg-slate-100'
+                  )}>
+                    <Zap size={18} className={clsx(
+                      action.priority === 'urgent' ? 'text-red-600' : 
+                      action.priority === 'high' ? 'text-amber-600' : 'text-slate-600'
+                    )} />
+                  </div>
+                  <div>
+                    <div className="font-medium text-slate-800">{action.title}</div>
+                    <div className="text-xs text-slate-500">{action.impact}</div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 text-xs text-slate-400">
-                  <Clock size={12} />
-                  {action.deadline}
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <div className="text-xs text-slate-400">截止日期</div>
+                    <div className="text-sm font-medium text-slate-700">{action.deadline}</div>
+                  </div>
+                  <button className="px-4 py-2 bg-ihg-navy text-white text-sm rounded-lg hover:bg-ihg-navy-light">
+                    去处理
+                  </button>
                 </div>
               </div>
-            ))}
-          </div>
-        </Card>
-      </section>
-
-      {/* 数据变化总结 */}
-      <section className="animate-fade-in-up delay-400">
-        <h3 className="text-base font-semibold text-slate-800 mb-4">📝 本期变化总结</h3>
-        <div className="grid grid-cols-2 gap-6">
-          <SummaryCard 
-            type="positive"
-            title="正向变化"
-            items={[
-              '综合评分环比上升1.8%',
-              '服务响应维度得分提升明显',
-              '位置交通好评持续领先',
-            ]}
-          />
-          <SummaryCard 
-            type="negative"
-            title="需要关注"
-            items={[
-              `${pendingActions}项待处理行动建议`,
-              '3楼走廊隔音问题需优先解决',
-              '早餐补餐速度投诉增加',
-            ]}
-          />
+            </Card>
+          ))}
         </div>
       </section>
-    </>
+    </div>
   );
 }
 
 // ========== 定价团队视角 ==========
-function RevenueMgrOverview() {
+// 核心问题：价格有竞争力吗？竞对在搞什么促销？
+function RevenueMgrView() {
+  const priceAlerts = [
+    { platform: '抖音', ourPrice: 568, competitorPrice: 498, competitor: '万豪', diff: '+14%', urgency: 'high' },
+    { platform: '携程', ourPrice: 668, competitorPrice: 625, competitor: '希尔顿', diff: '+7%', urgency: 'medium' },
+  ];
+
   return (
-    <>
-      {/* 北极星指标 */}
-      <section className="mb-8 animate-fade-in-up delay-100">
-        <h3 className="text-base font-semibold text-slate-800 mb-4">📊 北极星指标</h3>
+    <div className="space-y-6">
+      {/* 价格竞争力概览 */}
+      <section className="animate-fade-in-up">
         <div className="grid grid-cols-4 gap-4">
-          <MetricCard 
-            label="全国均价"
-            value={`¥${priceData.regions[0].avgPrice}`}
-            trend={priceData.regions[0].change}
-            isUp={priceData.regions[0].change.startsWith('+')}
-          />
-          <MetricCard 
-            label="vs 竞对价差"
-            value="+¥33"
-            subtext="高于万豪均价"
-          />
-          <MetricCard 
-            label="促销活动占比"
-            value={`${priceData.regions[0].promoRate}%`}
-            trend="-2.1%"
-            isUp={false}
-          />
-          <MetricCard 
-            label="性价比指数"
-            value="1.12"
-            subtext="高性价比"
-            isUp={true}
-          />
+          <Card className="bg-gradient-to-br from-ihg-navy to-ihg-navy-light text-white">
+            <p className="text-white/60 text-sm mb-1">IHG 全国均价</p>
+            <p className="text-3xl font-bold">¥{priceData.regions[0].avgPrice}</p>
+            <p className="text-emerald-300 text-sm mt-1">+5.2% vs 上期</p>
+          </Card>
+          <Card>
+            <p className="text-slate-500 text-sm mb-1">vs 万豪价差</p>
+            <p className="text-3xl font-bold text-slate-800">+¥33</p>
+            <p className="text-amber-600 text-sm mt-1">高于竞对 5%</p>
+          </Card>
+          <Card>
+            <p className="text-slate-500 text-sm mb-1">性价比指数</p>
+            <p className="text-3xl font-bold text-emerald-600">1.12</p>
+            <p className="text-slate-500 text-sm mt-1">高性价比区间</p>
+          </Card>
+          <Card>
+            <p className="text-slate-500 text-sm mb-1">价格预警</p>
+            <p className="text-3xl font-bold text-red-600">{priceAlerts.length}</p>
+            <p className="text-red-500 text-sm mt-1">个渠道需关注</p>
+          </Card>
         </div>
       </section>
 
-      {/* 竞对促销预警 */}
-      <section className="mb-8 animate-fade-in-up delay-200">
-        <h3 className="text-base font-semibold text-slate-800 mb-4">🎯 竞对促销预警</h3>
+      {/* 价格预警 - 需要立即行动 */}
+      <section className="animate-fade-in-up delay-100">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-base font-semibold text-slate-800">🚨 价格预警</h3>
+          <span className="text-sm text-slate-500">我们的价格可能失去竞争力</span>
+        </div>
+        <div className="space-y-3">
+          {priceAlerts.map((alert) => (
+            <Card key={alert.platform} className="border-l-4 border-l-red-500 bg-red-50/30" padding="sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center font-bold text-red-600">
+                    {alert.platform.slice(0, 2)}
+                  </div>
+                  <div>
+                    <div className="font-medium text-slate-800">{alert.platform}渠道价格偏高</div>
+                    <div className="text-sm text-slate-500">
+                      我们 ¥{alert.ourPrice} vs {alert.competitor} ¥{alert.competitorPrice}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="text-right">
+                    <div className="text-xl font-bold text-red-600">{alert.diff}</div>
+                    <div className="text-xs text-slate-500">高于竞对</div>
+                  </div>
+                  <button className="px-4 py-2 bg-ihg-navy text-white text-sm rounded-lg">
+                    调整价格
+                  </button>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      {/* 竞对促销追踪 */}
+      <section className="animate-fade-in-up delay-200">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-base font-semibold text-slate-800">🎯 竞对促销动态</h3>
+          <Badge variant="danger">{priceData.competitorPromos.filter(p => p.threat === 'high').length} 个高威胁</Badge>
+        </div>
         <Card>
           <div className="space-y-3">
             {priceData.competitorPromos.map((promo, idx) => (
               <div key={idx} className={clsx(
-                'flex items-center justify-between p-4 rounded-xl',
+                'p-4 rounded-xl flex items-center justify-between',
                 promo.threat === 'high' ? 'bg-red-50' : promo.threat === 'medium' ? 'bg-amber-50' : 'bg-slate-50'
               )}>
                 <div className="flex items-center gap-4">
                   <Badge variant={promo.threat === 'high' ? 'danger' : promo.threat === 'medium' ? 'warning' : 'info'}>
-                    {promo.threat === 'high' ? '高威胁' : promo.threat === 'medium' ? '中威胁' : '低威胁'}
+                    {promo.threat === 'high' ? '高威胁' : promo.threat === 'medium' ? '中威胁' : '关注'}
                   </Badge>
                   <div>
-                    <span className="font-medium text-slate-800">{promo.competitor}</span>
+                    <span className="font-semibold text-slate-800">{promo.competitor}</span>
                     <span className="text-ihg-gold font-bold ml-2">{promo.discount}</span>
                     <span className="text-sm text-slate-500 ml-2">{promo.campaign}</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-1 text-xs text-slate-400">
-                  <Calendar size={12} />
+                <div className="text-sm text-slate-500">
                   {promo.startDate} ~ {promo.endDate}
                 </div>
               </div>
@@ -367,184 +620,123 @@ function RevenueMgrOverview() {
           </div>
         </Card>
       </section>
-
-      {/* 数据变化总结 */}
-      <section className="animate-fade-in-up delay-300">
-        <h3 className="text-base font-semibold text-slate-800 mb-4">📝 本期变化总结</h3>
-        <div className="grid grid-cols-2 gap-6">
-          <SummaryCard 
-            type="positive"
-            title="正向变化"
-            items={[
-              '性价比指数维持高位，用户感知良好',
-              '直客通渠道价格竞争力最强',
-              '华东区均价稳步上升5.2%',
-            ]}
-          />
-          <SummaryCard 
-            type="negative"
-            title="需要关注"
-            items={[
-              '万豪双12促销力度大，5折起',
-              '抖音渠道价差超过10%需关注',
-              '华北区均价下降1.2%',
-            ]}
-          />
-        </div>
-      </section>
-    </>
-  );
-}
-
-// ========== 新店运营视角 ==========
-function NewHotelOverview() {
-  return (
-    <>
-      {/* 北极星指标 */}
-      <section className="mb-8 animate-fade-in-up delay-100">
-        <h3 className="text-base font-semibold text-slate-800 mb-4">📊 北极星指标</h3>
-        <div className="grid grid-cols-4 gap-4">
-          <MetricCard 
-            label="稳定性评分"
-            value={newOpeningData.stabilityScore.toString()}
-            suffix="/ 100"
-            trend="+5.2%"
-            isUp={true}
-          />
-          <MetricCard 
-            label="开业天数"
-            value={newOpeningData.daysOpen.toString()}
-            suffix="天"
-            subtext="0-90天关键期"
-          />
-          <MetricCard 
-            label="风险问题"
-            value="3"
-            suffix="项"
-            highlight={true}
-          />
-          <MetricCard 
-            label="vs 老店均值"
-            value={newOpeningData.vsOldHotels > 0 ? `+${newOpeningData.vsOldHotels}` : newOpeningData.vsOldHotels.toString()}
-            isUp={newOpeningData.vsOldHotels > 0}
-          />
-        </div>
-      </section>
-
-      {/* 开业进展 */}
-      <section className="mb-8 animate-fade-in-up delay-200">
-        <h3 className="text-base font-semibold text-slate-800 mb-4">📈 开业稳定化进展</h3>
-        <Card>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-                <span className="text-sm text-slate-600">30天目标: 65分</span>
-                <CheckCircle size={14} className="text-emerald-500" />
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-amber-500"></div>
-                <span className="text-sm text-slate-600">60天目标: 75分</span>
-                <Clock size={14} className="text-amber-500" />
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-slate-300"></div>
-                <span className="text-sm text-slate-600">90天目标: 85分</span>
-              </div>
-            </div>
-            <div className="text-right">
-              <span className="text-2xl font-bold text-ihg-navy">{newOpeningData.stabilityScore}</span>
-              <span className="text-sm text-slate-400 ml-1">当前得分</span>
-            </div>
-          </div>
-          <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-gradient-to-r from-ihg-navy to-ihg-gold rounded-full transition-all"
-              style={{ width: `${(newOpeningData.stabilityScore / 100) * 100}%` }}
-            />
-          </div>
-        </Card>
-      </section>
-
-      {/* 亮点与痛点 */}
-      <section className="animate-fade-in-up delay-300">
-        <h3 className="text-base font-semibold text-slate-800 mb-4">📝 本期变化总结</h3>
-        <div className="grid grid-cols-2 gap-6">
-          <SummaryCard 
-            type="positive"
-            title="新店亮点"
-            items={newOpeningData.highlights}
-          />
-          <SummaryCard 
-            type="negative"
-            title="待改进点"
-            items={newOpeningData.painPoints}
-          />
-        </div>
-      </section>
-    </>
-  );
-}
-
-// ========== 通用组件 ==========
-interface MetricCardProps {
-  label: string;
-  value: string;
-  suffix?: string;
-  trend?: string;
-  subtext?: string;
-  isUp?: boolean;
-  highlight?: boolean;
-}
-
-function MetricCard({ label, value, suffix, trend, subtext, isUp, highlight }: MetricCardProps) {
-  return (
-    <div className={clsx(
-      'bg-white rounded-2xl p-5 border',
-      highlight ? 'border-red-200 bg-red-50/50' : 'border-slate-100'
-    )}>
-      <div className="text-sm text-slate-500 mb-2">{label}</div>
-      <div className="flex items-end gap-2">
-        <span className={clsx('text-3xl font-bold', highlight ? 'text-red-600' : 'text-slate-800')}>
-          {value}
-        </span>
-        {suffix && <span className="text-sm text-slate-400 mb-1">{suffix}</span>}
-      </div>
-      {trend && (
-        <div className={clsx('flex items-center gap-1 mt-2 text-sm font-medium', isUp ? 'text-emerald-600' : 'text-red-600')}>
-          {isUp ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-          {trend}
-        </div>
-      )}
-      {subtext && !trend && (
-        <div className="text-xs text-slate-400 mt-2">{subtext}</div>
-      )}
     </div>
   );
 }
 
-interface SummaryCardProps {
-  type: 'positive' | 'negative';
-  title: string;
-  items: string[];
-}
+// ========== 新店运营视角 ==========
+// 核心问题：开业进度正常吗？有什么风险？
+function NewHotelView() {
+  const milestones = [
+    { day: 30, target: 65, label: '30天', achieved: true },
+    { day: 60, target: 75, label: '60天', achieved: false, current: true },
+    { day: 90, target: 85, label: '90天', achieved: false },
+  ];
 
-function SummaryCard({ type, title, items }: SummaryCardProps) {
-  const isPositive = type === 'positive';
   return (
-    <Card className={isPositive ? 'bg-emerald-50/50' : 'bg-red-50/50'}>
-      <div className={clsx('flex items-center gap-2 mb-4', isPositive ? 'text-emerald-600' : 'text-red-600')}>
-        {isPositive ? <TrendingUp size={16} /> : <AlertTriangle size={16} />}
-        <span className="font-semibold">{title}</span>
-      </div>
-      <div className="space-y-2">
-        {items.map((item, idx) => (
-          <div key={idx} className="flex items-start gap-2">
-            <Star size={12} className={clsx('mt-1 flex-shrink-0', isPositive ? 'text-emerald-400' : 'text-red-400')} />
-            <span className="text-sm text-slate-700">{item}</span>
+    <div className="space-y-6">
+      {/* 新店状态 */}
+      <section className="animate-fade-in-up">
+        <div className="bg-gradient-to-r from-ihg-navy to-ihg-navy-light rounded-2xl p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-white/60 text-sm mb-1">{newOpeningData.hotelName}</p>
+              <div className="flex items-end gap-3">
+                <span className="text-5xl font-bold">{newOpeningData.stabilityScore}</span>
+                <span className="text-white/50 text-xl mb-1">/ 100</span>
+              </div>
+              <p className="text-white/60 mt-2">开业第 {newOpeningData.daysOpen} 天</p>
+            </div>
+            <div className="flex gap-4">
+              {milestones.map((m) => (
+                <div key={m.day} className={clsx(
+                  'px-4 py-3 rounded-xl text-center',
+                  m.achieved ? 'bg-emerald-500/20' : m.current ? 'bg-amber-500/20' : 'bg-white/10'
+                )}>
+                  <p className="text-white/60 text-xs mb-1">{m.label}目标</p>
+                  <p className="text-xl font-bold">{m.target}</p>
+                  {m.achieved && <CheckCircle size={14} className="mx-auto mt-1 text-emerald-400" />}
+                  {m.current && <Clock size={14} className="mx-auto mt-1 text-amber-400" />}
+                </div>
+              ))}
+            </div>
           </div>
-        ))}
-      </div>
-    </Card>
+        </div>
+      </section>
+
+      {/* 开业风险预警 */}
+      <section className="animate-fade-in-up delay-100">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-base font-semibold text-slate-800">🚨 开业期风险预警</h3>
+          <Badge variant="danger">3 项需立即处理</Badge>
+        </div>
+        <div className="grid grid-cols-3 gap-4">
+          {newOpeningData.painPoints.map((point, idx) => (
+            <Card key={idx} className="border-l-4 border-l-red-500" padding="sm">
+              <div className="flex items-start gap-3">
+                <AlertTriangle size={18} className="text-red-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-slate-800">{point}</p>
+                  <button className="text-xs text-ihg-navy hover:underline mt-2 flex items-center gap-1">
+                    立即处理 <ArrowRight size={12} />
+                  </button>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      {/* 新店亮点 */}
+      <section className="animate-fade-in-up delay-200">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-base font-semibold text-slate-800">✨ 新店亮点</h3>
+          <span className="text-sm text-slate-500">可推广到其他新店</span>
+        </div>
+        <div className="grid grid-cols-3 gap-4">
+          {newOpeningData.highlights.map((point, idx) => (
+            <Card key={idx} className="border-l-4 border-l-emerald-500 bg-emerald-50/30" padding="sm">
+              <div className="flex items-start gap-3">
+                <Star size={18} className="text-emerald-500 flex-shrink-0 mt-0.5" />
+                <p className="font-medium text-slate-800">{point}</p>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      {/* 对比老店 */}
+      <section className="animate-fade-in-up delay-300">
+        <Card>
+          <h4 className="font-semibold text-slate-800 mb-4">📊 与成熟门店对比</h4>
+          <div className="grid grid-cols-2 gap-6">
+            <div className="p-4 bg-slate-50 rounded-xl">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-slate-600">vs 区域成熟店均值</span>
+                <span className={clsx(
+                  'text-lg font-bold',
+                  newOpeningData.vsRegionAvg > 0 ? 'text-emerald-600' : 'text-red-600'
+                )}>
+                  {newOpeningData.vsRegionAvg > 0 ? '+' : ''}{newOpeningData.vsRegionAvg}
+                </span>
+              </div>
+              <ProgressBar value={50 + newOpeningData.vsRegionAvg * 100} color="green" size="sm" />
+            </div>
+            <div className="p-4 bg-slate-50 rounded-xl">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-slate-600">vs 品牌成熟店均值</span>
+                <span className={clsx(
+                  'text-lg font-bold',
+                  newOpeningData.vsOldHotels > 0 ? 'text-emerald-600' : 'text-red-600'
+                )}>
+                  {newOpeningData.vsOldHotels}
+                </span>
+              </div>
+              <ProgressBar value={50 + newOpeningData.vsOldHotels * 100} color="red" size="sm" />
+            </div>
+          </div>
+        </Card>
+      </section>
+    </div>
   );
 }
