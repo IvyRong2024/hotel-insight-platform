@@ -13,7 +13,7 @@ import {
   BrandTier 
 } from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
-import { TrendingUp, TrendingDown, AlertCircle, ArrowRight, Zap, Star, ChevronRight, AlertTriangle } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertCircle, ArrowRight, Zap, Star, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 
