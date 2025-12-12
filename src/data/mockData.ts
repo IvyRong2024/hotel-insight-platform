@@ -3,12 +3,20 @@ export const platformConfig = {
   review: {
     name: '评论监测平台',
     platforms: ['携程', '美团', '飞猪', 'Booking', 'Expedia', 'Agoda'],
-    coverage: { brands: '8k+', hotels: '5k+' },
+    coverage: { 
+      total: '13,000+',
+      ihg: '2,800+',
+      competitors: '10,200+',
+    },
   },
   price: {
     name: '价格监测平台',
     platforms: ['携程', '抖音', '直客通'],
-    coverage: { hotels: '5k+' },
+    coverage: { 
+      total: '13,000+',
+      ihg: '2,800+',
+      competitors: '10,200+',
+    },
   },
 };
 

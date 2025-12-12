@@ -42,9 +42,10 @@ export function Login() {
         </div>
 
         <div className="mt-12 pt-8 border-t border-white/10">
-          <div className="text-white/40 text-sm">
-            <p>评论覆盖：携程 · 美团 · 飞猪 · Booking · Expedia · Agoda</p>
-            <p className="mt-1">价格覆盖：携程 · 抖音 · 直客通</p>
+          <div className="text-white/40 text-sm space-y-2">
+            <p><span className="text-white/60">监测规模：</span>13,000+ 家门店（IHG 2,800+ / 竞品 10,200+）</p>
+            <p><span className="text-white/60">评论来源：</span>携程 · 美团 · 飞猪 · Booking · Expedia · Agoda</p>
+            <p><span className="text-white/60">价格来源：</span>携程 · 抖音 · 直客通</p>
           </div>
         </div>
       </div>
