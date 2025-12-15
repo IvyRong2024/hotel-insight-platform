@@ -121,12 +121,32 @@ const competitorPriceData = {
   ],
 };
 
-// 竞品券类产品
-const competitorVouchers = [
-  { group: '万豪国际', product: '双人周末套餐', price: 828, platform: '抖音', includes: ['豪华大床房1晚', '双人自助早餐', '迷你吧饮品', '延迟退房'] },
-  { group: '希尔顿集团', product: '商务住宿券', price: 568, platform: '携程', includes: ['行政大床房1晚', '单人早餐', '行政酒廊', '健身房'] },
-  { group: '雅高集团', product: '圣诞特惠套餐', price: 698, platform: '飞猪', includes: ['高级房1晚', '双人早餐', '圣诞礼盒', '下午茶'] },
-  { group: '凯悦集团', product: '亲子度假券', price: 1188, platform: '抖音', includes: ['家庭房1晚', '三人早餐', '儿童礼包', '儿童乐园门票'] },
+// 竞品券类产品（按城市 × 品牌 × 渠道组织）
+const competitorVouchersByCity = [
+  {
+    city: '上海',
+    vouchers: [
+      { hotel: '上海外滩W酒店', group: '万豪国际', product: '周末双人套餐', price: 1288, platform: '抖音', includes: ['豪华大床房1晚', '双人自助早餐', '迷你吧饮品'] },
+      { hotel: '上海外滩W酒店', group: '万豪国际', product: '商务住宿券', price: 888, platform: '携程', includes: ['高级房1晚', '单人早餐', '延迟退房'] },
+      { hotel: '上海静安希尔顿', group: '希尔顿集团', product: '亲子欢乐住', price: 1088, platform: '抖音', includes: ['家庭房1晚', '三人早餐', '儿童礼包'] },
+      { hotel: '上海静安希尔顿', group: '希尔顿集团', product: '周末特惠券', price: 698, platform: '携程', includes: ['豪华房1晚', '双人早餐'] },
+    ],
+  },
+  {
+    city: '北京',
+    vouchers: [
+      { hotel: '北京国贸大酒店', group: '香格里拉', product: '商务精选套餐', price: 998, platform: '携程', includes: ['行政房1晚', '单人早餐', '行政酒廊'] },
+      { hotel: '北京王府井希尔顿', group: '希尔顿集团', product: '双人浪漫套餐', price: 1188, platform: '抖音', includes: ['豪华房1晚', '双人早餐', '下午茶'] },
+      { hotel: '北京柏悦酒店', group: '凯悦集团', product: '尊享住宿券', price: 1588, platform: '携程', includes: ['柏悦房1晚', '双人早餐', 'SPA体验'] },
+    ],
+  },
+  {
+    city: '广州',
+    vouchers: [
+      { hotel: '广州富力丽思卡尔顿', group: '万豪国际', product: '城市度假套餐', price: 1388, platform: '抖音', includes: ['豪华房1晚', '双人早餐', '泳池使用'] },
+      { hotel: '广州天河希尔顿', group: '希尔顿集团', product: '商务出行券', price: 568, platform: '携程', includes: ['高级房1晚', '单人早餐'] },
+    ],
+  },
 ];
 
 type ViewLevel = 'overview' | 'city' | 'tier';
@@ -135,7 +155,6 @@ export function PriceMonitoring() {
   const [viewLevel, setViewLevel] = useState<ViewLevel>('overview');
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
   const [selectedTier, setSelectedTier] = useState<BrandTier | null>(null);
-  const [expandedVoucher, setExpandedVoucher] = useState<number | null>(null);
 
   const cityData = selectedCity ? competitorPriceData.cities.find(c => c.city === selectedCity) : null;
   const tierData = selectedTier ? competitorPriceData.byTier[selectedTier] : null;
@@ -265,51 +284,69 @@ export function PriceMonitoring() {
         </Card>
       </section>
 
-      {/* 竞品券类动态 */}
+      {/* 竞品券类产品 - 按城市分组 */}
       <section className="animate-fade-in-up delay-200">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-base font-semibold text-slate-800 flex items-center gap-2">
               <Tag size={18} />
-              竞品券类产品动态
+              竞品券类产品监测
             </h3>
-            <p className="text-xs text-slate-500 mt-1">点击查看服务明细</p>
+            <p className="text-xs text-slate-500 mt-1">按城市 × 品牌 × 渠道了解竞品售卖策略</p>
           </div>
         </div>
-        <div className="grid grid-cols-4 gap-4">
-          {competitorVouchers.map((voucher, idx) => (
-            <Card 
-              key={idx} 
-              className={clsx(
-                'bg-slate-50 cursor-pointer transition-all',
-                expandedVoucher === idx && 'ring-2 ring-ihg-navy'
-              )}
-              onClick={() => setExpandedVoucher(expandedVoucher === idx ? null : idx)}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-slate-600">{voucher.group}</span>
-                {expandedVoucher === idx ? <ChevronDown size={14} className="text-slate-400" /> : <ChevronRight size={14} className="text-slate-400" />}
+        
+        <div className="space-y-6">
+          {competitorVouchersByCity.map((cityData) => (
+            <div key={cityData.city}>
+              <div className="flex items-center gap-2 mb-3">
+                <MapPin size={16} className="text-ihg-navy" />
+                <span className="font-medium text-slate-800">{cityData.city}</span>
+                <span className="text-xs text-slate-400">{cityData.vouchers.length} 个在售产品</span>
               </div>
-              <p className="text-sm font-medium text-slate-800 mb-2">{voucher.product}</p>
-              <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-slate-700">¥{voucher.price}</span>
-                <span className="text-xs text-slate-400">{voucher.platform}</span>
-              </div>
-              
-              {/* 服务明细展开 */}
-              {expandedVoucher === idx && (
-                <div className="mt-3 pt-3 border-t border-slate-200">
-                  <p className="text-xs text-slate-500 mb-2">📦 套餐包含</p>
-                  <div className="flex flex-wrap gap-1">
-                    {voucher.includes.map((item, i) => (
-                      <span key={i} className="text-xs px-2 py-1 bg-white text-slate-600 rounded border border-slate-200">
-                        {item}
-                      </span>
+              <Card padding="none">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-100 bg-slate-50">
+                      <th className="text-left p-3 font-medium text-slate-500">酒店/品牌</th>
+                      <th className="text-left p-3 font-medium text-slate-500">产品名称</th>
+                      <th className="text-center p-3 font-medium text-slate-500">渠道</th>
+                      <th className="text-center p-3 font-medium text-slate-500">价格</th>
+                      <th className="text-left p-3 font-medium text-slate-500">服务内容</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {cityData.vouchers.map((voucher, idx) => (
+                      <tr key={idx} className="border-b border-slate-50 hover:bg-slate-50/50">
+                        <td className="p-3">
+                          <div className="font-medium text-slate-800 text-xs">{voucher.hotel}</div>
+                          <div className="text-xs text-slate-400">{voucher.group}</div>
+                        </td>
+                        <td className="p-3 font-medium text-slate-700">{voucher.product}</td>
+                        <td className="p-3 text-center">
+                          <span className={clsx(
+                            'text-xs px-2 py-0.5 rounded',
+                            voucher.platform === '抖音' ? 'bg-pink-100 text-pink-700' :
+                            voucher.platform === '携程' ? 'bg-blue-100 text-blue-700' :
+                            'bg-emerald-100 text-emerald-700'
+                          )}>{voucher.platform}</span>
+                        </td>
+                        <td className="p-3 text-center font-bold text-slate-800">¥{voucher.price}</td>
+                        <td className="p-3">
+                          <div className="flex flex-wrap gap-1">
+                            {voucher.includes.map((item, i) => (
+                              <span key={i} className="text-xs px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded">
+                                {item}
+                              </span>
+                            ))}
+                          </div>
+                        </td>
+                      </tr>
                     ))}
-                  </div>
-                </div>
-              )}
-            </Card>
+                  </tbody>
+                </table>
+              </Card>
+            </div>
           ))}
         </div>
       </section>
