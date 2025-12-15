@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Layout } from '../components/Layout';
-import { Card, Badge } from '../components/ui';
+import { Card } from '../components/ui';
 import { priceData, brandTiers, BrandTier } from '../data/mockData';
 import { ChevronDown, ChevronRight, Tag, MapPin, Building } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';

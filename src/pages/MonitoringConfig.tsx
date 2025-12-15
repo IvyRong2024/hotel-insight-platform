@@ -127,10 +127,19 @@ export function MonitoringConfig() {
     { id: 'permissions' as TabType, label: '用户权限矩阵', icon: Users },
   ];
 
-  // 筛选酒店
-  const filterHotels = (hotels: typeof monitoredHotels.ihg) => {
-    return hotels.filter(h => {
+  // 筛选 IHG 酒店
+  const filterIHGHotels = () => {
+    return monitoredHotels.ihg.filter(h => {
       const matchSearch = h.name.includes(searchTerm) || h.brand.includes(searchTerm) || h.city.includes(searchTerm);
+      const matchTier = filterTier === 'all' || h.tier === filterTier;
+      return matchSearch && matchTier;
+    });
+  };
+
+  // 筛选竞品酒店
+  const filterCompetitorHotels = () => {
+    return monitoredHotels.competitors.filter(h => {
+      const matchSearch = h.name.includes(searchTerm) || h.brand.includes(searchTerm) || h.city.includes(searchTerm) || h.group.includes(searchTerm);
       const matchTier = filterTier === 'all' || h.tier === filterTier;
       return matchSearch && matchTier;
     });
@@ -219,7 +228,7 @@ export function MonitoringConfig() {
                   <div className="w-3 h-3 rounded-full bg-ihg-navy" />
                   IHG 监测门店
                 </h3>
-                <Badge>{filterHotels(monitoredHotels.ihg).length} 家</Badge>
+                <Badge>{filterIHGHotels().length} 家</Badge>
               </div>
               <Card padding="none">
                 <table className="w-full text-sm">
@@ -233,7 +242,7 @@ export function MonitoringConfig() {
                     </tr>
                   </thead>
                   <tbody>
-                    {filterHotels(monitoredHotels.ihg).map(hotel => (
+                    {filterIHGHotels().map(hotel => (
                       <tr key={hotel.id} className="border-b border-slate-50 hover:bg-slate-50/50">
                         <td className="p-3 font-medium text-slate-800">{hotel.name}</td>
                         <td className="p-3 text-slate-600">{hotel.brand}</td>
@@ -269,7 +278,7 @@ export function MonitoringConfig() {
                   <div className="w-3 h-3 rounded-full bg-slate-400" />
                   竞品监测门店
                 </h3>
-                <Badge variant="info">{filterHotels(monitoredHotels.competitors).length} 家</Badge>
+                <Badge variant="info">{filterCompetitorHotels().length} 家</Badge>
               </div>
               <Card padding="none">
                 <table className="w-full text-sm">
@@ -284,7 +293,7 @@ export function MonitoringConfig() {
                     </tr>
                   </thead>
                   <tbody>
-                    {filterHotels(monitoredHotels.competitors).map(hotel => (
+                    {filterCompetitorHotels().map(hotel => (
                       <tr key={hotel.id} className="border-b border-slate-50 hover:bg-slate-50/50">
                         <td className="p-3 font-medium text-slate-800">{hotel.name}</td>
                         <td className="p-3 text-slate-600">{hotel.brand}</td>
