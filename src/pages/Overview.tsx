@@ -1051,8 +1051,12 @@ function NewHotelMgrOverview() {
   // 新店平台高分占比数据
   const newHotelPlatformScores: PlatformScoreSummary = {
     summary: {
+      domesticHighScoreRatio: 80,
+      overseasHighScoreRatio: 86,
       overallHighScoreRatio: 82,
       trend: '+1.5%',
+      totalReviews: 856,
+      highScoreReviews: 702,
     },
     platforms: [
       { name: '携程', highScoreRatio: 80, trend: '+2.1%' },
