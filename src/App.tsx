@@ -6,6 +6,7 @@ import { BrandView } from './pages/BrandView';
 import { HotelView } from './pages/HotelView';
 import { PriceMonitoring } from './pages/PriceMonitoring';
 import { ActionCenter } from './pages/ActionCenter';
+import { MonitoringConfig } from './pages/MonitoringConfig';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isLoggedIn } = useAuth();
@@ -26,6 +27,7 @@ function AppRoutes() {
       <Route path="/hotel" element={<ProtectedRoute><HotelView /></ProtectedRoute>} />
       <Route path="/price" element={<ProtectedRoute><PriceMonitoring /></ProtectedRoute>} />
       <Route path="/actions" element={<ProtectedRoute><ActionCenter /></ProtectedRoute>} />
+      <Route path="/config" element={<ProtectedRoute><MonitoringConfig /></ProtectedRoute>} />
     </Routes>
   );
 }

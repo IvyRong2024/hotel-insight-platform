@@ -6,7 +6,8 @@ import {
   DollarSign, 
   Zap, 
   LogOut,
-  User
+  User,
+  Settings
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import clsx from 'clsx';
@@ -17,6 +18,7 @@ const navItems = [
   { path: '/hotel', icon: Hotel, label: 'Hotel View', module: 'hotel' },
   { path: '/price', icon: DollarSign, label: 'Price Monitor', module: 'price' },
   { path: '/actions', icon: Zap, label: 'Action Center', module: 'actions' },
+  { path: '/config', icon: Settings, label: '监测管理', module: 'overview' },
 ];
 
 export function Sidebar() {

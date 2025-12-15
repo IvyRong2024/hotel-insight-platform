@@ -13,10 +13,11 @@ export const platformConfig = {
     name: '价格监测平台',
     platforms: ['携程', '抖音', '直客通'],
     coverage: { 
-      total: '13,000+',
-      ihg: '2,800+',
+      total: '10,200+',
+      ihg: '—',  // IHG 价格为内部基准，不纳入监测
       competitors: '10,200+',
     },
+    note: '仅监测竞品价格，IHG 价格作为对比基准',
   },
 };
 

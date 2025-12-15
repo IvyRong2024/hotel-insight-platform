@@ -60,31 +60,34 @@ export function PriceMonitoring() {
   // 全国概览视图
   const renderOverview = () => (
     <div className="space-y-6">
-      {/* 监测说明 */}
-      <section className="animate-fade-in-up">
-        <Card className="bg-gradient-to-r from-ihg-navy to-ihg-navy-light text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-semibold mb-2">价格监测体系</h3>
-              <p className="text-white/70 text-sm">城市 × 品牌档次 × 单店 三级穿透</p>
+        {/* 监测说明 */}
+        <section className="animate-fade-in-up">
+          <Card className="bg-gradient-to-r from-ihg-navy to-ihg-navy-light text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold mb-2">竞品价格监测</h3>
+                <p className="text-white/70 text-sm">监测竞品价格动态，IHG 价格作为对比基准</p>
+                <p className="text-white/50 text-xs mt-1">监测平台：携程、抖音、直客通</p>
+              </div>
+              <div className="grid grid-cols-3 gap-6">
+                <div className="text-center px-4 py-2 bg-white/10 rounded-xl">
+                  <p className="text-white/60 text-xs mb-1">监测竞品</p>
+                  <p className="text-2xl font-bold">10,200+</p>
+                  <p className="text-white/50 text-xs">家门店</p>
+                </div>
+                <div className="text-center px-4 py-2 bg-white/10 rounded-xl">
+                  <p className="text-white/60 text-xs mb-1">覆盖城市</p>
+                  <p className="text-2xl font-bold">{cityPriceHierarchy.length}+</p>
+                </div>
+                <div className="text-center px-4 py-2 bg-white/10 rounded-xl">
+                  <p className="text-white/60 text-xs mb-1">竞品集团</p>
+                  <p className="text-2xl font-bold">4</p>
+                  <p className="text-white/50 text-xs">万豪/希尔顿/雅高/凯悦</p>
+                </div>
+              </div>
             </div>
-            <div className="grid grid-cols-3 gap-6">
-              <div className="text-center px-4 py-2 bg-white/10 rounded-xl">
-                <p className="text-white/60 text-xs mb-1">覆盖城市</p>
-                <p className="text-2xl font-bold">{cityPriceHierarchy.length}+</p>
-              </div>
-              <div className="text-center px-4 py-2 bg-white/10 rounded-xl">
-                <p className="text-white/60 text-xs mb-1">品牌档次</p>
-                <p className="text-2xl font-bold">4</p>
-              </div>
-              <div className="text-center px-4 py-2 bg-white/10 rounded-xl">
-                <p className="text-white/60 text-xs mb-1">监测门店</p>
-                <p className="text-2xl font-bold">13,000+</p>
-              </div>
-            </div>
-          </div>
-        </Card>
-      </section>
+          </Card>
+        </section>
 
       {/* 城市价格列表 */}
       <section className="animate-fade-in-up delay-50">
