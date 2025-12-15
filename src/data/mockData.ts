@@ -404,12 +404,12 @@ export const hotelDetailData = {
     { name: 'Agoda', score: 8.6, rank: 22, total: 156 },
   ],
   journeyRisks: [
-    { stage: '预订', risk: 'low' as const, issues: ['节假日价格波动大'], count: 12, icon: '📅' },
-    { stage: '入住', risk: 'medium' as const, issues: ['周末高峰排队', '升房沟通'], count: 38, icon: '🚪' },
-    { stage: '房间', risk: 'medium' as const, issues: ['临街房隔音', '空调出风位置'], count: 52, icon: '🛏️' },
-    { stage: '服务', risk: 'low' as const, issues: ['客房送物响应慢', '早餐高峰等位'], count: 28, icon: '🍳' },
-    { stage: '退房', risk: 'low' as const, issues: ['发票开具等待'], count: 8, icon: '✅' },
-  ],
+    { stage: '预订', risk: 'low', issues: ['节假日价格波动大'], count: 12, icon: '📅' },
+    { stage: '入住', risk: 'medium', issues: ['周末高峰排队', '升房沟通'], count: 38, icon: '🚪' },
+    { stage: '房间', risk: 'high', issues: ['临街房隔音', '空调出风位置'], count: 52, icon: '🛏️' },
+    { stage: '服务', risk: 'low', issues: ['客房送物响应慢', '早餐高峰等位'], count: 28, icon: '🍳' },
+    { stage: '退房', risk: 'low', issues: ['发票开具等待'], count: 8, icon: '✅' },
+  ] as Array<{ stage: string; risk: 'low' | 'medium' | 'high'; issues: string[]; count: number; icon: string }>,
   drivers: [
     { dimension: '服务响应', score: 4.7, vsCity: '+0.3', vsBrand: '+0.2', keywords: ['前台热情', '行李员主动', '响应快'], trend: 'stable' },
     { dimension: '位置交通', score: 4.8, vsCity: '+0.4', vsBrand: '+0.3', keywords: ['地铁口', '商圈近', '出行方便'], trend: 'stable' },
