@@ -917,68 +917,44 @@ function HotelMgrOverview() {
 function RevenueMgrOverview() {
   return (
     <div className="space-y-6">
-      {/* 价格竞争力概览 */}
+      {/* 监测范围说明 */}
       <section className="animate-fade-in-up">
-        <div className="grid grid-cols-4 gap-4">
-          <Card className="bg-gradient-to-br from-ihg-navy to-ihg-navy-light text-white">
-            <p className="text-white/60 text-sm mb-1">IHG 全国均价</p>
-            <p className="text-3xl font-bold">¥{priceData.overview.avgPrice}</p>
-            <p className="text-emerald-300 text-sm mt-1">{priceData.overview.change} vs 上期</p>
-          </Card>
-          {priceData.vsCompetitors.slice(0, 2).map(comp => (
-            <Card key={comp.competitor}>
-              <p className="text-slate-500 text-sm mb-1">vs {comp.competitor}价差</p>
-              <p className="text-3xl font-bold text-slate-800">{comp.priceDiff}</p>
-              <p className={clsx(
-                'text-sm mt-1',
-                comp.status === 'good' ? 'text-emerald-600' : comp.status === 'warning' ? 'text-amber-600' : 'text-slate-500'
-              )}>
-                {comp.percentage}
-              </p>
-            </Card>
-          ))}
-          <Card>
-            <p className="text-slate-500 text-sm mb-1">性价比指数</p>
-            <p className="text-3xl font-bold text-emerald-600">{priceData.overview.valueIndex}</p>
-            <p className="text-slate-500 text-sm mt-1">{priceData.overview.valueLabel}</p>
-          </Card>
-        </div>
-      </section>
-
-      {/* 全国平台高分占比（与价格性价比对照） */}
-      <section className="animate-fade-in-up delay-50">
-        <PlatformScoreRatioCard data={platformScoreStandards} title="全国高分评论占比（用户价值感知）" compact />
-      </section>
-
-      {/* 价格故事 */}
-      <section className="animate-fade-in-up delay-75">
-        <Card className="bg-gradient-to-r from-slate-50 to-white border-l-4 border-l-ihg-navy">
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 bg-ihg-navy/10 rounded-xl flex items-center justify-center text-xl">💰</div>
+        <Card className="bg-gradient-to-r from-ihg-navy to-ihg-navy-light text-white">
+          <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-semibold text-slate-800 mb-1">价格洞察摘要</h3>
-              <p className="text-slate-600 text-sm leading-relaxed">
-                IHG整体定价合理，性价比指数{priceData.overview.valueIndex}处于健康区间，
-                用户高分占比<span className="text-ihg-navy font-medium">{platformScoreStandards.summary.overallHighScoreRatio}%</span>支撑当前定价。
-                但<span className="text-red-600 font-medium">抖音渠道价格比万豪高14%</span>，需关注。
-                <span className="text-amber-600 font-medium">万豪双12促销5折起</span>，预计影响价格敏感客群。
-              </p>
+              <h3 className="text-lg font-semibold mb-2">价格监测覆盖</h3>
+              <p className="text-white/70 text-sm">监测平台：携程、抖音、直客通</p>
+            </div>
+            <div className="grid grid-cols-2 gap-6 text-center">
+              <div className="px-6 py-3 bg-white/10 rounded-xl">
+                <p className="text-white/60 text-xs mb-1">📦 基础房型监测</p>
+                <p className="text-2xl font-bold">13,000+</p>
+                <p className="text-white/50 text-xs">IHG + 竞品门店</p>
+              </div>
+              <div className="px-6 py-3 bg-white/10 rounded-xl">
+                <p className="text-white/60 text-xs mb-1">🎫 券类产品监测</p>
+                <p className="text-2xl font-bold">动态</p>
+                <p className="text-white/50 text-xs">各渠道在售产品</p>
+              </div>
             </div>
           </div>
         </Card>
       </section>
 
-      {/* 各品牌类型定价 */}
-      <section className="animate-fade-in-up delay-100">
+      {/* 基础房型价格概览 */}
+      <section className="animate-fade-in-up delay-50">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-base font-semibold text-slate-800">📊 各品牌类型定价对比</h3>
+          <div>
+            <h3 className="text-base font-semibold text-slate-800">📦 基础房型价格（标准大床房）</h3>
+            <p className="text-xs text-slate-500 mt-1">同档次竞品对比</p>
+          </div>
           <Link to="/price" className="text-sm text-ihg-navy hover:underline flex items-center gap-1">
             查看详情 <ArrowRight size={14} />
           </Link>
         </div>
         <div className="grid grid-cols-4 gap-4">
           {(Object.entries(priceData.tierPricing) as [BrandTier, typeof priceData.tierPricing.luxury_lifestyle][]).map(([tier, data]) => (
-            <Card key={tier} className={clsx(data.status === 'warning' && 'ring-2 ring-amber-200')}>
+            <Card key={tier}>
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: brandTiers[tier].color }} />
                 <span className="font-medium text-slate-800">{brandTiers[tier].name}</span>
@@ -987,51 +963,92 @@ function RevenueMgrOverview() {
                 <span className="text-2xl font-bold text-slate-800">¥{data.ihg}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-500">vs 竞品 ¥{data.competitor}</span>
-                <span className={clsx(
-                  'font-medium',
-                  data.status === 'good' ? 'text-emerald-600' : data.status === 'warning' ? 'text-amber-600' : 'text-slate-600'
-                )}>
-                  {data.diff}
-                </span>
+                <span className="text-slate-500">同档竞品 ¥{data.competitor}</span>
+                <span className="font-medium text-slate-700">{data.diff}</span>
               </div>
-              {data.status === 'warning' && (
-                <div className="mt-2 p-2 bg-amber-50 rounded-lg text-xs text-amber-600">⚠️ 定价偏高</div>
-              )}
             </Card>
           ))}
         </div>
       </section>
 
-      {/* 价格预警 */}
-      <section className="animate-fade-in-up delay-150">
+      {/* 券类产品动态 */}
+      <section className="animate-fade-in-up delay-75">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-base font-semibold text-slate-800">🚨 价格预警</h3>
-          <Badge variant="danger">{priceData.channelAlerts.length} 个渠道</Badge>
+          <div>
+            <h3 className="text-base font-semibold text-slate-800">🎫 券类产品动态</h3>
+            <p className="text-xs text-slate-500 mt-1">仅做动态监测，不做跨品牌对比</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <Card>
+            <h4 className="font-medium text-slate-700 mb-3">IHG 在售券类</h4>
+            <div className="space-y-2">
+              {priceData.voucherProducts.slice(0, 3).map((v, idx) => (
+                <div key={idx} className="flex items-center justify-between p-2 bg-slate-50 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <span className={clsx(
+                      'text-xs px-1.5 py-0.5 rounded',
+                      v.platform === '抖音' ? 'bg-pink-100 text-pink-700' :
+                      v.platform === '携程' ? 'bg-blue-100 text-blue-700' :
+                      'bg-emerald-100 text-emerald-700'
+                    )}>{v.platform}</span>
+                    <span className="text-sm text-slate-700">{v.name}</span>
+                  </div>
+                  <span className="font-bold text-slate-800">¥{v.salePrice}</span>
+                </div>
+              ))}
+            </div>
+          </Card>
+          <Card>
+            <h4 className="font-medium text-slate-700 mb-3">竞品券类动态</h4>
+            <div className="space-y-2">
+              {[
+                { brand: '万豪', product: '双人周末套餐', price: 828, platform: '抖音' },
+                { brand: '希尔顿', product: '商务住宿券', price: 568, platform: '携程' },
+                { brand: '雅高', product: '圣诞特惠套餐', price: 698, platform: '飞猪' },
+              ].map((item, idx) => (
+                <div key={idx} className="flex items-center justify-between p-2 bg-slate-50 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs px-1.5 py-0.5 rounded bg-slate-200 text-slate-600">{item.brand}</span>
+                    <span className="text-sm text-slate-700">{item.product}</span>
+                  </div>
+                  <span className="font-bold text-slate-800">¥{item.price}</span>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+      </section>
+
+      {/* 渠道价差监测 */}
+      <section className="animate-fade-in-up delay-100">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-base font-semibold text-slate-800">📊 渠道价差监测</h3>
+          <span className="text-xs text-slate-500">基础房型 · 同档竞品对比</span>
         </div>
         <div className="space-y-3">
           {priceData.channelAlerts.map((alert) => (
-            <Card key={alert.channel} className="border-l-4 border-l-red-500 bg-red-50/30" padding="sm">
+            <Card key={alert.channel} padding="sm">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center font-bold text-red-600">
+                  <div className={clsx(
+                    'w-12 h-12 rounded-xl flex items-center justify-center font-bold',
+                    alert.channel === '抖音' ? 'bg-pink-100 text-pink-700' : 'bg-blue-100 text-blue-700'
+                  )}>
                     {alert.channel.slice(0, 2)}
                   </div>
                   <div>
-                    <div className="font-medium text-slate-800">{alert.channel}渠道价格偏高</div>
+                    <div className="font-medium text-slate-800">{alert.channel}渠道</div>
                     <div className="text-sm text-slate-500">
-                      我们 ¥{alert.ourPrice} vs {alert.competitor} ¥{alert.competitorPrice}
+                      IHG ¥{alert.ourPrice} · {alert.competitor} ¥{alert.competitorPrice}
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="text-right">
-                    <div className="text-xl font-bold text-red-600">{alert.diff}</div>
-                    <div className="text-xs text-slate-500">高于竞对</div>
+                    <div className="text-xl font-bold text-slate-700">{alert.diff}</div>
+                    <div className="text-xs text-slate-500">价差</div>
                   </div>
-                  <button className="px-4 py-2 bg-ihg-navy text-white text-sm rounded-lg">
-                    调整价格
-                  </button>
                 </div>
               </div>
             </Card>
@@ -1042,21 +1059,16 @@ function RevenueMgrOverview() {
       {/* 竞对促销 */}
       <section className="animate-fade-in-up delay-200">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-base font-semibold text-slate-800">⚠️ 竞对促销动态</h3>
+          <h3 className="text-base font-semibold text-slate-800">📰 竞品促销动态</h3>
         </div>
         <Card>
           <div className="space-y-3">
             {priceData.competitorPromos.map((promo, idx) => (
-              <div key={idx} className={clsx(
-                'p-3 rounded-xl flex items-center justify-between',
-                promo.threat === 'high' ? 'bg-red-50' : promo.threat === 'medium' ? 'bg-amber-50' : 'bg-slate-50'
-              )}>
+              <div key={idx} className="p-3 rounded-xl flex items-center justify-between bg-slate-50">
                 <div className="flex items-center gap-3">
-                  <Badge variant={promo.threat === 'high' ? 'danger' : promo.threat === 'medium' ? 'warning' : 'info'}>
-                    {promo.threat === 'high' ? '高威胁' : promo.threat === 'medium' ? '中威胁' : '关注'}
-                  </Badge>
-                  <span className="text-sm">
-                    <b>{promo.competitor}</b> {promo.campaign} <span className="text-ihg-gold font-bold">{promo.discount}</span>
+                  <span className="text-xs px-2 py-0.5 rounded bg-slate-200 text-slate-600">{promo.competitor}</span>
+                  <span className="text-sm text-slate-700">
+                    {promo.campaign} <span className="font-bold text-slate-800">{promo.discount}</span>
                   </span>
                 </div>
                 <span className="text-xs text-slate-500">{promo.dates} · {promo.channels.join('/')}</span>
