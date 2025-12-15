@@ -90,7 +90,7 @@ function PlatformScoreRatioCard({
                 platform.name === 'Expedia' ? 'bg-purple-100 text-purple-700' :
                 'bg-pink-100 text-pink-700'
               )}>
-                {platform.name.slice(0, 4)}
+                {platform.name}
               </div>
               <div className="text-sm font-bold text-slate-700">{platform.highScoreRatio}%</div>
             </div>
@@ -171,12 +171,12 @@ function PlatformScoreRatioCard({
             {Object.values(data.overseas).map((platform) => (
               <div key={platform.name} className="flex items-center gap-3">
                 <div className={clsx(
-                  'w-12 h-8 rounded flex items-center justify-center text-xs font-medium',
+                  'w-16 h-8 rounded flex items-center justify-center text-xs font-medium',
                   platform.name === 'Booking' ? 'bg-indigo-100 text-indigo-700' :
                   platform.name === 'Expedia' ? 'bg-purple-100 text-purple-700' :
                   'bg-pink-100 text-pink-700'
                 )}>
-                  {platform.name.slice(0, 4)}
+                  {platform.name}
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between text-xs mb-1">
