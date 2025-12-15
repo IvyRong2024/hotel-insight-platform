@@ -957,6 +957,251 @@ export const priceData = {
   competitorPromos: competitorData.promos,
 };
 
+// ==================== 价格层级数据（城市 × 品牌档次 × 单店）====================
+export interface HotelPriceData {
+  id: string;
+  name: string;
+  brand: string;
+  tier: BrandTier;
+  basePrice: number; // 基础房型价格
+  channels: {
+    ctrip: number;
+    douyin: number;
+    zhiketong: number;
+  };
+  competitorAvg: number;
+  diff: string;
+}
+
+export interface CityPriceData {
+  city: string;
+  region: string;
+  avgPrice: number;
+  change: string;
+  byTier: Record<BrandTier, {
+    ihgAvg: number;
+    competitorAvg: number;
+    diff: string;
+    hotels: HotelPriceData[];
+  }>;
+}
+
+export const cityPriceHierarchy: CityPriceData[] = [
+  {
+    city: '上海',
+    region: '华东',
+    avgPrice: 728,
+    change: '+4.2%',
+    byTier: {
+      luxury_lifestyle: {
+        ihgAvg: 1680,
+        competitorAvg: 1750,
+        diff: '-4%',
+        hotels: [
+          { id: 'sh-1', name: '上海外滩英迪格酒店', brand: '英迪格', tier: 'luxury_lifestyle', basePrice: 1580, channels: { ctrip: 1580, douyin: 1488, zhiketong: 1520 }, competitorAvg: 1650, diff: '-4%' },
+          { id: 'sh-2', name: '上海浦东洲际酒店', brand: '洲际酒店', tier: 'luxury_lifestyle', basePrice: 1880, channels: { ctrip: 1880, douyin: 1780, zhiketong: 1820 }, competitorAvg: 1950, diff: '-4%' },
+          { id: 'sh-3', name: '上海新天地朗廷酒店', brand: '丽晶', tier: 'luxury_lifestyle', basePrice: 2180, channels: { ctrip: 2180, douyin: 1980, zhiketong: 2080 }, competitorAvg: 2250, diff: '-3%' },
+        ],
+      },
+      premium: {
+        ihgAvg: 728,
+        competitorAvg: 698,
+        diff: '+4%',
+        hotels: [
+          { id: 'sh-4', name: '上海浦东皇冠假日酒店', brand: '皇冠假日', tier: 'premium', basePrice: 758, channels: { ctrip: 758, douyin: 698, zhiketong: 728 }, competitorAvg: 718, diff: '+6%' },
+          { id: 'sh-5', name: '上海虹桥voco酒店', brand: 'voco', tier: 'premium', basePrice: 698, channels: { ctrip: 698, douyin: 658, zhiketong: 678 }, competitorAvg: 678, diff: '+3%' },
+        ],
+      },
+      essentials: {
+        ihgAvg: 358,
+        competitorAvg: 328,
+        diff: '+9%',
+        hotels: [
+          { id: 'sh-6', name: '上海浦东假日酒店', brand: '假日酒店', tier: 'essentials', basePrice: 398, channels: { ctrip: 398, douyin: 358, zhiketong: 378 }, competitorAvg: 358, diff: '+11%' },
+          { id: 'sh-7', name: '上海虹桥智选假日酒店', brand: '智选假日', tier: 'essentials', basePrice: 318, channels: { ctrip: 318, douyin: 288, zhiketong: 298 }, competitorAvg: 298, diff: '+7%' },
+        ],
+      },
+      suites: {
+        ihgAvg: 528,
+        competitorAvg: 558,
+        diff: '-5%',
+        hotels: [
+          { id: 'sh-8', name: '上海古北馨乐庭酒店', brand: '馨乐庭', tier: 'suites', basePrice: 528, channels: { ctrip: 528, douyin: 488, zhiketong: 508 }, competitorAvg: 558, diff: '-5%' },
+        ],
+      },
+    },
+  },
+  {
+    city: '北京',
+    region: '华北',
+    avgPrice: 688,
+    change: '+2.8%',
+    byTier: {
+      luxury_lifestyle: {
+        ihgAvg: 1580,
+        competitorAvg: 1620,
+        diff: '-2%',
+        hotels: [
+          { id: 'bj-1', name: '北京三里屯洲际酒店', brand: '洲际酒店', tier: 'luxury_lifestyle', basePrice: 1680, channels: { ctrip: 1680, douyin: 1580, zhiketong: 1620 }, competitorAvg: 1720, diff: '-2%' },
+          { id: 'bj-2', name: '北京王府井英迪格酒店', brand: '英迪格', tier: 'luxury_lifestyle', basePrice: 1480, channels: { ctrip: 1480, douyin: 1380, zhiketong: 1420 }, competitorAvg: 1520, diff: '-3%' },
+        ],
+      },
+      premium: {
+        ihgAvg: 688,
+        competitorAvg: 658,
+        diff: '+5%',
+        hotels: [
+          { id: 'bj-3', name: '北京国贸皇冠假日酒店', brand: '皇冠假日', tier: 'premium', basePrice: 728, channels: { ctrip: 728, douyin: 668, zhiketong: 698 }, competitorAvg: 688, diff: '+6%' },
+          { id: 'bj-4', name: '北京望京voco酒店', brand: 'voco', tier: 'premium', basePrice: 648, channels: { ctrip: 648, douyin: 598, zhiketong: 618 }, competitorAvg: 628, diff: '+3%' },
+        ],
+      },
+      essentials: {
+        ihgAvg: 338,
+        competitorAvg: 308,
+        diff: '+10%',
+        hotels: [
+          { id: 'bj-5', name: '北京朝阳假日酒店', brand: '假日酒店', tier: 'essentials', basePrice: 368, channels: { ctrip: 368, douyin: 328, zhiketong: 348 }, competitorAvg: 338, diff: '+9%' },
+          { id: 'bj-6', name: '北京中关村智选假日酒店', brand: '智选假日', tier: 'essentials', basePrice: 308, channels: { ctrip: 308, douyin: 278, zhiketong: 288 }, competitorAvg: 278, diff: '+11%' },
+        ],
+      },
+      suites: {
+        ihgAvg: 498,
+        competitorAvg: 528,
+        diff: '-6%',
+        hotels: [
+          { id: 'bj-7', name: '北京CBD馨乐庭酒店', brand: '馨乐庭', tier: 'suites', basePrice: 498, channels: { ctrip: 498, douyin: 458, zhiketong: 478 }, competitorAvg: 528, diff: '-6%' },
+        ],
+      },
+    },
+  },
+  {
+    city: '广州',
+    region: '华南',
+    avgPrice: 658,
+    change: '+3.5%',
+    byTier: {
+      luxury_lifestyle: {
+        ihgAvg: 1480,
+        competitorAvg: 1520,
+        diff: '-3%',
+        hotels: [
+          { id: 'gz-1', name: '广州珠江新城洲际酒店', brand: '洲际酒店', tier: 'luxury_lifestyle', basePrice: 1580, channels: { ctrip: 1580, douyin: 1480, zhiketong: 1520 }, competitorAvg: 1620, diff: '-2%' },
+          { id: 'gz-2', name: '广州天河英迪格酒店', brand: '英迪格', tier: 'luxury_lifestyle', basePrice: 1380, channels: { ctrip: 1380, douyin: 1280, zhiketong: 1320 }, competitorAvg: 1420, diff: '-3%' },
+        ],
+      },
+      premium: {
+        ihgAvg: 658,
+        competitorAvg: 628,
+        diff: '+5%',
+        hotels: [
+          { id: 'gz-3', name: '广州花园皇冠假日酒店', brand: '皇冠假日', tier: 'premium', basePrice: 698, channels: { ctrip: 698, douyin: 638, zhiketong: 668 }, competitorAvg: 658, diff: '+6%' },
+        ],
+      },
+      essentials: {
+        ihgAvg: 318,
+        competitorAvg: 288,
+        diff: '+10%',
+        hotels: [
+          { id: 'gz-4', name: '广州天河假日酒店', brand: '假日酒店', tier: 'essentials', basePrice: 338, channels: { ctrip: 338, douyin: 298, zhiketong: 318 }, competitorAvg: 308, diff: '+10%' },
+          { id: 'gz-5', name: '广州番禺智选假日酒店', brand: '智选假日', tier: 'essentials', basePrice: 298, channels: { ctrip: 298, douyin: 268, zhiketong: 278 }, competitorAvg: 268, diff: '+11%' },
+        ],
+      },
+      suites: {
+        ihgAvg: 468,
+        competitorAvg: 498,
+        diff: '-6%',
+        hotels: [
+          { id: 'gz-6', name: '广州珠江馨乐庭酒店', brand: '馨乐庭', tier: 'suites', basePrice: 468, channels: { ctrip: 468, douyin: 428, zhiketong: 448 }, competitorAvg: 498, diff: '-6%' },
+        ],
+      },
+    },
+  },
+  {
+    city: '杭州',
+    region: '华东',
+    avgPrice: 618,
+    change: '+2.1%',
+    byTier: {
+      luxury_lifestyle: {
+        ihgAvg: 1380,
+        competitorAvg: 1420,
+        diff: '-3%',
+        hotels: [
+          { id: 'hz-1', name: '杭州西湖洲际酒店', brand: '洲际酒店', tier: 'luxury_lifestyle', basePrice: 1480, channels: { ctrip: 1480, douyin: 1380, zhiketong: 1420 }, competitorAvg: 1520, diff: '-3%' },
+          { id: 'hz-2', name: '杭州滨江英迪格酒店', brand: '英迪格', tier: 'luxury_lifestyle', basePrice: 1280, channels: { ctrip: 1280, douyin: 1180, zhiketong: 1220 }, competitorAvg: 1320, diff: '-3%' },
+        ],
+      },
+      premium: {
+        ihgAvg: 618,
+        competitorAvg: 588,
+        diff: '+5%',
+        hotels: [
+          { id: 'hz-3', name: '杭州黄龙皇冠假日酒店', brand: '皇冠假日', tier: 'premium', basePrice: 658, channels: { ctrip: 658, douyin: 598, zhiketong: 628 }, competitorAvg: 618, diff: '+6%' },
+        ],
+      },
+      essentials: {
+        ihgAvg: 298,
+        competitorAvg: 268,
+        diff: '+11%',
+        hotels: [
+          { id: 'hz-4', name: '杭州西湖假日酒店', brand: '假日酒店', tier: 'essentials', basePrice: 318, channels: { ctrip: 318, douyin: 278, zhiketong: 298 }, competitorAvg: 288, diff: '+10%' },
+          { id: 'hz-5', name: '杭州城北智选假日酒店', brand: '智选假日', tier: 'essentials', basePrice: 278, channels: { ctrip: 278, douyin: 248, zhiketong: 258 }, competitorAvg: 248, diff: '+12%' },
+        ],
+      },
+      suites: {
+        ihgAvg: 458,
+        competitorAvg: 488,
+        diff: '-6%',
+        hotels: [
+          { id: 'hz-6', name: '杭州滨江馨乐庭酒店', brand: '馨乐庭', tier: 'suites', basePrice: 458, channels: { ctrip: 458, douyin: 418, zhiketong: 438 }, competitorAvg: 488, diff: '-6%' },
+        ],
+      },
+    },
+  },
+  {
+    city: '深圳',
+    region: '华南',
+    avgPrice: 698,
+    change: '+4.8%',
+    byTier: {
+      luxury_lifestyle: {
+        ihgAvg: 1580,
+        competitorAvg: 1650,
+        diff: '-4%',
+        hotels: [
+          { id: 'sz-1', name: '深圳福田洲际酒店', brand: '洲际酒店', tier: 'luxury_lifestyle', basePrice: 1680, channels: { ctrip: 1680, douyin: 1580, zhiketong: 1620 }, competitorAvg: 1750, diff: '-4%' },
+          { id: 'sz-2', name: '深圳南山英迪格酒店', brand: '英迪格', tier: 'luxury_lifestyle', basePrice: 1480, channels: { ctrip: 1480, douyin: 1380, zhiketong: 1420 }, competitorAvg: 1550, diff: '-5%' },
+        ],
+      },
+      premium: {
+        ihgAvg: 698,
+        competitorAvg: 668,
+        diff: '+4%',
+        hotels: [
+          { id: 'sz-3', name: '深圳会展中心皇冠假日酒店', brand: '皇冠假日', tier: 'premium', basePrice: 738, channels: { ctrip: 738, douyin: 678, zhiketong: 708 }, competitorAvg: 698, diff: '+6%' },
+        ],
+      },
+      essentials: {
+        ihgAvg: 348,
+        competitorAvg: 318,
+        diff: '+9%',
+        hotels: [
+          { id: 'sz-4', name: '深圳宝安假日酒店', brand: '假日酒店', tier: 'essentials', basePrice: 368, channels: { ctrip: 368, douyin: 328, zhiketong: 348 }, competitorAvg: 338, diff: '+9%' },
+          { id: 'sz-5', name: '深圳龙岗智选假日酒店', brand: '智选假日', tier: 'essentials', basePrice: 328, channels: { ctrip: 328, douyin: 298, zhiketong: 308 }, competitorAvg: 298, diff: '+10%' },
+        ],
+      },
+      suites: {
+        ihgAvg: 508,
+        competitorAvg: 538,
+        diff: '-6%',
+        hotels: [
+          { id: 'sz-6', name: '深圳福田馨乐庭酒店', brand: '馨乐庭', tier: 'suites', basePrice: 508, channels: { ctrip: 508, douyin: 468, zhiketong: 488 }, competitorAvg: 538, diff: '-6%' },
+        ],
+      },
+    },
+  },
+];
+
 // ==================== 关注清单 ====================
 export const watchlistData = [
   { hotelId: 'h9', name: '上海浦东假日酒店', reason: '评分持续下滑', score: 4.28, trend: '-0.08', tier: 'essentials' as BrandTier },
