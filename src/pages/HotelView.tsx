@@ -636,9 +636,9 @@ function SingleHotelView({ hotelData, onBack, isNewOpening = false, hotelId }: {
     phase: { name: '磨合期', range: '31-90天', color: '#f59e0b' },
     stabilityIndex: 72,
     maturityScore: 68,
-    brandFulfillment: 75,
+    brandPerception: 75,
     negativeRatio: 8,
-    matureBenchmark: { stabilityIndex: 85, maturityScore: 88, brandFulfillment: 82, negativeRatio: 4 },
+    matureBenchmark: { stabilityIndex: 85, maturityScore: 88, brandPerception: 82, negativeRatio: 4 },
     barriers: [
       { factor: '入住等待时间', severity: 'high' as const, frequency: 15, description: '前台办理入住平均等待超10分钟' },
       { factor: '早餐补给不及时', severity: 'medium' as const, frequency: 8, description: '周末高峰期补餐不及时' },
@@ -911,7 +911,10 @@ function SingleHotelView({ hotelData, onBack, isNewOpening = false, hotelId }: {
             <h3 className="text-base font-semibold text-slate-800 mb-3">📊 新店核心指标（vs 同品牌成熟店）</h3>
             <div className="grid grid-cols-4 gap-4">
               <Card>
-                <p className="text-slate-500 text-sm mb-1">稳定性指数</p>
+                <div className="flex items-center gap-1 mb-1">
+                  <p className="text-slate-500 text-sm">稳定性指数</p>
+                  <span className="text-xs text-slate-400 cursor-help" title="近7天评分标准差越小，稳定性越高">ⓘ</span>
+                </div>
                 <div className="flex items-end gap-2">
                   <p className="text-3xl font-bold text-slate-800">{newOpeningMonitorData.stabilityIndex}%</p>
                   <p className={clsx(
@@ -921,9 +924,13 @@ function SingleHotelView({ hotelData, onBack, isNewOpening = false, hotelId }: {
                     vs {newOpeningMonitorData.matureBenchmark.stabilityIndex}%
                   </p>
                 </div>
+                <p className="text-xs text-slate-400 mt-1">7日评分波动率倒数</p>
               </Card>
               <Card>
-                <p className="text-slate-500 text-sm mb-1">成熟度评分</p>
+                <div className="flex items-center gap-1 mb-1">
+                  <p className="text-slate-500 text-sm">体验成熟度</p>
+                  <span className="text-xs text-slate-400 cursor-help" title="6大体验维度被正向提及的覆盖率 + 服务一致性">ⓘ</span>
+                </div>
                 <div className="flex items-end gap-2">
                   <p className="text-3xl font-bold text-slate-800">{newOpeningMonitorData.maturityScore}</p>
                   <p className={clsx(
@@ -933,21 +940,29 @@ function SingleHotelView({ hotelData, onBack, isNewOpening = false, hotelId }: {
                     vs {newOpeningMonitorData.matureBenchmark.maturityScore}
                   </p>
                 </div>
+                <p className="text-xs text-slate-400 mt-1">体验维度覆盖 × 一致性</p>
               </Card>
               <Card>
-                <p className="text-slate-500 text-sm mb-1">品牌兑现度</p>
+                <div className="flex items-center gap-1 mb-1">
+                  <p className="text-slate-500 text-sm">品牌特色感知</p>
+                  <span className="text-xs text-slate-400 cursor-help" title="用户主动提及品牌特色关键词的比例">ⓘ</span>
+                </div>
                 <div className="flex items-end gap-2">
-                  <p className="text-3xl font-bold text-ihg-navy">{newOpeningMonitorData.brandFulfillment}%</p>
+                  <p className="text-3xl font-bold text-ihg-navy">{newOpeningMonitorData.brandPerception}%</p>
                   <p className={clsx(
                     'text-sm mb-1',
-                    newOpeningMonitorData.brandFulfillment < newOpeningMonitorData.matureBenchmark.brandFulfillment ? 'text-red-500' : 'text-emerald-500'
+                    newOpeningMonitorData.brandPerception < newOpeningMonitorData.matureBenchmark.brandPerception ? 'text-red-500' : 'text-emerald-500'
                   )}>
-                    vs {newOpeningMonitorData.matureBenchmark.brandFulfillment}%
+                    vs {newOpeningMonitorData.matureBenchmark.brandPerception}%
                   </p>
                 </div>
+                <p className="text-xs text-slate-400 mt-1">用户主动提及品牌特色词</p>
               </Card>
               <Card>
-                <p className="text-slate-500 text-sm mb-1">负面评论占比</p>
+                <div className="flex items-center gap-1 mb-1">
+                  <p className="text-slate-500 text-sm">负面评论占比</p>
+                  <span className="text-xs text-slate-400 cursor-help" title="1-2分/星评论占总评论的比例">ⓘ</span>
+                </div>
                 <div className="flex items-end gap-2">
                   <p className="text-3xl font-bold text-red-600">{newOpeningMonitorData.negativeRatio}%</p>
                   <p className={clsx(
@@ -957,6 +972,7 @@ function SingleHotelView({ hotelData, onBack, isNewOpening = false, hotelId }: {
                     vs {newOpeningMonitorData.matureBenchmark.negativeRatio}%
                   </p>
                 </div>
+                <p className="text-xs text-slate-400 mt-1">低分评论（1-2分/星）</p>
               </Card>
             </div>
           </section>

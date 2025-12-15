@@ -1011,7 +1011,7 @@ function NewHotelMgrOverview() {
     targetScore: 4.5,
     stabilityIndex: 72,
     maturityScore: 68,
-    brandFulfillment: 75,
+    brandPerception: 75, // 改名：品牌特色感知
     negativeRatio: 8,
     rankings: {
       city: { rank: 8, total: 15, name: '杭州' },
@@ -1044,7 +1044,7 @@ function NewHotelMgrOverview() {
   const matureStoreBenchmark = {
     stabilityIndex: 85,
     maturityScore: 88,
-    brandFulfillment: 82,
+    brandPerception: 82,
     negativeRatio: 4,
   };
 
@@ -1186,7 +1186,10 @@ function NewHotelMgrOverview() {
         <h3 className="text-base font-semibold text-slate-800 mb-3">✨ 新店核心指标（vs 同品牌成熟店）</h3>
         <div className="grid grid-cols-4 gap-4">
           <Card>
-            <p className="text-slate-500 text-sm mb-1">稳定性指数</p>
+            <div className="flex items-center gap-1 mb-1">
+              <p className="text-slate-500 text-sm">稳定性指数</p>
+              <span className="text-xs text-slate-400 cursor-help" title="近7天评分标准差越小，稳定性越高。反映新店运营是否进入稳定状态。">ⓘ</span>
+            </div>
             <div className="flex items-end gap-2">
               <p className="text-3xl font-bold text-slate-800">{newHotel.stabilityIndex}%</p>
               <p className={clsx(
@@ -1196,10 +1199,13 @@ function NewHotelMgrOverview() {
                 vs {matureStoreBenchmark.stabilityIndex}%
               </p>
             </div>
-            <p className="text-xs text-slate-400 mt-1">评分波动率</p>
+            <p className="text-xs text-slate-400 mt-1">7日评分波动率倒数</p>
           </Card>
           <Card>
-            <p className="text-slate-500 text-sm mb-1">成熟度评分</p>
+            <div className="flex items-center gap-1 mb-1">
+              <p className="text-slate-500 text-sm">体验成熟度</p>
+              <span className="text-xs text-slate-400 cursor-help" title="6大体验维度（房间/清洁/入住/服务/早餐/环境）被正向提及的覆盖率 + 服务一致性评估。">ⓘ</span>
+            </div>
             <div className="flex items-end gap-2">
               <p className="text-3xl font-bold text-slate-800">{newHotel.maturityScore}</p>
               <p className={clsx(
@@ -1209,23 +1215,29 @@ function NewHotelMgrOverview() {
                 vs {matureStoreBenchmark.maturityScore}
               </p>
             </div>
-            <p className="text-xs text-slate-400 mt-1">体验完整性</p>
+            <p className="text-xs text-slate-400 mt-1">体验维度覆盖 × 服务一致性</p>
           </Card>
           <Card>
-            <p className="text-slate-500 text-sm mb-1">品牌兑现度</p>
+            <div className="flex items-center gap-1 mb-1">
+              <p className="text-slate-500 text-sm">品牌特色感知</p>
+              <span className="text-xs text-slate-400 cursor-help" title="用户评论中主动提及品牌特色关键词的比例。如假日酒店的"舒适、便捷"，英迪格的"设计感、在地文化"等。">ⓘ</span>
+            </div>
             <div className="flex items-end gap-2">
-              <p className="text-3xl font-bold text-ihg-navy">{newHotel.brandFulfillment}%</p>
+              <p className="text-3xl font-bold text-ihg-navy">{newHotel.brandPerception}%</p>
               <p className={clsx(
                 'text-sm mb-1',
-                newHotel.brandFulfillment < matureStoreBenchmark.brandFulfillment ? 'text-red-500' : 'text-emerald-500'
+                newHotel.brandPerception < matureStoreBenchmark.brandPerception ? 'text-red-500' : 'text-emerald-500'
               )}>
-                vs {matureStoreBenchmark.brandFulfillment}%
+                vs {matureStoreBenchmark.brandPerception}%
               </p>
             </div>
-            <p className="text-xs text-slate-400 mt-1">用户感知品牌主张</p>
+            <p className="text-xs text-slate-400 mt-1">用户主动提及品牌特色词占比</p>
           </Card>
           <Card>
-            <p className="text-slate-500 text-sm mb-1">负面评论占比</p>
+            <div className="flex items-center gap-1 mb-1">
+              <p className="text-slate-500 text-sm">负面评论占比</p>
+              <span className="text-xs text-slate-400 cursor-help" title="携程/飞猪1-2分、美团1-2星、境外渠道1-4分评论占总评论的比例。">ⓘ</span>
+            </div>
             <div className="flex items-end gap-2">
               <p className="text-3xl font-bold text-red-600">{newHotel.negativeRatio}%</p>
               <p className={clsx(
@@ -1235,7 +1247,7 @@ function NewHotelMgrOverview() {
                 vs {matureStoreBenchmark.negativeRatio}%
               </p>
             </div>
-            <p className="text-xs text-slate-400 mt-1">1-2星评论</p>
+            <p className="text-xs text-slate-400 mt-1">低分评论（1-2分/星）占比</p>
           </Card>
         </div>
       </section>
