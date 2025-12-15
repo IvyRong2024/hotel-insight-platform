@@ -36,11 +36,20 @@ export function HotelView() {
   
   if (!currentRole) return null;
 
-  // 酒店店长看单店详情
+  // 酒店店长（成熟门店）看单店详情
   if (currentRole.id === 'hotel_mgr') {
     return (
       <Layout title="我的酒店" subtitle="单店详细数据与用户洞察" requiredModule="hotel">
         <SingleHotelView />
+      </Layout>
+    );
+  }
+
+  // 酒店店长（新店）看单店详情 + 新店监测模块
+  if (currentRole.id === 'hotel_mgr_new') {
+    return (
+      <Layout title="我的酒店（新店）" subtitle="单店详细数据与新店运营监测" requiredModule="hotel">
+        <SingleHotelView isNewOpening />
       </Layout>
     );
   }
@@ -613,11 +622,32 @@ function NewHotelMonitor() {
 }
 
 // ========== 单店视角（酒店店长）==========
-function SingleHotelView({ hotelData, onBack }: { hotelData?: HotelData, onBack?: () => void }) {
+function SingleHotelView({ hotelData, onBack, isNewOpening = false }: { hotelData?: HotelData, onBack?: () => void, isNewOpening?: boolean }) {
   const [expandedStage, setExpandedStage] = useState<string | null>(null);
   const [showCommentDeepDive, setShowCommentDeepDive] = useState<string | null>(null); // 评论深度查看的需求类别
 
   const hotel = hotelDetailData;
+  
+  // 新店监测数据（仅新店店长可见）
+  const newOpeningMonitorData = {
+    daysOpen: 58,
+    phase: { name: '磨合期', range: '31-90天', color: '#f59e0b' },
+    stabilityIndex: 72,
+    maturityScore: 68,
+    brandFulfillment: 75,
+    negativeRatio: 8,
+    matureBenchmark: { stabilityIndex: 85, maturityScore: 88, brandFulfillment: 82, negativeRatio: 4 },
+    barriers: [
+      { factor: '入住等待时间', severity: 'high' as const, frequency: 15, description: '前台办理入住平均等待超10分钟' },
+      { factor: '早餐补给不及时', severity: 'medium' as const, frequency: 8, description: '周末高峰期补餐不及时' },
+      { factor: '空调温控不稳定', severity: 'medium' as const, frequency: 6, description: '部分房间温控需要调试' },
+    ],
+    phaseActions: [
+      { action: '前台入住流程优化', priority: 'high' as const, status: 'in_progress' as const, deadline: '12月20日' },
+      { action: '早餐高峰预案制定', priority: 'high' as const, status: 'pending' as const, deadline: '12月25日' },
+      { action: '空调系统全面调试', priority: 'medium' as const, status: 'pending' as const, deadline: '12月28日' },
+    ],
+  };
 
   // 如果正在查看评论详情，显示评论深度查看页面
   if (showCommentDeepDive) {
@@ -835,6 +865,180 @@ function SingleHotelView({ hotelData, onBack }: { hotelData?: HotelData, onBack?
           ))}
         </div>
       </section>
+
+      {/* ===== 新店监测模块（仅新店店长可见）===== */}
+      {isNewOpening && (
+        <>
+          {/* 新店监测标题 */}
+          <section className="animate-fade-in-up delay-250">
+            <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl p-4 text-white">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">✨</span>
+                  <div>
+                    <h3 className="font-bold text-lg">新店监测专区</h3>
+                    <p className="text-white/80 text-sm">
+                      开业 {newOpeningMonitorData.daysOpen} 天 · {newOpeningMonitorData.phase.name}（{newOpeningMonitorData.phase.range}）
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-white/60 text-sm">距离切换标准视角</p>
+                  <p className="text-xl font-bold">{180 - newOpeningMonitorData.daysOpen} 天</p>
+                </div>
+              </div>
+              {/* 生命周期进度条 */}
+              <div className="mt-3">
+                <div className="h-2 bg-white/20 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-white rounded-full transition-all"
+                    style={{ width: `${(newOpeningMonitorData.daysOpen / 180) * 100}%` }}
+                  />
+                </div>
+                <div className="flex justify-between text-xs text-white/60 mt-1">
+                  <span>启动期 0-30天</span>
+                  <span>磨合期 31-90天</span>
+                  <span>稳定期 91-180天</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* 新店核心指标 */}
+          <section className="animate-fade-in-up delay-300">
+            <h3 className="text-base font-semibold text-slate-800 mb-3">📊 新店核心指标（vs 同品牌成熟店）</h3>
+            <div className="grid grid-cols-4 gap-4">
+              <Card>
+                <p className="text-slate-500 text-sm mb-1">稳定性指数</p>
+                <div className="flex items-end gap-2">
+                  <p className="text-3xl font-bold text-slate-800">{newOpeningMonitorData.stabilityIndex}%</p>
+                  <p className={clsx(
+                    'text-sm mb-1',
+                    newOpeningMonitorData.stabilityIndex < newOpeningMonitorData.matureBenchmark.stabilityIndex ? 'text-red-500' : 'text-emerald-500'
+                  )}>
+                    vs {newOpeningMonitorData.matureBenchmark.stabilityIndex}%
+                  </p>
+                </div>
+              </Card>
+              <Card>
+                <p className="text-slate-500 text-sm mb-1">成熟度评分</p>
+                <div className="flex items-end gap-2">
+                  <p className="text-3xl font-bold text-slate-800">{newOpeningMonitorData.maturityScore}</p>
+                  <p className={clsx(
+                    'text-sm mb-1',
+                    newOpeningMonitorData.maturityScore < newOpeningMonitorData.matureBenchmark.maturityScore ? 'text-red-500' : 'text-emerald-500'
+                  )}>
+                    vs {newOpeningMonitorData.matureBenchmark.maturityScore}
+                  </p>
+                </div>
+              </Card>
+              <Card>
+                <p className="text-slate-500 text-sm mb-1">品牌兑现度</p>
+                <div className="flex items-end gap-2">
+                  <p className="text-3xl font-bold text-ihg-navy">{newOpeningMonitorData.brandFulfillment}%</p>
+                  <p className={clsx(
+                    'text-sm mb-1',
+                    newOpeningMonitorData.brandFulfillment < newOpeningMonitorData.matureBenchmark.brandFulfillment ? 'text-red-500' : 'text-emerald-500'
+                  )}>
+                    vs {newOpeningMonitorData.matureBenchmark.brandFulfillment}%
+                  </p>
+                </div>
+              </Card>
+              <Card>
+                <p className="text-slate-500 text-sm mb-1">负面评论占比</p>
+                <div className="flex items-end gap-2">
+                  <p className="text-3xl font-bold text-red-600">{newOpeningMonitorData.negativeRatio}%</p>
+                  <p className={clsx(
+                    'text-sm mb-1',
+                    newOpeningMonitorData.negativeRatio > newOpeningMonitorData.matureBenchmark.negativeRatio ? 'text-red-500' : 'text-emerald-500'
+                  )}>
+                    vs {newOpeningMonitorData.matureBenchmark.negativeRatio}%
+                  </p>
+                </div>
+              </Card>
+            </div>
+          </section>
+
+          {/* 新店早期风险 */}
+          <section className="animate-fade-in-up delay-350">
+            <h3 className="text-base font-semibold text-slate-800 mb-3">⚠️ 新店早期风险</h3>
+            <div className="space-y-3">
+              {newOpeningMonitorData.barriers.map((barrier) => (
+                <Card key={barrier.factor} className={clsx(
+                  'border-l-4',
+                  barrier.severity === 'high' ? 'border-l-red-500 bg-red-50/30' : 'border-l-amber-500 bg-amber-50/30'
+                )} padding="sm">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-medium text-slate-800">{barrier.factor}</span>
+                        <Badge variant={barrier.severity === 'high' ? 'danger' : 'warning'}>
+                          {barrier.severity === 'high' ? '高风险' : '中风险'}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-slate-500">{barrier.description}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-lg font-bold text-slate-800">{barrier.frequency}次</p>
+                      <p className="text-xs text-slate-400">发生频率</p>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </section>
+
+          {/* 阶段行动建议 */}
+          <section className="animate-fade-in-up delay-400">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: newOpeningMonitorData.phase.color }} />
+              <h3 className="text-base font-semibold text-slate-800">{newOpeningMonitorData.phase.name}行动建议</h3>
+            </div>
+            <div className="space-y-2">
+              {newOpeningMonitorData.phaseActions.map((action) => (
+                <Card key={action.action} padding="sm" className="bg-slate-50">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      {action.status === 'in_progress' ? (
+                        <div className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center">
+                          <Clock size={12} className="text-amber-600" />
+                        </div>
+                      ) : (
+                        <div className="w-6 h-6 rounded-full border-2 border-slate-300" />
+                      )}
+                      <div>
+                        <span className="font-medium text-slate-800">{action.action}</span>
+                        <p className="text-xs text-slate-400">截止：{action.deadline}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant={action.priority === 'high' ? 'danger' : 'warning'}>
+                        {action.priority === 'high' ? '高优' : '中优'}
+                      </Badge>
+                      <span className={clsx(
+                        'text-xs px-2 py-0.5 rounded',
+                        action.status === 'in_progress' ? 'bg-amber-100 text-amber-600' : 'bg-slate-200 text-slate-600'
+                      )}>
+                        {action.status === 'in_progress' ? '进行中' : '待处理'}
+                      </span>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </section>
+
+          {/* 提示信息 */}
+          <section className="animate-fade-in-up delay-450">
+            <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+              <p className="text-sm text-amber-800">
+                <b>💡 新店监测模式：</b>您的酒店处于开业 {newOpeningMonitorData.daysOpen} 天的{newOpeningMonitorData.phase.name}阶段，
+                系统将持续关注运营稳定性与体验成熟度。{180 - newOpeningMonitorData.daysOpen} 天后将自动切换为标准门店视角。
+              </p>
+            </div>
+          </section>
+        </>
+      )}
     </div>
   );
 }
