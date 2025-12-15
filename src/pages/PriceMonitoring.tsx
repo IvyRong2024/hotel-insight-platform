@@ -123,10 +123,10 @@ const competitorPriceData = {
 
 // 竞品促销动态
 const competitorVouchers = [
-  { group: '万豪国际', product: '双人周末套餐', price: 828, platform: '抖音', status: '热销' },
-  { group: '希尔顿集团', product: '商务住宿券', price: 568, platform: '携程', status: '在售' },
-  { group: '雅高集团', product: '圣诞特惠套餐', price: 698, platform: '飞猪', status: '促销中' },
-  { group: '凯悦集团', product: '亲子度假券', price: 1188, platform: '抖音', status: '新上架' },
+  { group: '万豪国际', product: '双人周末套餐', price: 828, platform: '抖音', status: '热销', includes: ['豪华大床房1晚', '双人自助早餐', '迷你吧饮品', '延迟退房'] },
+  { group: '希尔顿集团', product: '商务住宿券', price: 568, platform: '携程', status: '在售', includes: ['行政大床房1晚', '单人早餐', '行政酒廊', '健身房'] },
+  { group: '雅高集团', product: '圣诞特惠套餐', price: 698, platform: '飞猪', status: '促销中', includes: ['高级房1晚', '双人早餐', '圣诞礼盒', '下午茶'] },
+  { group: '凯悦集团', product: '亲子度假券', price: 1188, platform: '抖音', status: '新上架', includes: ['家庭房1晚', '三人早餐', '儿童礼包', '儿童乐园门票'] },
 ];
 
 type ViewLevel = 'overview' | 'city' | 'tier';
@@ -135,6 +135,7 @@ export function PriceMonitoring() {
   const [viewLevel, setViewLevel] = useState<ViewLevel>('overview');
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
   const [selectedTier, setSelectedTier] = useState<BrandTier | null>(null);
+  const [expandedVoucher, setExpandedVoucher] = useState<number | null>(null);
 
   const cityData = selectedCity ? competitorPriceData.cities.find(c => c.city === selectedCity) : null;
   const tierData = selectedTier ? competitorPriceData.byTier[selectedTier] : null;
@@ -267,29 +268,56 @@ export function PriceMonitoring() {
       {/* 竞品券类动态 */}
       <section className="animate-fade-in-up delay-200">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-base font-semibold text-slate-800 flex items-center gap-2">
-            <Tag size={18} />
-            竞品券类产品动态
-          </h3>
+          <div>
+            <h3 className="text-base font-semibold text-slate-800 flex items-center gap-2">
+              <Tag size={18} />
+              竞品券类产品动态
+            </h3>
+            <p className="text-xs text-slate-500 mt-1">点击查看服务明细</p>
+          </div>
         </div>
         <div className="grid grid-cols-4 gap-4">
           {competitorVouchers.map((voucher, idx) => (
-            <Card key={idx} className="bg-slate-50">
+            <Card 
+              key={idx} 
+              className={clsx(
+                'bg-slate-50 cursor-pointer transition-all',
+                expandedVoucher === idx && 'ring-2 ring-ihg-navy'
+              )}
+              onClick={() => setExpandedVoucher(expandedVoucher === idx ? null : idx)}
+            >
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-medium text-slate-600">{voucher.group}</span>
-                <span className={clsx(
-                  'text-xs px-1.5 py-0.5 rounded',
-                  voucher.status === '热销' ? 'bg-red-100 text-red-600' :
-                  voucher.status === '新上架' ? 'bg-blue-100 text-blue-600' :
-                  voucher.status === '促销中' ? 'bg-amber-100 text-amber-600' :
-                  'bg-slate-200 text-slate-600'
-                )}>{voucher.status}</span>
+                <div className="flex items-center gap-2">
+                  <span className={clsx(
+                    'text-xs px-1.5 py-0.5 rounded',
+                    voucher.status === '热销' ? 'bg-red-100 text-red-600' :
+                    voucher.status === '新上架' ? 'bg-blue-100 text-blue-600' :
+                    voucher.status === '促销中' ? 'bg-amber-100 text-amber-600' :
+                    'bg-slate-200 text-slate-600'
+                  )}>{voucher.status}</span>
+                  {expandedVoucher === idx ? <ChevronDown size={14} className="text-slate-400" /> : <ChevronRight size={14} className="text-slate-400" />}
+                </div>
               </div>
               <p className="text-sm font-medium text-slate-800 mb-2">{voucher.product}</p>
               <div className="flex items-center justify-between">
                 <span className="text-lg font-bold text-slate-700">¥{voucher.price}</span>
                 <span className="text-xs text-slate-400">{voucher.platform}</span>
               </div>
+              
+              {/* 服务明细展开 */}
+              {expandedVoucher === idx && (
+                <div className="mt-3 pt-3 border-t border-slate-200">
+                  <p className="text-xs text-slate-500 mb-2">📦 套餐包含</p>
+                  <div className="flex flex-wrap gap-1">
+                    {voucher.includes.map((item, i) => (
+                      <span key={i} className="text-xs px-2 py-1 bg-white text-slate-600 rounded border border-slate-200">
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </Card>
           ))}
         </div>
