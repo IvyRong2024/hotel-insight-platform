@@ -573,11 +573,24 @@ function NewHotelMonitor() {
 
 // ========== 单店视角（酒店店长）==========
 function SingleHotelView({ hotelData, onBack }: { hotelData?: HotelData, onBack?: () => void }) {
-  const [expandedNeed, setExpandedNeed] = useState<string | null>(null);
   const [expandedStage, setExpandedStage] = useState<string | null>(null);
-  const [selectedPlatform, setSelectedPlatform] = useState<ReviewPlatform | 'all'>('all');
+  const [showCommentDeepDive, setShowCommentDeepDive] = useState<string | null>(null); // 评论深度查看的需求类别
 
   const hotel = hotelDetailData;
+
+  // 如果正在查看评论详情，显示评论深度查看页面
+  if (showCommentDeepDive) {
+    const selectedNeed = userNeedsData.find(n => n.category === showCommentDeepDive);
+    if (selectedNeed) {
+      return (
+        <CommentDeepDive 
+          need={selectedNeed} 
+          hotelName={hotelData?.name || hotel.hotelName}
+          onBack={() => setShowCommentDeepDive(null)} 
+        />
+      );
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -629,166 +642,54 @@ function SingleHotelView({ hotelData, onBack }: { hotelData?: HotelData, onBack?
         </div>
       </section>
 
-      {/* 用户需求洞察 - 可展开 + 分平台下钻 */}
+      {/* 用户需求洞察 - 点击跳转到评论深度分析 */}
       <section className="animate-fade-in-up delay-100">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-base font-semibold text-slate-800">📊 用户需求洞察</h3>
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-slate-500">按平台筛选:</span>
-            <div className="flex gap-1">
-              <button
-                onClick={() => setSelectedPlatform('all')}
-                className={clsx(
-                  'px-2 py-1 text-xs rounded-lg transition-all',
-                  selectedPlatform === 'all' ? 'bg-ihg-navy text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                )}
-              >
-                全部
-              </button>
-              {reviewPlatforms.map(platform => (
-                <button
-                  key={platform}
-                  onClick={() => setSelectedPlatform(platform)}
-                  className={clsx(
-                    'px-2 py-1 text-xs rounded-lg transition-all',
-                    selectedPlatform === platform ? 'bg-ihg-navy text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                  )}
-                >
-                  {platform}
-                </button>
-              ))}
-            </div>
-          </div>
+          <span className="text-sm text-slate-500">点击"查看评论"深度分析各平台反馈</span>
         </div>
         <div className="grid grid-cols-3 gap-4">
           {userNeedsData.map((need) => {
-            // 根据选中平台筛选评论
-            const filteredComments = selectedPlatform === 'all' 
-              ? need.platformComments 
-              : need.platformComments?.filter(c => c.platform === selectedPlatform) || [];
-            const positiveComments = filteredComments.filter(c => c.sentiment === 'positive');
-            const negativeComments = filteredComments.filter(c => c.sentiment === 'negative');
+            const totalComments = need.platformComments?.length || 0;
+            const positiveCount = need.platformComments?.filter(c => c.sentiment === 'positive').length || 0;
+            const negativeCount = need.platformComments?.filter(c => c.sentiment === 'negative').length || 0;
 
             return (
-              <div key={need.category}>
-                <Card
-                  className={clsx(
-                    'cursor-pointer transition-all',
-                    expandedNeed === need.category ? 'ring-2 ring-ihg-navy' : 'hover:shadow-md'
-                  )}
-                  padding="sm"
-                  onClick={() => setExpandedNeed(expandedNeed === need.category ? null : need.category)}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xl">{need.icon}</span>
-                      <span className="font-medium text-slate-800">{need.category}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className={clsx(
-                        'text-sm',
-                        need.trend === '↑' ? 'text-red-500' : need.trend === '↓' ? 'text-emerald-500' : 'text-slate-400'
-                      )}>
-                        {need.trend}
-                      </span>
-                      {expandedNeed === need.category ? (
-                        <ChevronDown size={16} className="text-slate-400" />
-                      ) : (
-                        <ChevronRight size={16} className="text-slate-400" />
-                      )}
-                    </div>
+              <Card key={need.category} padding="sm" className="hover:shadow-md transition-all">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">{need.icon}</span>
+                    <span className="font-medium text-slate-800">{need.category}</span>
                   </div>
-                  <ProgressBar value={need.intensity} color="navy" size="sm" />
-                  <div className="mt-2 flex flex-wrap gap-1">
-                    {need.items.slice(0, 2).map((item) => (
-                      <span key={item} className="text-xs px-2 py-0.5 bg-slate-100 rounded text-slate-600">
-                        {item}
-                      </span>
-                    ))}
+                  <span className={clsx(
+                    'text-sm font-medium',
+                    need.trend === '↑' ? 'text-red-500' : need.trend === '↓' ? 'text-emerald-500' : 'text-slate-400'
+                  )}>
+                    {need.trend} 声量{need.trend === '↑' ? '上升' : need.trend === '↓' ? '下降' : '稳定'}
+                  </span>
+                </div>
+                <ProgressBar value={need.intensity} color="navy" size="sm" />
+                <div className="mt-3 flex items-center justify-between">
+                  <div className="flex gap-2 text-xs">
+                    <span className="text-emerald-600">👍 {positiveCount}</span>
+                    <span className="text-red-600">👎 {negativeCount}</span>
+                    <span className="text-slate-400">共 {totalComments} 条</span>
                   </div>
-                </Card>
-
-                {/* 展开的详情 - 分平台评论 */}
-                {expandedNeed === need.category && (
-                  <div className="mt-2 animate-fade-in-up">
-                    <Card className="bg-slate-50" padding="sm">
-                      {selectedPlatform !== 'all' && (
-                        <div className="mb-3 pb-2 border-b border-slate-200">
-                          <span className="text-xs text-ihg-navy font-medium">
-                            📍 {selectedPlatform} 平台评论 ({filteredComments.length}条)
-                          </span>
-                        </div>
-                      )}
-                      <div className="space-y-3">
-                        {/* 正面评价 */}
-                        <div>
-                          <div className="flex items-center gap-2 mb-2">
-                            <CheckCircle size={14} className="text-emerald-500" />
-                            <span className="text-xs font-medium text-emerald-700">
-                              正面评价 ({positiveComments.length})
-                            </span>
-                          </div>
-                          <div className="space-y-2">
-                            {positiveComments.length > 0 ? positiveComments.map((comment, idx) => (
-                              <div key={idx} className="flex items-start gap-2 pl-5">
-                                <span className={clsx(
-                                  'text-xs px-1.5 py-0.5 rounded shrink-0',
-                                  comment.platform === '携程' ? 'bg-blue-100 text-blue-700' :
-                                  comment.platform === '美团' ? 'bg-yellow-100 text-yellow-700' :
-                                  comment.platform === '飞猪' ? 'bg-orange-100 text-orange-700' :
-                                  comment.platform === 'Booking' ? 'bg-indigo-100 text-indigo-700' :
-                                  comment.platform === 'Expedia' ? 'bg-purple-100 text-purple-700' :
-                                  'bg-pink-100 text-pink-700'
-                                )}>
-                                  {comment.platform}
-                                </span>
-                                <div className="flex-1">
-                                  <p className="text-xs text-slate-600">"{comment.content}"</p>
-                                  <p className="text-xs text-slate-400 mt-0.5">{comment.date} · ⭐{comment.rating}</p>
-                                </div>
-                              </div>
-                            )) : (
-                              <p className="text-xs text-slate-400 pl-5">暂无正面评价</p>
-                            )}
-                          </div>
-                        </div>
-                        {/* 负面评价 */}
-                        <div className="border-t border-slate-200 pt-3">
-                          <div className="flex items-center gap-2 mb-2">
-                            <AlertTriangle size={14} className="text-red-500" />
-                            <span className="text-xs font-medium text-red-700">
-                              负面评价 ({negativeComments.length})
-                            </span>
-                          </div>
-                          <div className="space-y-2">
-                            {negativeComments.length > 0 ? negativeComments.map((comment, idx) => (
-                              <div key={idx} className="flex items-start gap-2 pl-5">
-                                <span className={clsx(
-                                  'text-xs px-1.5 py-0.5 rounded shrink-0',
-                                  comment.platform === '携程' ? 'bg-blue-100 text-blue-700' :
-                                  comment.platform === '美团' ? 'bg-yellow-100 text-yellow-700' :
-                                  comment.platform === '飞猪' ? 'bg-orange-100 text-orange-700' :
-                                  comment.platform === 'Booking' ? 'bg-indigo-100 text-indigo-700' :
-                                  comment.platform === 'Expedia' ? 'bg-purple-100 text-purple-700' :
-                                  'bg-pink-100 text-pink-700'
-                                )}>
-                                  {comment.platform}
-                                </span>
-                                <div className="flex-1">
-                                  <p className="text-xs text-slate-600">"{comment.content}"</p>
-                                  <p className="text-xs text-slate-400 mt-0.5">{comment.date} · ⭐{comment.rating}</p>
-                                </div>
-                              </div>
-                            )) : (
-                              <p className="text-xs text-slate-400 pl-5">暂无负面评价</p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  </div>
-                )}
-              </div>
+                  <button 
+                    onClick={() => setShowCommentDeepDive(need.category)}
+                    className="px-3 py-1.5 bg-ihg-navy text-white text-xs rounded-lg hover:bg-ihg-navy-light flex items-center gap-1 transition-all"
+                  >
+                    查看评论 <ArrowRight size={12} />
+                  </button>
+                </div>
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {need.items.slice(0, 3).map((item) => (
+                    <span key={item} className="text-xs px-2 py-0.5 bg-slate-100 rounded text-slate-600">
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </Card>
             );
           })}
         </div>
@@ -893,6 +794,296 @@ function SingleHotelView({ hotelData, onBack }: { hotelData?: HotelData, onBack?
           ))}
         </div>
       </section>
+    </div>
+  );
+}
+
+// ========== 评论深度分析页面 ==========
+function CommentDeepDive({ 
+  need, 
+  hotelName,
+  onBack 
+}: { 
+  need: typeof userNeedsData[0], 
+  hotelName: string,
+  onBack: () => void 
+}) {
+  const [selectedPlatform, setSelectedPlatform] = useState<ReviewPlatform | 'all'>('all');
+  const [sentimentFilter, setSentimentFilter] = useState<'all' | 'positive' | 'negative'>('all');
+  const [sortBy, setSortBy] = useState<'date' | 'rating'>('date');
+
+  // 筛选和排序评论
+  const filteredComments = (need.platformComments || [])
+    .filter(c => selectedPlatform === 'all' || c.platform === selectedPlatform)
+    .filter(c => sentimentFilter === 'all' || c.sentiment === sentimentFilter)
+    .sort((a, b) => {
+      if (sortBy === 'date') return new Date(b.date).getTime() - new Date(a.date).getTime();
+      return b.rating - a.rating;
+    });
+
+  // 各平台统计
+  const platformStats = reviewPlatforms.map(platform => {
+    const comments = (need.platformComments || []).filter(c => c.platform === platform);
+    return {
+      platform,
+      total: comments.length,
+      positive: comments.filter(c => c.sentiment === 'positive').length,
+      negative: comments.filter(c => c.sentiment === 'negative').length,
+      avgRating: comments.length > 0 
+        ? (comments.reduce((sum, c) => sum + c.rating, 0) / comments.length).toFixed(1)
+        : '-'
+    };
+  });
+
+  const totalPositive = (need.platformComments || []).filter(c => c.sentiment === 'positive').length;
+  const totalNegative = (need.platformComments || []).filter(c => c.sentiment === 'negative').length;
+
+  return (
+    <div className="space-y-6 animate-fade-in-up">
+      {/* 头部 */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={onBack}
+            className="flex items-center gap-2 text-sm text-ihg-navy hover:underline"
+          >
+            ← 返回需求洞察
+          </button>
+          <div className="h-6 w-px bg-slate-200" />
+          <div className="flex items-center gap-2">
+            <span className="text-3xl">{need.icon}</span>
+            <div>
+              <h2 className="text-xl font-bold text-slate-800">{need.category} · 评论深度分析</h2>
+              <p className="text-sm text-slate-500">{hotelName}</p>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <Badge variant="success">👍 {totalPositive}</Badge>
+          <Badge variant="danger">👎 {totalNegative}</Badge>
+        </div>
+      </div>
+
+      {/* 平台分布概览 */}
+      <Card>
+        <h3 className="font-semibold text-slate-800 mb-4">📊 各平台评论分布</h3>
+        <div className="grid grid-cols-6 gap-4">
+          {platformStats.map(stat => (
+            <div 
+              key={stat.platform}
+              onClick={() => setSelectedPlatform(selectedPlatform === stat.platform ? 'all' : stat.platform)}
+              className={clsx(
+                'p-3 rounded-xl cursor-pointer transition-all border-2',
+                selectedPlatform === stat.platform 
+                  ? 'border-ihg-navy bg-ihg-navy/5' 
+                  : 'border-transparent bg-slate-50 hover:border-slate-200'
+              )}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className={clsx(
+                  'text-xs font-medium px-2 py-0.5 rounded',
+                  stat.platform === '携程' ? 'bg-blue-100 text-blue-700' :
+                  stat.platform === '美团' ? 'bg-yellow-100 text-yellow-700' :
+                  stat.platform === '飞猪' ? 'bg-orange-100 text-orange-700' :
+                  stat.platform === 'Booking' ? 'bg-indigo-100 text-indigo-700' :
+                  stat.platform === 'Expedia' ? 'bg-purple-100 text-purple-700' :
+                  'bg-pink-100 text-pink-700'
+                )}>
+                  {stat.platform}
+                </span>
+                <span className="text-lg font-bold text-slate-800">{stat.avgRating}</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs">
+                <span className="text-emerald-600">+{stat.positive}</span>
+                <span className="text-red-600">-{stat.negative}</span>
+                <span className="text-slate-400">共{stat.total}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {/* 筛选器 */}
+      <Card padding="sm">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-slate-500">情感筛选:</span>
+              <div className="flex gap-1">
+                {[
+                  { value: 'all', label: '全部' },
+                  { value: 'positive', label: '👍 好评' },
+                  { value: 'negative', label: '👎 差评' },
+                ].map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setSentimentFilter(opt.value as 'all' | 'positive' | 'negative')}
+                    className={clsx(
+                      'px-3 py-1.5 text-xs rounded-lg transition-all',
+                      sentimentFilter === opt.value 
+                        ? 'bg-ihg-navy text-white' 
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    )}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="h-4 w-px bg-slate-200" />
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-slate-500">排序:</span>
+              <div className="flex gap-1">
+                {[
+                  { value: 'date', label: '最新' },
+                  { value: 'rating', label: '评分' },
+                ].map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setSortBy(opt.value as 'date' | 'rating')}
+                    className={clsx(
+                      'px-3 py-1.5 text-xs rounded-lg transition-all',
+                      sortBy === opt.value 
+                        ? 'bg-ihg-navy text-white' 
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    )}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="text-sm text-slate-500">
+            共 <span className="font-bold text-ihg-navy">{filteredComments.length}</span> 条评论
+            {selectedPlatform !== 'all' && (
+              <button 
+                onClick={() => setSelectedPlatform('all')}
+                className="ml-2 text-ihg-navy hover:underline"
+              >
+                清除平台筛选
+              </button>
+            )}
+          </div>
+        </div>
+      </Card>
+
+      {/* 评论列表 */}
+      <Card padding="none">
+        <div className="divide-y divide-slate-100">
+          {filteredComments.length > 0 ? filteredComments.map((comment, idx) => (
+            <div key={idx} className={clsx(
+              'p-4 transition-all hover:bg-slate-50',
+              comment.sentiment === 'negative' && 'bg-red-50/30'
+            )}>
+              <div className="flex items-start gap-4">
+                <div className={clsx(
+                  'w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold shrink-0',
+                  comment.sentiment === 'positive' ? 'bg-emerald-100 text-emerald-600' :
+                  comment.sentiment === 'negative' ? 'bg-red-100 text-red-600' :
+                  'bg-slate-100 text-slate-600'
+                )}>
+                  {comment.sentiment === 'positive' ? '👍' : comment.sentiment === 'negative' ? '👎' : '💬'}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className={clsx(
+                      'text-xs font-medium px-2 py-1 rounded',
+                      comment.platform === '携程' ? 'bg-blue-100 text-blue-700' :
+                      comment.platform === '美团' ? 'bg-yellow-100 text-yellow-700' :
+                      comment.platform === '飞猪' ? 'bg-orange-100 text-orange-700' :
+                      comment.platform === 'Booking' ? 'bg-indigo-100 text-indigo-700' :
+                      comment.platform === 'Expedia' ? 'bg-purple-100 text-purple-700' :
+                      'bg-pink-100 text-pink-700'
+                    )}>
+                      {comment.platform}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star 
+                          key={i} 
+                          size={12} 
+                          className={i < comment.rating ? 'text-ihg-gold fill-ihg-gold' : 'text-slate-200'} 
+                        />
+                      ))}
+                    </div>
+                    <span className="text-xs text-slate-400">{comment.date}</span>
+                  </div>
+                  <p className="text-sm text-slate-700 leading-relaxed">"{comment.content}"</p>
+                </div>
+              </div>
+            </div>
+          )) : (
+            <div className="p-12 text-center">
+              <p className="text-slate-400">没有符合条件的评论</p>
+            </div>
+          )}
+        </div>
+      </Card>
+
+      {/* 关键词云 */}
+      <Card>
+        <h3 className="font-semibold text-slate-800 mb-4">🏷️ 关键词聚类</h3>
+        <div className="flex flex-wrap gap-2">
+          {need.items.map((item, idx) => (
+            <span 
+              key={item} 
+              className={clsx(
+                'px-4 py-2 rounded-full text-sm font-medium',
+                idx % 3 === 0 ? 'bg-ihg-navy/10 text-ihg-navy' :
+                idx % 3 === 1 ? 'bg-emerald-100 text-emerald-700' :
+                'bg-amber-100 text-amber-700'
+              )}
+            >
+              {item}
+            </span>
+          ))}
+          {/* 额外添加一些从评论中提取的关键词 */}
+          {['效率', '体验', '改进空间', '推荐', '性价比'].map((kw) => (
+            <span 
+              key={kw}
+              className="px-3 py-1.5 rounded-full text-xs bg-slate-100 text-slate-600"
+            >
+              {kw}
+            </span>
+          ))}
+        </div>
+      </Card>
+
+      {/* 行动建议 */}
+      <Card className="border-l-4 border-l-ihg-navy">
+        <h3 className="font-semibold text-slate-800 mb-3">💡 基于评论的行动建议</h3>
+        <div className="space-y-2">
+          {need.category === '效率需求' && (
+            <>
+              <p className="text-sm text-slate-600">• 优化自助入住机身份证识别准确率</p>
+              <p className="text-sm text-slate-600">• 高峰时段（14:00-16:00）增加前台人员</p>
+              <p className="text-sm text-slate-600">• 推广 App 预办入住功能，减少现场等待</p>
+            </>
+          )}
+          {need.category === '舒适需求' && (
+            <>
+              <p className="text-sm text-slate-600">• 重点排查走廊房和电梯旁房间隔音问题</p>
+              <p className="text-sm text-slate-600">• 定期检查空调设备，减少异响</p>
+              <p className="text-sm text-slate-600">• 升级高楼层窗户密封性</p>
+            </>
+          )}
+          {need.category === '服务需求' && (
+            <>
+              <p className="text-sm text-slate-600">• 客房服务响应目标控制在10分钟内</p>
+              <p className="text-sm text-slate-600">• 加强服务话术培训，提升服务温度</p>
+              <p className="text-sm text-slate-600">• 建立服务满意度即时反馈机制</p>
+            </>
+          )}
+          {!['效率需求', '舒适需求', '服务需求'].includes(need.category) && (
+            <>
+              <p className="text-sm text-slate-600">• 根据负面评论关键词制定改进计划</p>
+              <p className="text-sm text-slate-600">• 将正面反馈作为服务标杆进行推广</p>
+              <p className="text-sm text-slate-600">• 持续监控该维度的用户满意度变化</p>
+            </>
+          )}
+        </div>
+      </Card>
     </div>
   );
 }
