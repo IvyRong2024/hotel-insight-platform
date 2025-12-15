@@ -45,11 +45,11 @@ export function HotelView() {
     );
   }
 
-  // 酒店店长（新店）看单店详情 + 新店监测模块
+  // 酒店店长（新店）看单店详情（与成熟门店相同，新店监测在 Overview 展示）
   if (currentRole.id === 'hotel_mgr_new') {
     return (
-      <Layout title="我的酒店（新店）" subtitle="单店详细数据与新店运营监测" requiredModule="hotel">
-        <SingleHotelView isNewOpening />
+      <Layout title="我的酒店" subtitle="单店详细数据与用户洞察" requiredModule="hotel">
+        <SingleHotelView />
       </Layout>
     );
   }

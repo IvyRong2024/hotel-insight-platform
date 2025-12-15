@@ -19,12 +19,12 @@ const navItems = [
   { path: '/hotel', icon: Hotel, label: 'Hotel View', module: 'hotel' },
   { path: '/price', icon: DollarSign, label: 'Price Monitor', module: 'price' },
   { path: '/actions', icon: Zap, label: 'Action Center', module: 'actions' },
-  { path: '/config', icon: Settings, label: '监测管理', module: 'overview' },
 ];
 
-// 管理层专属：新店管理汇总（仅城市经理及以上角色可见）
+// 管理层专属入口（店长不可见）
 const managerOnlyItems = [
   { path: '/new-opening', icon: Sparkles, label: '新店管理', roles: ['city_mgr', 'region_vp', 'brand_ops'] },
+  { path: '/config', icon: Settings, label: '监测管理', roles: ['city_mgr', 'region_vp', 'brand_ops', 'revenue_mgr'] },
 ];
 
 export function Sidebar() {
