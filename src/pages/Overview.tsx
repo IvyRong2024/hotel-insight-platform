@@ -933,6 +933,12 @@ function NewHotelMgrOverview() {
       city: { rank: 8, total: 15, name: '杭州' },
       region: { rank: 35, total: 120, name: '华东区' },
       brand: { rank: 12, total: 85, name: '假日' },
+      tier: { rank: 18, total: 95, name: 'Essentials' },
+    },
+    comparisons: {
+      vsCityTier: '+0.08',
+      vsRegionTier: '+0.03',
+      vsNationalTier: '-0.05',
     },
     barriers: [
       { factor: '入住等待时间', severity: 'high' as const, frequency: 15, description: '前台办理入住平均等待超10分钟' },
@@ -958,6 +964,22 @@ function NewHotelMgrOverview() {
     negativeRatio: 4,
   };
 
+  // 新店平台高分占比数据
+  const newHotelPlatformScores: PlatformScoreSummary = {
+    summary: {
+      overallHighScoreRatio: 82,
+      trend: '+1.5%',
+    },
+    platforms: [
+      { name: '携程', highScoreRatio: 80, trend: '+2.1%' },
+      { name: '美团', highScoreRatio: 82, trend: '+1.8%' },
+      { name: '飞猪', highScoreRatio: 79, trend: '+1.2%' },
+      { name: 'Booking', highScoreRatio: 88, trend: '+0.8%' },
+      { name: 'Expedia', highScoreRatio: 84, trend: '+1.5%' },
+      { name: 'Agoda', highScoreRatio: 86, trend: '+1.0%' },
+    ],
+  };
+
   return (
     <div className="space-y-6">
       {/* 新店状态头部 */}
@@ -967,6 +989,9 @@ function NewHotelMgrOverview() {
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-white/80 text-sm">{newHotel.name}</span>
+                <span className="text-xs px-2 py-0.5 rounded bg-white/20">
+                  {brandTiers[newHotel.tier].name}
+                </span>
                 <span className="text-xs px-2 py-0.5 rounded bg-white/20">
                   ✨ 新店 · {newHotel.phase.name}
                 </span>
@@ -980,7 +1005,7 @@ function NewHotelMgrOverview() {
                 <span className="text-sm text-white/60 mb-1">目标 {newHotel.targetScore}</span>
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-4 text-center">
+            <div className="grid grid-cols-4 gap-4 text-center">
               <div className="px-4 py-2 bg-white/10 rounded-xl">
                 <p className="text-white/50 text-xs mb-1">城市排名</p>
                 <p className="text-xl font-bold">#{newHotel.rankings.city.rank}</p>
@@ -995,6 +1020,11 @@ function NewHotelMgrOverview() {
                 <p className="text-white/50 text-xs mb-1">品牌排名</p>
                 <p className="text-xl font-bold">#{newHotel.rankings.brand.rank}</p>
                 <p className="text-white/40 text-xs">{newHotel.rankings.brand.name}全国</p>
+              </div>
+              <div className="px-4 py-2 bg-white/10 rounded-xl">
+                <p className="text-white/50 text-xs mb-1">类型排名</p>
+                <p className="text-xl font-bold">#{newHotel.rankings.tier.rank}</p>
+                <p className="text-white/40 text-xs">{newHotel.rankings.tier.name}全国{newHotel.rankings.tier.total}家</p>
               </div>
             </div>
           </div>
@@ -1020,9 +1050,50 @@ function NewHotelMgrOverview() {
         </div>
       </section>
 
-      {/* 核心监测指标 */}
+      {/* 本店各平台高分评论占比 - 北极星指标 */}
+      <section className="animate-fade-in-up delay-25">
+        <PlatformScoreRatioCard data={newHotelPlatformScores} title="本店各平台高分评论占比" compact />
+      </section>
+
+      {/* 与同类型门店对比 - 北极星指标 */}
       <section className="animate-fade-in-up delay-50">
-        <h3 className="text-base font-semibold text-slate-800 mb-3">📊 新店核心指标（vs 同品牌成熟店）</h3>
+        <Card>
+          <h3 className="font-semibold text-slate-800 mb-3">📊 与同类型（{brandTiers[newHotel.tier].name}）门店对比</h3>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="p-3 bg-slate-50 rounded-xl text-center">
+              <p className="text-sm text-slate-500 mb-1">vs 城市同类型</p>
+              <p className={clsx(
+                'text-2xl font-bold',
+                newHotel.comparisons.vsCityTier.startsWith('+') ? 'text-emerald-600' : 'text-red-600'
+              )}>
+                {newHotel.comparisons.vsCityTier}
+              </p>
+            </div>
+            <div className="p-3 bg-slate-50 rounded-xl text-center">
+              <p className="text-sm text-slate-500 mb-1">vs 区域同类型</p>
+              <p className={clsx(
+                'text-2xl font-bold',
+                newHotel.comparisons.vsRegionTier.startsWith('+') ? 'text-emerald-600' : 'text-red-600'
+              )}>
+                {newHotel.comparisons.vsRegionTier}
+              </p>
+            </div>
+            <div className="p-3 bg-slate-50 rounded-xl text-center">
+              <p className="text-sm text-slate-500 mb-1">vs 全国同类型</p>
+              <p className={clsx(
+                'text-2xl font-bold',
+                newHotel.comparisons.vsNationalTier.startsWith('+') ? 'text-emerald-600' : 'text-red-600'
+              )}>
+                {newHotel.comparisons.vsNationalTier}
+              </p>
+            </div>
+          </div>
+        </Card>
+      </section>
+
+      {/* 新店核心监测指标 */}
+      <section className="animate-fade-in-up delay-75">
+        <h3 className="text-base font-semibold text-slate-800 mb-3">✨ 新店核心指标（vs 同品牌成熟店）</h3>
         <div className="grid grid-cols-4 gap-4">
           <Card>
             <p className="text-slate-500 text-sm mb-1">稳定性指数</p>
