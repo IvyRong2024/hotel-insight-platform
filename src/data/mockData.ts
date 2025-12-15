@@ -303,15 +303,94 @@ export const regionHierarchy: RegionData[] = [
   },
 ];
 
+// ==================== 平台评分标准与高分占比 ====================
+// 携程/飞猪：5分制，4.5分及以上为高分
+// 美团：5星制，4星及以上为高分
+// 境外渠道（Booking/Expedia/Agoda）：10分制，8分及以上为高分
+export const platformScoreStandards = {
+  domestic: {
+    ctrip: {
+      name: '携程',
+      scale: '5分制',
+      highScoreThreshold: 4.5,
+      totalReviews: 12580,
+      highScoreReviews: 10189,
+      highScoreRatio: 81.0,
+      trend: '+2.3%',
+      avgScore: 4.52,
+    },
+    meituan: {
+      name: '美团',
+      scale: '5星制',
+      highScoreThreshold: '4星',
+      totalReviews: 8920,
+      highScoreReviews: 7493,
+      highScoreRatio: 84.0,
+      trend: '+1.8%',
+      avgScore: 4.48,
+    },
+    fliggy: {
+      name: '飞猪',
+      scale: '5分制',
+      highScoreThreshold: 4.5,
+      totalReviews: 5680,
+      highScoreReviews: 4544,
+      highScoreRatio: 80.0,
+      trend: '+0.5%',
+      avgScore: 4.45,
+    },
+  },
+  overseas: {
+    booking: {
+      name: 'Booking',
+      scale: '10分制',
+      highScoreThreshold: 8.0,
+      totalReviews: 3250,
+      highScoreReviews: 2795,
+      highScoreRatio: 86.0,
+      trend: '+1.2%',
+      avgScore: 8.6,
+    },
+    expedia: {
+      name: 'Expedia',
+      scale: '10分制',
+      highScoreThreshold: 8.0,
+      totalReviews: 1820,
+      highScoreReviews: 1474,
+      highScoreRatio: 81.0,
+      trend: '-0.5%',
+      avgScore: 8.2,
+    },
+    agoda: {
+      name: 'Agoda',
+      scale: '10分制',
+      highScoreThreshold: 8.0,
+      totalReviews: 2150,
+      highScoreReviews: 1849,
+      highScoreRatio: 86.0,
+      trend: '+0.8%',
+      avgScore: 8.5,
+    },
+  },
+  summary: {
+    domesticHighScoreRatio: 82.0, // 国内渠道加权平均
+    overseasHighScoreRatio: 85.0, // 境外渠道加权平均
+    overallHighScoreRatio: 83.0,  // 综合高分占比
+    trend: '+1.5%',
+  },
+};
+
 // ==================== 品牌健康指数 ====================
 export const brandHealthData = {
   overallScore: 4.52,
   sentimentIndex: 78.5,
   experienceIndex: 82.1,
+  highScoreRatio: platformScoreStandards.summary.overallHighScoreRatio, // 高分占比
   trends: {
     overallScore: '+3.2%',
     sentimentIndex: '+2.1%',
     experienceIndex: '+1.8%',
+    highScoreRatio: platformScoreStandards.summary.trend,
   },
   trendData: [
     { date: '11-11', score: 4.45, sentiment: 75 },

@@ -10,6 +10,7 @@ import {
   actionsData, 
   priceData,
   watchlistData,
+  platformScoreStandards,
   BrandTier 
 } from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
@@ -78,8 +79,124 @@ function BrandOpsOverview() {
         </div>
       </section>
 
-      {/* 品牌故事 Narrative */}
+      {/* 各平台高分占比 - 总分依据 */}
       <section className="animate-fade-in-up delay-50">
+        <Card>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="font-semibold text-slate-800">📊 各平台高分评论占比</h3>
+              <p className="text-xs text-slate-500 mt-1">携程/飞猪 4.5分+ | 美团 4星+ | 境外渠道 8分+ 作为高分标准</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-3xl font-bold text-ihg-navy">{platformScoreStandards.summary.overallHighScoreRatio}%</span>
+              <span className={clsx(
+                'text-sm flex items-center gap-1',
+                platformScoreStandards.summary.trend.startsWith('+') ? 'text-emerald-600' : 'text-red-600'
+              )}>
+                {platformScoreStandards.summary.trend.startsWith('+') ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                {platformScoreStandards.summary.trend}
+              </span>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-6">
+            {/* 国内渠道 */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-sm font-medium text-slate-700">🇨🇳 国内渠道</span>
+                <span className="text-sm text-emerald-600 font-medium">{platformScoreStandards.summary.domesticHighScoreRatio}%</span>
+              </div>
+              <div className="space-y-3">
+                {Object.values(platformScoreStandards.domestic).map((platform) => (
+                  <div key={platform.name} className="flex items-center gap-3">
+                    <div className={clsx(
+                      'w-12 h-8 rounded flex items-center justify-center text-xs font-medium',
+                      platform.name === '携程' ? 'bg-blue-100 text-blue-700' :
+                      platform.name === '美团' ? 'bg-yellow-100 text-yellow-700' :
+                      'bg-orange-100 text-orange-700'
+                    )}>
+                      {platform.name}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between text-xs mb-1">
+                        <span className="text-slate-500">{platform.scale} · {typeof platform.highScoreThreshold === 'number' ? `${platform.highScoreThreshold}分+` : `${platform.highScoreThreshold}+`}</span>
+                        <span className="font-medium text-slate-700">{platform.highScoreRatio}%</span>
+                      </div>
+                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-ihg-navy rounded-full transition-all"
+                          style={{ width: `${platform.highScoreRatio}%` }}
+                        />
+                      </div>
+                    </div>
+                    <span className={clsx(
+                      'text-xs',
+                      platform.trend.startsWith('+') ? 'text-emerald-600' : 'text-red-600'
+                    )}>
+                      {platform.trend}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 境外渠道 */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-sm font-medium text-slate-700">🌍 境外渠道</span>
+                <span className="text-sm text-emerald-600 font-medium">{platformScoreStandards.summary.overseasHighScoreRatio}%</span>
+              </div>
+              <div className="space-y-3">
+                {Object.values(platformScoreStandards.overseas).map((platform) => (
+                  <div key={platform.name} className="flex items-center gap-3">
+                    <div className={clsx(
+                      'w-12 h-8 rounded flex items-center justify-center text-xs font-medium',
+                      platform.name === 'Booking' ? 'bg-indigo-100 text-indigo-700' :
+                      platform.name === 'Expedia' ? 'bg-purple-100 text-purple-700' :
+                      'bg-pink-100 text-pink-700'
+                    )}>
+                      {platform.name.slice(0, 4)}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between text-xs mb-1">
+                        <span className="text-slate-500">{platform.scale} · {platform.highScoreThreshold}分+</span>
+                        <span className="font-medium text-slate-700">{platform.highScoreRatio}%</span>
+                      </div>
+                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-ihg-gold rounded-full transition-all"
+                          style={{ width: `${platform.highScoreRatio}%` }}
+                        />
+                      </div>
+                    </div>
+                    <span className={clsx(
+                      'text-xs',
+                      platform.trend.startsWith('+') ? 'text-emerald-600' : 'text-red-600'
+                    )}>
+                      {platform.trend}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* 评论数统计 */}
+          <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+            <span>
+              总评论数：{(Object.values(platformScoreStandards.domestic).reduce((sum, p) => sum + p.totalReviews, 0) + 
+                        Object.values(platformScoreStandards.overseas).reduce((sum, p) => sum + p.totalReviews, 0)).toLocaleString()} 条
+            </span>
+            <span>
+              高分评论：{(Object.values(platformScoreStandards.domestic).reduce((sum, p) => sum + p.highScoreReviews, 0) + 
+                        Object.values(platformScoreStandards.overseas).reduce((sum, p) => sum + p.highScoreReviews, 0)).toLocaleString()} 条
+            </span>
+          </div>
+        </Card>
+      </section>
+
+      {/* 品牌故事 Narrative */}
+      <section className="animate-fade-in-up delay-100">
         <Card className="bg-gradient-to-r from-slate-50 to-white border-l-4 border-l-ihg-navy">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 bg-ihg-navy/10 rounded-xl flex items-center justify-center text-xl">📊</div>
@@ -88,7 +205,9 @@ function BrandOpsOverview() {
               <p className="text-slate-600 text-sm leading-relaxed">
                 IHG整体表现稳健，综合评分<span className="text-emerald-600 font-medium">领先万豪</span>但
                 <span className="text-red-600 font-medium">略落后希尔顿</span>。
-                「<span className="text-red-600 font-medium">智能体验</span>」承诺感知度仅45%，是当前最大短板，建议在App引导和自助入住机使用率上加强。
+                各平台高分占比达<span className="text-ihg-navy font-medium">{platformScoreStandards.summary.overallHighScoreRatio}%</span>，
+                其中境外渠道表现更优（{platformScoreStandards.summary.overseasHighScoreRatio}%）。
+                「<span className="text-red-600 font-medium">智能体验</span>」承诺感知度仅45%，是当前最大短板。
                 <span className="text-amber-600 font-medium">万豪双12促销力度大（5折起）</span>，注意价格敏感用户流失风险。
               </p>
             </div>
