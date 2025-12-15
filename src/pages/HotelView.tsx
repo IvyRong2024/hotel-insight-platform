@@ -5,7 +5,6 @@ import {
   regionHierarchy, 
   brandTiers, 
   hotelDetailData, 
-  newHotelDetailData,
   getHotelDetailById,
   userNeedsData, 
   watchlistData,
