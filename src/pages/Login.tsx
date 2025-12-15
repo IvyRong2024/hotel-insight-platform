@@ -1,22 +1,62 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, roleConfigs, UserRole } from '../context/AuthContext';
-import { Building2, Users, MapPin, Hotel, DollarSign, ChevronRight, Sparkles } from 'lucide-react';
+import { Building2, Users, MapPin, Hotel, DollarSign, ChevronRight, Sparkles, TrendingUp } from 'lucide-react';
 import clsx from 'clsx';
 
+// 三大视角入口配置
+const viewportGroups = [
+  {
+    id: 'brand',
+    name: '品牌视角',
+    icon: <Building2 size={24} />,
+    color: 'from-violet-500 to-purple-600',
+    description: '全国品牌健康监测、品牌承诺验证、竞品对比分析',
+    roles: ['brand_ops'],
+  },
+  {
+    id: 'hotel',
+    name: '酒店视角',
+    icon: <Hotel size={24} />,
+    color: 'from-ihg-navy to-blue-600',
+    description: '区域/城市/单店运营诊断、用户洞察、行动建议',
+    roles: ['region_vp', 'city_mgr', 'hotel_mgr', 'hotel_mgr_new'],
+  },
+  {
+    id: 'price',
+    name: '价格视角',
+    icon: <DollarSign size={24} />,
+    color: 'from-emerald-500 to-teal-600',
+    description: '竞品价格监测、券类产品追踪、渠道价差分析',
+    roles: ['revenue_mgr'],
+  },
+];
+
 const roleIcons: Record<UserRole, React.ReactNode> = {
-  brand_ops: <Building2 size={20} />,
-  region_vp: <Users size={20} />,
-  city_mgr: <MapPin size={20} />,
-  hotel_mgr: <Hotel size={20} />,
-  hotel_mgr_new: <Sparkles size={20} />,
-  revenue_mgr: <DollarSign size={20} />,
+  brand_ops: <TrendingUp size={18} />,
+  region_vp: <Users size={18} />,
+  city_mgr: <MapPin size={18} />,
+  hotel_mgr: <Hotel size={18} />,
+  hotel_mgr_new: <Sparkles size={18} />,
+  revenue_mgr: <DollarSign size={18} />,
 };
 
 export function Login() {
+  const [selectedViewport, setSelectedViewport] = useState<string | null>(null);
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  const handleViewportSelect = (viewportId: string) => {
+    setSelectedViewport(viewportId);
+    // 如果该视角只有一个角色，自动选中
+    const viewport = viewportGroups.find(v => v.id === viewportId);
+    if (viewport && viewport.roles.length === 1) {
+      setSelectedRole(viewport.roles[0] as UserRole);
+    } else {
+      setSelectedRole(null);
+    }
+  };
 
   const handleLogin = () => {
     if (selectedRole) {
@@ -24,6 +64,11 @@ export function Login() {
       navigate('/');
     }
   };
+
+  const currentViewport = viewportGroups.find(v => v.id === selectedViewport);
+  const availableRoles = currentViewport 
+    ? roleConfigs.filter(r => currentViewport.roles.includes(r.id))
+    : [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-ihg-navy via-ihg-navy-light to-ihg-navy flex">
@@ -37,8 +82,7 @@ export function Login() {
         <div className="space-y-3 text-white/80">
           <FeatureItem icon="🎯" title="品牌视角" desc="全国品牌健康监测与竞对分析" />
           <FeatureItem icon="🏨" title="酒店视角" desc="区域/城市/单店运营诊断" />
-          <FeatureItem icon="💰" title="价格监测" desc="价格策略与竞对促销追踪" />
-          <FeatureItem icon="⚡" title="行动中心" desc="可执行的改善建议管理" />
+          <FeatureItem icon="💰" title="价格监测" desc="竞品价格策略与促销追踪" />
         </div>
 
         <div className="mt-12 pt-8 border-t border-white/10">
@@ -51,71 +95,146 @@ export function Login() {
       </div>
 
       {/* Right: Login */}
-      <div className="w-[520px] bg-white flex flex-col justify-center px-12">
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-slate-800 mb-2">选择您的角色</h2>
-          <p className="text-slate-500">不同角色将看到对应权限范围内的数据和功能</p>
-        </div>
+      <div className="w-[560px] bg-white flex flex-col justify-center px-12">
+        {!selectedViewport ? (
+          // 第一步：选择视角
+          <>
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-slate-800 mb-2">选择您的视角</h2>
+              <p className="text-slate-500">根据您的工作职责选择对应的数据视角</p>
+            </div>
 
-        <div className="space-y-2 mb-6 max-h-[400px] overflow-y-auto pr-2">
-          {roleConfigs.map((role) => (
+            <div className="space-y-4 mb-6">
+              {viewportGroups.map((viewport) => (
+                <button
+                  key={viewport.id}
+                  onClick={() => handleViewportSelect(viewport.id)}
+                  className="w-full group"
+                >
+                  <div className={clsx(
+                    'p-5 rounded-2xl border-2 transition-all text-left',
+                    'hover:border-slate-300 hover:shadow-lg',
+                    'border-slate-200 bg-white'
+                  )}>
+                    <div className="flex items-start gap-4">
+                      <div className={clsx(
+                        'w-14 h-14 rounded-xl flex items-center justify-center text-white bg-gradient-to-br',
+                        viewport.color
+                      )}>
+                        {viewport.icon}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-lg font-bold text-slate-800">{viewport.name}</span>
+                          <ChevronRight size={20} className="text-slate-400 group-hover:text-slate-600 transition-colors" />
+                        </div>
+                        <p className="text-sm text-slate-500">{viewport.description}</p>
+                        <div className="mt-2 flex flex-wrap gap-1">
+                          {viewport.roles.map(roleId => {
+                            const role = roleConfigs.find(r => r.id === roleId);
+                            return role ? (
+                              <span key={roleId} className="text-xs px-2 py-0.5 bg-slate-100 text-slate-600 rounded">
+                                {role.name}
+                              </span>
+                            ) : null;
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            <p className="text-center text-sm text-slate-400">
+              Demo 版本 · 数据仅供演示
+            </p>
+          </>
+        ) : (
+          // 第二步：选择具体角色
+          <>
+            <div className="mb-6">
+              <button 
+                onClick={() => { setSelectedViewport(null); setSelectedRole(null); }}
+                className="text-sm text-slate-500 hover:text-ihg-navy mb-3 flex items-center gap-1"
+              >
+                ← 返回选择视角
+              </button>
+              <div className="flex items-center gap-3 mb-2">
+                <div className={clsx(
+                  'w-10 h-10 rounded-xl flex items-center justify-center text-white bg-gradient-to-br',
+                  currentViewport?.color
+                )}>
+                  {currentViewport?.icon}
+                </div>
+                <h2 className="text-2xl font-bold text-slate-800">{currentViewport?.name}</h2>
+              </div>
+              <p className="text-slate-500">
+                {availableRoles.length > 1 ? '选择您的具体角色' : '确认进入'}
+              </p>
+            </div>
+
+            <div className="space-y-2 mb-6 max-h-[320px] overflow-y-auto pr-2">
+              {availableRoles.map((role) => (
+                <button
+                  key={role.id}
+                  onClick={() => setSelectedRole(role.id)}
+                  className={clsx(
+                    'w-full flex items-start gap-4 p-4 rounded-xl border-2 transition-all text-left',
+                    selectedRole === role.id
+                      ? 'border-ihg-navy bg-ihg-navy/5'
+                      : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                  )}
+                >
+                  <div className={clsx(
+                    'w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0',
+                    selectedRole === role.id ? 'bg-ihg-navy text-white' : 'bg-slate-100 text-slate-500'
+                  )}>
+                    {roleIcons[role.id]}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className={clsx(
+                        'font-semibold',
+                        selectedRole === role.id ? 'text-ihg-navy' : 'text-slate-700'
+                      )}>
+                        {role.name}
+                      </span>
+                      <span className="text-xs text-slate-400">{role.level}</span>
+                    </div>
+                    <p className="text-xs text-slate-500 line-clamp-2">{role.description}</p>
+                  </div>
+                  <div className={clsx(
+                    'w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-1',
+                    selectedRole === role.id ? 'border-ihg-navy bg-ihg-navy' : 'border-slate-300'
+                  )}>
+                    {selectedRole === role.id && (
+                      <div className="w-2 h-2 rounded-full bg-white" />
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+
             <button
-              key={role.id}
-              onClick={() => setSelectedRole(role.id)}
+              onClick={handleLogin}
+              disabled={!selectedRole}
               className={clsx(
-                'w-full flex items-start gap-4 p-4 rounded-xl border-2 transition-all text-left',
-                selectedRole === role.id
-                  ? 'border-ihg-navy bg-ihg-navy/5'
-                  : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                'w-full py-4 rounded-xl font-semibold text-white flex items-center justify-center gap-2 transition-all',
+                selectedRole
+                  ? 'bg-ihg-navy hover:bg-ihg-navy-light cursor-pointer'
+                  : 'bg-slate-300 cursor-not-allowed'
               )}
             >
-              <div className={clsx(
-                'w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0',
-                selectedRole === role.id ? 'bg-ihg-navy text-white' : 'bg-slate-100 text-slate-500'
-              )}>
-                {roleIcons[role.id]}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-0.5">
-                  <span className={clsx(
-                    'font-semibold',
-                    selectedRole === role.id ? 'text-ihg-navy' : 'text-slate-700'
-                  )}>
-                    {role.name}
-                  </span>
-                  <span className="text-xs text-slate-400">{role.level}</span>
-                </div>
-                <p className="text-xs text-slate-500 line-clamp-2">{role.description}</p>
-              </div>
-              <div className={clsx(
-                'w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-1',
-                selectedRole === role.id ? 'border-ihg-navy bg-ihg-navy' : 'border-slate-300'
-              )}>
-                {selectedRole === role.id && (
-                  <div className="w-2 h-2 rounded-full bg-white" />
-                )}
-              </div>
+              进入平台
+              <ChevronRight size={18} />
             </button>
-          ))}
-        </div>
 
-        <button
-          onClick={handleLogin}
-          disabled={!selectedRole}
-          className={clsx(
-            'w-full py-4 rounded-xl font-semibold text-white flex items-center justify-center gap-2 transition-all',
-            selectedRole
-              ? 'bg-ihg-navy hover:bg-ihg-navy-light cursor-pointer'
-              : 'bg-slate-300 cursor-not-allowed'
-          )}
-        >
-          进入平台
-          <ChevronRight size={18} />
-        </button>
-
-        <p className="mt-6 text-center text-sm text-slate-400">
-          Demo 版本 · 数据仅供演示
-        </p>
+            <p className="mt-6 text-center text-sm text-slate-400">
+              Demo 版本 · 数据仅供演示
+            </p>
+          </>
+        )}
       </div>
     </div>
   );
