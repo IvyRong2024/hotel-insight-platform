@@ -10,6 +10,8 @@ import {
   watchlistData,
   newOpeningData,
   reviewPlatforms,
+  cityCompetitorHotels,
+  brandCompetitorData,
   BrandTier,
   HotelData,
   CityData,
@@ -316,6 +318,16 @@ function HierarchyView({ roleId }: { roleId: string }) {
       {!selectedHotel && (
         <NewHotelMonitor />
       )}
+
+      {/* 同城竞品对比 */}
+      {!selectedHotel && currentData && (currentData.type === 'hotels' || currentData.type === 'city') && (
+        <CityCompetitorSection cityName={currentData.type === 'city' ? currentData.data.name : currentData.data.name} />
+      )}
+
+      {/* 品牌级别竞品对比（区域视角） */}
+      {!selectedHotel && !selectedCity && !startFromCity && (
+        <BrandCompetitorSection />
+      )}
     </div>
   );
 }
@@ -618,6 +630,139 @@ function NewHotelMonitor() {
           </div>
         </div>
       </Card>
+    </section>
+  );
+}
+
+// ========== 同城竞品对比 ==========
+function CityCompetitorSection({ cityName }: { cityName: string }) {
+  const competitors = cityCompetitorHotels[cityName] || [];
+  
+  if (competitors.length === 0) return null;
+
+  // 按档次分组
+  const byTier = competitors.reduce((acc, hotel) => {
+    if (!acc[hotel.tier]) acc[hotel.tier] = [];
+    acc[hotel.tier].push(hotel);
+    return acc;
+  }, {} as Record<BrandTier, typeof competitors>);
+
+  return (
+    <section className="animate-fade-in-up">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h3 className="text-base font-semibold text-slate-800 flex items-center gap-2">
+            <Building size={18} className="text-purple-500" />
+            {cityName}竞品酒店动态
+          </h3>
+          <p className="text-xs text-slate-500 mt-0.5">监测同城主要竞品酒店的表现，便于对标分析</p>
+        </div>
+        <span className="text-sm text-slate-500">{competitors.length}家竞品</span>
+      </div>
+      
+      <div className="space-y-4">
+        {(Object.entries(byTier) as [BrandTier, typeof competitors][]).map(([tier, hotels]) => (
+          <Card key={tier} padding="sm">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: brandTiers[tier].color }} />
+              <span className="font-medium text-slate-700">{brandTiers[tier].name}</span>
+              <span className="text-xs text-slate-400">{hotels.length}家</span>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {hotels.map((hotel) => (
+                <div key={hotel.id} className="p-3 bg-slate-50 rounded-xl">
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <span className="font-medium text-slate-800 text-sm">{hotel.name}</span>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-xs text-slate-500">{hotel.brand}</span>
+                        <span className="text-xs px-1.5 py-0.5 rounded bg-slate-200 text-slate-600">{hotel.group}</span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-lg font-bold text-slate-800">{hotel.score}</span>
+                      <span className={clsx(
+                        'text-xs ml-1',
+                        hotel.trend.startsWith('+') ? 'text-emerald-600' : 'text-red-600'
+                      )}>
+                        {hotel.trend}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {hotel.highlights.map((h, i) => (
+                      <span key={i} className="text-xs px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700">{h}</span>
+                    ))}
+                    {hotel.concerns.map((c, i) => (
+                      <span key={i} className="text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">{c}</span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ========== 品牌级别竞品对比（区域视角） ==========
+function BrandCompetitorSection() {
+  return (
+    <section className="animate-fade-in-up">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h3 className="text-base font-semibold text-slate-800 flex items-center gap-2">
+            <Star size={18} className="text-ihg-gold" />
+            品牌级别竞品对比
+          </h3>
+          <p className="text-xs text-slate-500 mt-0.5">按品牌档次对标同类竞品品牌表现</p>
+        </div>
+      </div>
+      
+      <div className="space-y-3">
+        {brandCompetitorData.slice(0, 3).map((item) => (
+          <Card key={item.ihgBrand} padding="sm">
+            <div className="flex items-center gap-4">
+              <div className="w-28 flex-shrink-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: brandTiers[item.tier].color }} />
+                  <span className="font-semibold text-ihg-navy text-sm">{item.ihgBrand}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg font-bold text-slate-800">{item.ihgScore}</span>
+                  <span className={clsx(
+                    'text-xs',
+                    item.ihgTrend.startsWith('+') ? 'text-emerald-600' : 'text-red-600'
+                  )}>
+                    {item.ihgTrend}
+                  </span>
+                </div>
+              </div>
+              <div className="flex-1 flex gap-2 overflow-x-auto">
+                {item.competitors.slice(0, 3).map((comp) => (
+                  <div key={comp.brand} className={clsx(
+                    'px-3 py-2 rounded-lg min-w-[120px] text-center flex-shrink-0',
+                    comp.diff.startsWith('+') ? 'bg-emerald-50' : 'bg-red-50'
+                  )}>
+                    <div className="text-xs font-medium text-slate-700 mb-1">{comp.brand}</div>
+                    <div className="flex items-center justify-center gap-1">
+                      <span className="font-bold text-slate-800">{comp.score}</span>
+                      <span className={clsx(
+                        'text-xs',
+                        comp.diff.startsWith('+') ? 'text-emerald-600' : 'text-red-600'
+                      )}>
+                        {comp.diff}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
     </section>
   );
 }

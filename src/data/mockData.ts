@@ -529,7 +529,95 @@ export const brandBarriersData = [
   { barrier: '服务响应', severity: 'low', mentions: 423, trend: '→', affectedTier: 'luxury_lifestyle', type: '延迟', impact: -0.05 },
 ];
 
-// ==================== 竞对对比 ====================
+// ==================== 竞对对比（品牌级别） ====================
+// 按品牌档次对标，非集团层面
+export interface CompetitorBrandData {
+  ihgBrand: string;
+  tier: BrandTier;
+  ihgScore: number;
+  ihgTrend: string;
+  competitors: Array<{
+    brand: string;
+    group: string;
+    score: number;
+    trend: string;
+    diff: string;
+    advantages: string[];
+  }>;
+}
+
+export const brandCompetitorData: CompetitorBrandData[] = [
+  {
+    ihgBrand: '洲际酒店',
+    tier: 'luxury_lifestyle',
+    ihgScore: 4.68,
+    ihgTrend: '+0.02',
+    competitors: [
+      { brand: 'JW万豪', group: '万豪', score: 4.72, trend: '+0.03', diff: '-0.04', advantages: ['设施豪华', '行政酒廊'] },
+      { brand: '华尔道夫', group: '希尔顿', score: 4.75, trend: '+0.01', diff: '-0.07', advantages: ['历史底蕴', '服务定制'] },
+      { brand: '柏悦', group: '凯悦', score: 4.70, trend: '+0.02', diff: '-0.02', advantages: ['设计感', '私密性'] },
+      { brand: '索菲特', group: '雅高', score: 4.58, trend: '-0.01', diff: '+0.10', advantages: ['法式优雅'] },
+    ],
+  },
+  {
+    ihgBrand: '英迪格',
+    tier: 'luxury_lifestyle',
+    ihgScore: 4.62,
+    ihgTrend: '+0.03',
+    competitors: [
+      { brand: 'W酒店', group: '万豪', score: 4.65, trend: '+0.02', diff: '-0.03', advantages: ['潮流设计', '夜生活'] },
+      { brand: '安达仕', group: '凯悦', score: 4.60, trend: '+0.01', diff: '+0.02', advantages: ['艺术氛围'] },
+      { brand: '美憬阁', group: '雅高', score: 4.52, trend: '-0.02', diff: '+0.10', advantages: ['独特个性'] },
+    ],
+  },
+  {
+    ihgBrand: '皇冠假日',
+    tier: 'premium',
+    ihgScore: 4.55,
+    ihgTrend: '+0.01',
+    competitors: [
+      { brand: '万豪酒店', group: '万豪', score: 4.52, trend: '+0.02', diff: '+0.03', advantages: ['会员体系', '全球布局'] },
+      { brand: '希尔顿酒店', group: '希尔顿', score: 4.58, trend: '+0.03', diff: '-0.03', advantages: ['数字化入住', '设施新'] },
+      { brand: '君悦', group: '凯悦', score: 4.60, trend: '+0.02', diff: '-0.05', advantages: ['商务配套'] },
+      { brand: '美居', group: '雅高', score: 4.42, trend: '-0.01', diff: '+0.13', advantages: ['性价比'] },
+    ],
+  },
+  {
+    ihgBrand: 'voco',
+    tier: 'premium',
+    ihgScore: 4.48,
+    ihgTrend: '+0.02',
+    competitors: [
+      { brand: '傲途格', group: '万豪', score: 4.50, trend: '+0.01', diff: '-0.02', advantages: ['精选体验'] },
+      { brand: 'Curio', group: '希尔顿', score: 4.45, trend: '+0.02', diff: '+0.03', advantages: ['本地特色'] },
+    ],
+  },
+  {
+    ihgBrand: '假日酒店',
+    tier: 'essentials',
+    ihgScore: 4.35,
+    ihgTrend: '-0.02',
+    competitors: [
+      { brand: '万怡酒店', group: '万豪', score: 4.38, trend: '+0.01', diff: '-0.03', advantages: ['商务便捷'] },
+      { brand: '希尔顿花园', group: '希尔顿', score: 4.42, trend: '+0.02', diff: '-0.07', advantages: ['现代设施'] },
+      { brand: '凯悦嘉轩', group: '凯悦', score: 4.40, trend: '+0.01', diff: '-0.05', advantages: ['服务一致性'] },
+      { brand: '诺富特', group: '雅高', score: 4.32, trend: '-0.01', diff: '+0.03', advantages: ['性价比高'] },
+    ],
+  },
+  {
+    ihgBrand: '智选假日',
+    tier: 'essentials',
+    ihgScore: 4.28,
+    ihgTrend: '-0.03',
+    competitors: [
+      { brand: 'Hampton', group: '希尔顿', score: 4.35, trend: '+0.02', diff: '-0.07', advantages: ['早餐含住', '性价比'] },
+      { brand: '宜必思', group: '雅高', score: 4.22, trend: '-0.02', diff: '+0.06', advantages: ['价格优势'] },
+      { brand: '万枫', group: '万豪', score: 4.30, trend: '+0.01', diff: '-0.02', advantages: ['现代设计'] },
+    ],
+  },
+];
+
+// 旧结构保留兼容（集团层面汇总）
 export const competitorData = {
   brands: ['IHG洲际', '万豪国际', '希尔顿', '雅高集团'],
   colors: ['#003B6F', '#8b5cf6', '#f59e0b', '#6b7280'],
@@ -550,6 +638,43 @@ export const competitorData = {
     { competitor: '万豪', campaign: '双12狂欢', discount: '5折起', dates: '12/10-15', channels: ['抖音', '携程'], threat: 'high' as const },
     { competitor: '希尔顿', campaign: '荣誉客会员日', discount: '8折', dates: '12/12', channels: ['直客通'], threat: 'low' as const },
     { competitor: '雅高', campaign: '圣诞特惠', discount: '7折', dates: '12/20-26', channels: ['携程', '飞猪'], threat: 'medium' as const },
+  ],
+};
+
+// ==================== 同城竞品酒店数据 ====================
+export interface CompetitorHotelData {
+  id: string;
+  name: string;
+  brand: string;
+  group: string;
+  tier: BrandTier;
+  city: string;
+  score: number;
+  trend: string;
+  reviewCount: number;
+  highlights: string[];
+  concerns: string[];
+}
+
+export const cityCompetitorHotels: Record<string, CompetitorHotelData[]> = {
+  '上海市': [
+    { id: 'c1', name: '上海虹桥万豪酒店', brand: '万豪酒店', group: '万豪', tier: 'premium', city: '上海市', score: 4.55, trend: '+0.02', reviewCount: 2856, highlights: ['商务配套完善', '会议设施好'], concerns: ['价格偏高'] },
+    { id: 'c2', name: '上海虹桥希尔顿酒店', brand: '希尔顿酒店', group: '希尔顿', tier: 'premium', city: '上海市', score: 4.58, trend: '+0.03', reviewCount: 3124, highlights: ['设施新', '数字化入住快'], concerns: ['停车不便'] },
+    { id: 'c3', name: '上海外滩华尔道夫酒店', brand: '华尔道夫', group: '希尔顿', tier: 'luxury_lifestyle', city: '上海市', score: 4.78, trend: '+0.01', reviewCount: 1856, highlights: ['历史建筑', '服务顶级'], concerns: ['价格极高'] },
+    { id: 'c4', name: '上海外滩W酒店', brand: 'W酒店', group: '万豪', tier: 'luxury_lifestyle', city: '上海市', score: 4.65, trend: '+0.02', reviewCount: 2145, highlights: ['设计潮流', '夜生活丰富'], concerns: ['隔音一般'] },
+    { id: 'c5', name: '上海虹桥希尔顿花园酒店', brand: '希尔顿花园', group: '希尔顿', tier: 'essentials', city: '上海市', score: 4.42, trend: '+0.02', reviewCount: 1567, highlights: ['性价比高', '早餐好'], concerns: ['房间略小'] },
+    { id: 'c6', name: '上海虹桥万怡酒店', brand: '万怡酒店', group: '万豪', tier: 'essentials', city: '上海市', score: 4.38, trend: '+0.01', reviewCount: 1234, highlights: ['商务便捷'], concerns: ['设施略旧'] },
+  ],
+  '杭州市': [
+    { id: 'c7', name: '杭州西湖JW万豪酒店', brand: 'JW万豪', group: '万豪', tier: 'luxury_lifestyle', city: '杭州市', score: 4.72, trend: '+0.02', reviewCount: 1856, highlights: ['西湖景观', '设施豪华'], concerns: ['价格高'] },
+    { id: 'c8', name: '杭州柏悦酒店', brand: '柏悦', group: '凯悦', tier: 'luxury_lifestyle', city: '杭州市', score: 4.68, trend: '+0.01', reviewCount: 1234, highlights: ['设计简约', '私密性好'], concerns: ['位置偏'] },
+    { id: 'c9', name: '杭州滨江希尔顿酒店', brand: '希尔顿酒店', group: '希尔顿', tier: 'premium', city: '杭州市', score: 4.55, trend: '+0.02', reviewCount: 1678, highlights: ['商务配套', '交通便利'], concerns: ['周边配套少'] },
+    { id: 'c10', name: '杭州希尔顿花园酒店', brand: '希尔顿花园', group: '希尔顿', tier: 'essentials', city: '杭州市', score: 4.40, trend: '+0.01', reviewCount: 987, highlights: ['性价比高'], concerns: ['设施一般'] },
+  ],
+  '南京市': [
+    { id: 'c11', name: '南京万豪酒店', brand: '万豪酒店', group: '万豪', tier: 'premium', city: '南京市', score: 4.52, trend: '+0.01', reviewCount: 1456, highlights: ['位置好', '服务稳定'], concerns: ['设施略旧'] },
+    { id: 'c12', name: '南京希尔顿酒店', brand: '希尔顿酒店', group: '希尔顿', tier: 'premium', city: '南京市', score: 4.55, trend: '+0.02', reviewCount: 1678, highlights: ['设施新', '早餐丰富'], concerns: ['价格偏高'] },
+    { id: 'c13', name: '南京索菲特银河大酒店', brand: '索菲特', group: '雅高', tier: 'luxury_lifestyle', city: '南京市', score: 4.58, trend: '+0.01', reviewCount: 1234, highlights: ['法式服务', '位置绝佳'], concerns: ['年代感'] },
   ],
 };
 

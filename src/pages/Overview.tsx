@@ -3,7 +3,9 @@ import { Card, Badge } from '../components/ui';
 import { 
   brandHealthData, 
   promiseFulfillmentData, 
-  competitorData, 
+  competitorData,
+  brandCompetitorData,
+  cityCompetitorHotels,
   regionHierarchy, 
   brandTiers, 
   hotelDetailData, 
@@ -438,8 +440,68 @@ function BrandOpsOverview() {
         </div>
       </section>
 
-      {/* 竞对动态预警 */}
+      {/* 品牌级别竞品对比（非集团层面） */}
       <section className="animate-fade-in-up delay-200">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-base font-semibold text-slate-800">🎯 品牌级别竞品对比</h3>
+            <p className="text-xs text-slate-500 mt-0.5">按品牌档次对标同类竞品品牌，而非集团层面</p>
+          </div>
+          <Link to="/brand" className="text-sm text-ihg-navy hover:underline flex items-center gap-1">
+            查看详情 <ArrowRight size={14} />
+          </Link>
+        </div>
+        <div className="space-y-3">
+          {brandCompetitorData.slice(0, 4).map((item) => (
+            <Card key={item.ihgBrand} padding="sm">
+              <div className="flex items-center gap-4">
+                {/* IHG品牌 */}
+                <div className="w-32 flex-shrink-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: brandTiers[item.tier].color }} />
+                    <span className="font-semibold text-ihg-navy">{item.ihgBrand}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl font-bold text-slate-800">{item.ihgScore}</span>
+                    <span className={clsx(
+                      'text-xs',
+                      item.ihgTrend.startsWith('+') ? 'text-emerald-600' : 'text-red-600'
+                    )}>
+                      {item.ihgTrend}
+                    </span>
+                  </div>
+                </div>
+                {/* 竞品品牌对比 */}
+                <div className="flex-1 flex gap-3 overflow-x-auto">
+                  {item.competitors.map((comp) => (
+                    <div key={comp.brand} className={clsx(
+                      'px-3 py-2 rounded-lg min-w-[140px] text-center',
+                      comp.diff.startsWith('+') ? 'bg-emerald-50' : 'bg-red-50'
+                    )}>
+                      <div className="flex items-center justify-center gap-1 mb-1">
+                        <span className="text-sm font-medium text-slate-700">{comp.brand}</span>
+                        <span className="text-xs text-slate-400">({comp.group})</span>
+                      </div>
+                      <div className="flex items-center justify-center gap-2">
+                        <span className="font-bold text-slate-800">{comp.score}</span>
+                        <span className={clsx(
+                          'text-xs font-medium',
+                          comp.diff.startsWith('+') ? 'text-emerald-600' : 'text-red-600'
+                        )}>
+                          {comp.diff.startsWith('+') ? '领先' : '落后'} {comp.diff.replace(/[+-]/, '')}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      {/* 竞对动态预警 */}
+      <section className="animate-fade-in-up delay-250">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-base font-semibold text-slate-800">⚠️ 竞对动态预警</h3>
         </div>
