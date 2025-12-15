@@ -19,7 +19,6 @@ import {
   TrendingUp, 
   TrendingDown, 
   ChevronRight, 
-  ChevronDown, 
   Star, 
   AlertTriangle, 
   ArrowRight, 
