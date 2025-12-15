@@ -18,8 +18,8 @@ export function ActionCenter() {
   const getActionsForRole = () => {
     let filtered = [...actionsData];
 
-    // 酒店店长只看自己酒店的
-    if (currentRole.id === 'hotel_mgr' && currentRole.hotelId) {
+    // 酒店店长（成熟门店/新店）只看自己酒店的
+    if ((currentRole.id === 'hotel_mgr' || currentRole.id === 'hotel_mgr_new') && currentRole.hotelId) {
       filtered = filtered.filter(a => a.hotelId === currentRole.hotelId);
     }
     // 城市负责人看自己城市的
