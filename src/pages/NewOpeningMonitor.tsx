@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Layout } from '../components/Layout';
 import { Card, Badge } from '../components/ui';
-import { brandTiers, BrandTier } from '../data/mockData';
+import { BrandTier } from '../data/mockData';
 import { 
-  Building, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, 
-  Target, Users, Clock, ChevronRight, Star, Activity, Shield,
-  Zap, Calendar, BarChart3
+  TrendingUp, AlertTriangle, CheckCircle, 
+  Target, Clock, Activity,
+  Zap, BarChart3
 } from 'lucide-react';
 import { 
   RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
@@ -304,7 +304,7 @@ export function NewOpeningMonitor() {
             <Card>
               <h4 className="font-semibold text-slate-800 mb-4">🔄 新店生命周期</h4>
               <div className="flex items-center gap-2">
-                {Object.entries(phases).map(([key, phase], idx) => (
+                {Object.entries(phases).map(([key, phase]) => (
                   <div key={key} className="flex-1">
                     <div className={clsx(
                       'h-3 rounded-full',
