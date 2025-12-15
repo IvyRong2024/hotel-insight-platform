@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
 
-export type UserRole = 'brand_ops' | 'region_vp' | 'city_mgr' | 'hotel_mgr' | 'hotel_mgr_new' | 'revenue_mgr';
+export type UserRole = 'platform_admin' | 'brand_ops' | 'region_vp' | 'city_mgr' | 'hotel_mgr' | 'hotel_mgr_new' | 'revenue_mgr';
 
 interface RoleConfig {
   id: UserRole;
@@ -15,6 +15,13 @@ interface RoleConfig {
 }
 
 export const roleConfigs: RoleConfig[] = [
+  { 
+    id: 'platform_admin', 
+    name: '平台管理员', 
+    level: '系统',
+    description: '平台配置与监测管理：酒店列表、品牌对标、用户权限',
+    accessModules: ['overview', 'config'],
+  },
   { 
     id: 'brand_ops', 
     name: '品牌运营', 

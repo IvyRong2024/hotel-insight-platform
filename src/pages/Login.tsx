@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, roleConfigs, UserRole } from '../context/AuthContext';
-import { Building2, Users, MapPin, Hotel, DollarSign, ChevronRight, Sparkles, TrendingUp } from 'lucide-react';
+import { Building2, Users, MapPin, Hotel, DollarSign, ChevronRight, Sparkles, TrendingUp, Settings } from 'lucide-react';
 import clsx from 'clsx';
 
-// 三大视角入口配置
+// 四大视角入口配置
 const viewportGroups = [
   {
     id: 'brand',
@@ -30,9 +30,18 @@ const viewportGroups = [
     description: '竞品价格监测、券类产品追踪、渠道价差分析',
     roles: ['revenue_mgr'],
   },
+  {
+    id: 'admin',
+    name: '平台管理',
+    icon: <Settings size={24} />,
+    color: 'from-slate-500 to-slate-700',
+    description: '监测酒店列表、品牌对标清单、用户权限矩阵',
+    roles: ['platform_admin'],
+  },
 ];
 
 const roleIcons: Record<UserRole, React.ReactNode> = {
+  platform_admin: <Settings size={18} />,
   brand_ops: <TrendingUp size={18} />,
   region_vp: <Users size={18} />,
   city_mgr: <MapPin size={18} />,

@@ -18,7 +18,7 @@ import {
   BrandTier 
 } from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
-import { TrendingUp, TrendingDown, AlertCircle, ArrowRight, Zap, Star, ChevronRight } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertCircle, ArrowRight, Zap, Star, ChevronRight, Settings, Hotel, Building2, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 
@@ -29,6 +29,7 @@ export function Overview() {
 
   return (
     <Layout title="Overview" subtitle={currentRole.description} requiredModule="overview">
+      {currentRole.id === 'platform_admin' && <PlatformAdminOverview />}
       {currentRole.id === 'brand_ops' && <BrandOpsOverview />}
       {currentRole.id === 'region_vp' && <RegionVPOverview />}
       {currentRole.id === 'city_mgr' && <CityMgrOverview />}
@@ -36,6 +37,89 @@ export function Overview() {
       {currentRole.id === 'hotel_mgr_new' && <NewHotelMgrOverview />}
       {currentRole.id === 'revenue_mgr' && <RevenueMgrOverview />}
     </Layout>
+  );
+}
+
+// ========== 平台管理员 Overview ==========
+function PlatformAdminOverview() {
+  return (
+    <div className="space-y-6">
+      <section className="animate-fade-in-up">
+        <div className="bg-gradient-to-r from-slate-600 to-slate-800 rounded-2xl p-6 text-white">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center">
+              <Settings size={32} />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold">平台管理中心</h2>
+              <p className="text-white/60 mt-1">监测酒店列表、品牌对标清单、用户权限矩阵</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="animate-fade-in-up delay-50">
+        <div className="grid grid-cols-3 gap-6">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => window.location.href = '/config'}>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                <Hotel size={24} className="text-blue-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-slate-800">监测酒店列表</h3>
+                <p className="text-sm text-slate-500">13,000+ 家门店</p>
+              </div>
+            </div>
+          </Card>
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => window.location.href = '/config'}>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                <Building2 size={24} className="text-purple-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-slate-800">品牌对标清单</h3>
+                <p className="text-sm text-slate-500">4大竞品集团</p>
+              </div>
+            </div>
+          </Card>
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => window.location.href = '/config'}>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
+                <Users size={24} className="text-amber-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-slate-800">用户权限矩阵</h3>
+                <p className="text-sm text-slate-500">6大角色类型</p>
+              </div>
+            </div>
+          </Card>
+        </div>
+      </section>
+
+      <section className="animate-fade-in-up delay-100">
+        <Card>
+          <h3 className="font-semibold text-slate-800 mb-4">📊 平台数据概览</h3>
+          <div className="grid grid-cols-4 gap-4">
+            <div className="p-4 bg-slate-50 rounded-xl text-center">
+              <p className="text-3xl font-bold text-ihg-navy">2,800+</p>
+              <p className="text-sm text-slate-500 mt-1">IHG 门店</p>
+            </div>
+            <div className="p-4 bg-slate-50 rounded-xl text-center">
+              <p className="text-3xl font-bold text-slate-600">10,200+</p>
+              <p className="text-sm text-slate-500 mt-1">竞品门店</p>
+            </div>
+            <div className="p-4 bg-slate-50 rounded-xl text-center">
+              <p className="text-3xl font-bold text-emerald-600">6</p>
+              <p className="text-sm text-slate-500 mt-1">评论平台</p>
+            </div>
+            <div className="p-4 bg-slate-50 rounded-xl text-center">
+              <p className="text-3xl font-bold text-amber-600">3</p>
+              <p className="text-sm text-slate-500 mt-1">价格渠道</p>
+            </div>
+          </div>
+        </Card>
+      </section>
+    </div>
   );
 }
 
