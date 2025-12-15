@@ -60,6 +60,10 @@ function HierarchyView({ roleId }: { roleId: string }) {
   const [selectedHotel, setSelectedHotel] = useState<HotelData | null>(null);
   const [showWatchlist, setShowWatchlist] = useState(false);
   const [tierFilter, setTierFilter] = useState<BrandTier | 'all'>('all');
+  const [showAddToWatchlist, setShowAddToWatchlist] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [localWatchlist, setLocalWatchlist] = useState(watchlistData);
+  const [addedHotels, setAddedHotels] = useState<string[]>([]);
 
   const region = regionHierarchy[0]; // 华东区
 
@@ -192,14 +196,16 @@ function HierarchyView({ roleId }: { roleId: string }) {
             <span className="text-xs text-slate-500">系统推荐 + 自行添加</span>
           </div>
           <div className="space-y-3">
-            {watchlistData.map((hotel) => (
+            {localWatchlist.map((hotel) => (
               <div key={hotel.hotelId} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
                 <div className="flex items-center gap-3">
                   <div className={clsx(
                     'w-10 h-10 rounded-lg flex items-center justify-center',
-                    hotel.isNew ? 'bg-blue-100' : 'bg-red-100'
+                    hotel.isNew ? 'bg-blue-100' : addedHotels.includes(hotel.hotelId) ? 'bg-ihg-navy/10' : 'bg-red-100'
                   )}>
-                    {hotel.isNew ? <Clock size={18} className="text-blue-600" /> : <AlertTriangle size={18} className="text-red-600" />}
+                    {hotel.isNew ? <Clock size={18} className="text-blue-600" /> : 
+                     addedHotels.includes(hotel.hotelId) ? <Star size={18} className="text-ihg-navy" /> :
+                     <AlertTriangle size={18} className="text-red-600" />}
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
@@ -207,6 +213,9 @@ function HierarchyView({ roleId }: { roleId: string }) {
                       <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: brandTiers[hotel.tier].color + '20', color: brandTiers[hotel.tier].color }}>
                         {brandTiers[hotel.tier].name}
                       </span>
+                      {addedHotels.includes(hotel.hotelId) && (
+                        <span className="text-xs px-2 py-0.5 rounded bg-ihg-navy/10 text-ihg-navy">自行添加</span>
+                      )}
                     </div>
                     <div className="text-xs text-slate-500">{hotel.reason}</div>
                   </div>
@@ -221,18 +230,51 @@ function HierarchyView({ roleId }: { roleId: string }) {
                   <button className="px-3 py-1.5 bg-ihg-navy text-white text-xs rounded-lg">
                     查看
                   </button>
-                  <button className="p-1.5 text-slate-400 hover:text-red-500">
+                  <button 
+                    onClick={() => {
+                      setLocalWatchlist(prev => prev.filter(h => h.hotelId !== hotel.hotelId));
+                      setAddedHotels(prev => prev.filter(id => id !== hotel.hotelId));
+                    }}
+                    className="p-1.5 text-slate-400 hover:text-red-500 transition-colors"
+                  >
                     <X size={16} />
                   </button>
                 </div>
               </div>
             ))}
           </div>
-          <button className="mt-4 w-full py-2 border-2 border-dashed border-slate-200 rounded-lg text-slate-500 text-sm hover:border-ihg-navy hover:text-ihg-navy flex items-center justify-center gap-2">
+          <button 
+            onClick={() => setShowAddToWatchlist(true)}
+            className="mt-4 w-full py-2 border-2 border-dashed border-slate-200 rounded-lg text-slate-500 text-sm hover:border-ihg-navy hover:text-ihg-navy flex items-center justify-center gap-2 transition-colors"
+          >
             <Plus size={16} />
             添加门店到关注清单
           </button>
         </Card>
+      )}
+
+      {/* 添加门店弹窗 */}
+      {showAddToWatchlist && (
+        <AddToWatchlistModal
+          onClose={() => {
+            setShowAddToWatchlist(false);
+            setSearchQuery('');
+          }}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          existingIds={localWatchlist.map(h => h.hotelId)}
+          onAdd={(hotel) => {
+            setLocalWatchlist(prev => [...prev, {
+              hotelId: hotel.id,
+              name: hotel.name,
+              reason: '自行添加关注',
+              score: hotel.score,
+              trend: hotel.trend,
+              tier: hotel.tier,
+            }]);
+            setAddedHotels(prev => [...prev, hotel.id]);
+          }}
+        />
       )}
 
       {/* 主内容区 */}
@@ -1081,6 +1123,202 @@ function CommentDeepDive({
               <p className="text-sm text-slate-600">• 持续监控该维度的用户满意度变化</p>
             </>
           )}
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+// ========== 添加门店到关注清单弹窗 ==========
+function AddToWatchlistModal({
+  onClose,
+  searchQuery,
+  onSearchChange,
+  existingIds,
+  onAdd
+}: {
+  onClose: () => void;
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
+  existingIds: string[];
+  onAdd: (hotel: HotelData) => void;
+}) {
+  // 获取所有可添加的门店
+  const allHotels: HotelData[] = [];
+  regionHierarchy.forEach(region => {
+    region.provinces.forEach(province => {
+      province.cities.forEach(city => {
+        city.hotels.forEach(hotel => {
+          if (!existingIds.includes(hotel.id)) {
+            allHotels.push(hotel);
+          }
+        });
+      });
+    });
+  });
+
+  // 根据搜索词筛选
+  const filteredHotels = searchQuery
+    ? allHotels.filter(h => 
+        h.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        h.brand.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : allHotels;
+
+  // 推荐关注（评分下降或有问题的门店）
+  const recommendedHotels = allHotels
+    .filter(h => h.status === 'warning' || h.status === 'danger' || h.trend.startsWith('-'))
+    .slice(0, 3);
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-fade-in-up">
+      <Card className="w-[700px] max-h-[80vh] overflow-hidden flex flex-col">
+        {/* 头部 */}
+        <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+          <div>
+            <h3 className="text-lg font-semibold text-slate-800">添加门店到关注清单</h3>
+            <p className="text-sm text-slate-500">搜索或从推荐中选择需要重点关注的门店</p>
+          </div>
+          <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 transition-colors">
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* 搜索框 */}
+        <div className="py-4">
+          <div className="relative">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              placeholder="输入门店名称或品牌搜索..."
+              className="w-full px-4 py-3 pl-10 border border-slate-200 rounded-xl focus:outline-none focus:border-ihg-navy text-sm"
+            />
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
+
+        {/* 内容区 */}
+        <div className="flex-1 overflow-y-auto space-y-4">
+          {/* 系统推荐 */}
+          {!searchQuery && recommendedHotels.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <AlertTriangle size={16} className="text-amber-500" />
+                <span className="text-sm font-medium text-slate-700">系统推荐关注</span>
+                <span className="text-xs text-slate-400">根据评分趋势和问题预警</span>
+              </div>
+              <div className="space-y-2">
+                {recommendedHotels.map(hotel => (
+                  <div 
+                    key={hotel.id}
+                    className="flex items-center justify-between p-3 bg-amber-50 rounded-xl border border-amber-100"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={clsx(
+                        'w-10 h-10 rounded-lg flex items-center justify-center',
+                        hotel.status === 'danger' ? 'bg-red-100' : 'bg-amber-100'
+                      )}>
+                        <AlertTriangle size={18} className={hotel.status === 'danger' ? 'text-red-600' : 'text-amber-600'} />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-slate-800">{hotel.name}</span>
+                          <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: brandTiers[hotel.tier].color + '20', color: brandTiers[hotel.tier].color }}>
+                            {brandTiers[hotel.tier].name}
+                          </span>
+                        </div>
+                        <div className="text-xs text-slate-500">
+                          {hotel.issues?.[0] || `评分趋势 ${hotel.trend}`}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-slate-800">{hotel.score}</div>
+                        <div className={clsx('text-xs', hotel.trend.startsWith('+') ? 'text-emerald-600' : 'text-red-600')}>
+                          {hotel.trend}
+                        </div>
+                      </div>
+                      <button 
+                        onClick={() => onAdd(hotel)}
+                        className="px-4 py-2 bg-ihg-navy text-white text-xs rounded-lg hover:bg-ihg-navy-light transition-colors flex items-center gap-1"
+                      >
+                        <Plus size={14} /> 添加
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 搜索结果 / 全部门店 */}
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <Building size={16} className="text-slate-400" />
+              <span className="text-sm font-medium text-slate-700">
+                {searchQuery ? `搜索结果 (${filteredHotels.length})` : `全部可添加门店 (${allHotels.length})`}
+              </span>
+            </div>
+            {filteredHotels.length > 0 ? (
+              <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                {filteredHotels.map(hotel => (
+                  <div 
+                    key={hotel.id}
+                    className="flex items-center justify-between p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
+                        <Building size={18} className="text-slate-500" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-slate-800">{hotel.name}</span>
+                          <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: brandTiers[hotel.tier].color + '20', color: brandTiers[hotel.tier].color }}>
+                            {brandTiers[hotel.tier].name}
+                          </span>
+                          {hotel.isNew && <span className="text-xs px-2 py-0.5 rounded bg-blue-100 text-blue-700">新店</span>}
+                        </div>
+                        <div className="text-xs text-slate-500">{hotel.brand}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-slate-800">{hotel.score}</div>
+                        <div className={clsx('text-xs', hotel.trend.startsWith('+') ? 'text-emerald-600' : 'text-red-600')}>
+                          {hotel.trend}
+                        </div>
+                      </div>
+                      <button 
+                        onClick={() => onAdd(hotel)}
+                        className="px-4 py-2 bg-slate-200 text-slate-700 text-xs rounded-lg hover:bg-ihg-navy hover:text-white transition-colors flex items-center gap-1"
+                      >
+                        <Plus size={14} /> 添加
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="p-8 text-center text-slate-400">
+                <p>没有找到匹配的门店</p>
+                <p className="text-xs mt-1">试试其他关键词</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 底部 */}
+        <div className="pt-4 border-t border-slate-100 flex justify-end">
+          <button 
+            onClick={onClose}
+            className="px-6 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors text-sm"
+          >
+            完成
+          </button>
         </div>
       </Card>
     </div>
