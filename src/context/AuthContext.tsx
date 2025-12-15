@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
 
-export type UserRole = 'brand_ops' | 'region_vp' | 'city_mgr' | 'hotel_mgr' | 'revenue_mgr';
+export type UserRole = 'brand_ops' | 'region_vp' | 'city_mgr' | 'hotel_mgr' | 'hotel_mgr_new' | 'revenue_mgr';
 
 interface RoleConfig {
   id: UserRole;
@@ -41,13 +41,24 @@ export const roleConfigs: RoleConfig[] = [
   },
   { 
     id: 'hotel_mgr', 
-    name: '酒店店长', 
-    level: '上海外滩英迪格酒店',
-    description: '为单店运营部门提供可执行的链路改善方案，含排名与用户洞察',
+    name: '酒店店长（成熟门店）', 
+    level: '上海虹桥皇冠假日酒店',
+    description: '成熟门店店长：查看门店排名、用户反馈与待办事项',
     region: '华东',
     city: '上海市',
-    hotel: '上海外滩英迪格酒店',
-    hotelId: 'h3',
+    hotel: '上海虹桥皇冠假日酒店',
+    hotelId: 'h1',
+    accessModules: ['overview', 'hotel', 'actions'],
+  },
+  { 
+    id: 'hotel_mgr_new', 
+    name: '酒店店长（新店）', 
+    level: '杭州西湖假日酒店 · 开业58天',
+    description: '新店店长：关注0-180天运营稳定性、体验成熟度与阶段行动',
+    region: '华东',
+    city: '杭州',
+    hotel: '杭州西湖假日酒店',
+    hotelId: 'new-1',
     accessModules: ['overview', 'hotel', 'actions'],
   },
   { 

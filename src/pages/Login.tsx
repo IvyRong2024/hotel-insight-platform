@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, roleConfigs, UserRole } from '../context/AuthContext';
-import { Building2, Users, MapPin, Hotel, DollarSign, ChevronRight } from 'lucide-react';
+import { Building2, Users, MapPin, Hotel, DollarSign, ChevronRight, Sparkles } from 'lucide-react';
 import clsx from 'clsx';
 
 const roleIcons: Record<UserRole, React.ReactNode> = {
@@ -9,6 +9,7 @@ const roleIcons: Record<UserRole, React.ReactNode> = {
   region_vp: <Users size={20} />,
   city_mgr: <MapPin size={20} />,
   hotel_mgr: <Hotel size={20} />,
+  hotel_mgr_new: <Sparkles size={20} />,
   revenue_mgr: <DollarSign size={20} />,
 };
 
