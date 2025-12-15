@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Layout } from '../components/Layout';
 import { Card, Badge } from '../components/ui';
-import { brandTiers, BrandTier, brandConfig, platformConfig } from '../data/mockData';
-import { Building, Users, Eye, Search, Plus, X, Check, Settings } from 'lucide-react';
+import { brandTiers, BrandTier, platformConfig } from '../data/mockData';
+import { Building, Users, Eye, Search, Check, Settings } from 'lucide-react';
 import clsx from 'clsx';
 
 type TabType = 'hotels' | 'benchmark' | 'permissions';
@@ -20,13 +20,13 @@ const monitoredHotels = {
     { id: 'ihg-8', name: '上海虹桥智选假日酒店', brand: '智选假日', tier: 'essentials' as BrandTier, city: '上海', status: 'active' },
   ],
   competitors: [
-    { id: 'comp-1', name: '上海外滩W酒店', brand: 'W酒店', group: '万豪国际', tier: 'luxury_lifestyle' as BrandTier, city: '上海', status: 'active' },
-    { id: 'comp-2', name: '上海浦东丽思卡尔顿酒店', brand: '丽思卡尔顿', group: '万豪国际', tier: 'luxury_lifestyle' as BrandTier, city: '上海', status: 'active' },
-    { id: 'comp-3', name: '北京国贸大酒店', brand: '香格里拉', group: '香格里拉', tier: 'luxury_lifestyle' as BrandTier, city: '北京', status: 'active' },
-    { id: 'comp-4', name: '上海静安希尔顿酒店', brand: '希尔顿酒店', group: '希尔顿集团', tier: 'premium' as BrandTier, city: '上海', status: 'active' },
-    { id: 'comp-5', name: '北京王府井希尔顿酒店', brand: '希尔顿酒店', group: '希尔顿集团', tier: 'premium' as BrandTier, city: '北京', status: 'active' },
-    { id: 'comp-6', name: '上海虹桥万怡酒店', brand: '万怡酒店', group: '万豪国际', tier: 'essentials' as BrandTier, city: '上海', status: 'active' },
-    { id: 'comp-7', name: '北京望京Hampton酒店', brand: 'Hampton', group: '希尔顿集团', tier: 'essentials' as BrandTier, city: '北京', status: 'active' },
+    { id: 'comp-1', name: '上海外滩W酒店', brand: 'W酒店', group: '万豪国际', tier: 'luxury_lifestyle' as BrandTier, city: '上海', status: 'active' as const },
+    { id: 'comp-2', name: '上海浦东丽思卡尔顿酒店', brand: '丽思卡尔顿', group: '万豪国际', tier: 'luxury_lifestyle' as BrandTier, city: '上海', status: 'active' as const },
+    { id: 'comp-3', name: '北京国贸大酒店', brand: '香格里拉', group: '香格里拉', tier: 'luxury_lifestyle' as BrandTier, city: '北京', status: 'active' as const },
+    { id: 'comp-4', name: '上海静安希尔顿酒店', brand: '希尔顿酒店', group: '希尔顿集团', tier: 'premium' as BrandTier, city: '上海', status: 'active' as const },
+    { id: 'comp-5', name: '北京王府井希尔顿酒店', brand: '希尔顿酒店', group: '希尔顿集团', tier: 'premium' as BrandTier, city: '北京', status: 'active' as const },
+    { id: 'comp-6', name: '上海虹桥万怡酒店', brand: '万怡酒店', group: '万豪国际', tier: 'essentials' as BrandTier, city: '上海', status: 'active' as const },
+    { id: 'comp-7', name: '北京望京Hampton酒店', brand: 'Hampton', group: '希尔顿集团', tier: 'essentials' as BrandTier, city: '北京', status: 'active' as const },
   ],
 };
 
@@ -269,7 +269,7 @@ export function MonitoringConfig() {
                   <div className="w-3 h-3 rounded-full bg-slate-400" />
                   竞品监测门店
                 </h3>
-                <Badge variant="secondary">{filterHotels(monitoredHotels.competitors).length} 家</Badge>
+                <Badge variant="info">{filterHotels(monitoredHotels.competitors).length} 家</Badge>
               </div>
               <Card padding="none">
                 <table className="w-full text-sm">
@@ -408,7 +408,7 @@ export function MonitoringConfig() {
                         <span className="font-semibold text-ihg-navy">{perm.role}</span>
                       </td>
                       <td className="p-4">
-                        <Badge variant="secondary">{perm.scope}</Badge>
+                        <Badge variant="info">{perm.scope}</Badge>
                       </td>
                       <td className="p-4">
                         <div className="flex flex-wrap gap-1">
