@@ -5,6 +5,8 @@ import {
   regionHierarchy, 
   brandTiers, 
   hotelDetailData, 
+  newHotelDetailData,
+  getHotelDetailById,
   userNeedsData, 
   watchlistData,
   newOpeningData,
@@ -40,7 +42,7 @@ export function HotelView() {
   if (currentRole.id === 'hotel_mgr') {
     return (
       <Layout title="我的酒店" subtitle="单店详细数据与用户洞察" requiredModule="hotel">
-        <SingleHotelView />
+        <SingleHotelView hotelId={currentRole.hotelId || 'h1'} />
       </Layout>
     );
   }
@@ -49,7 +51,7 @@ export function HotelView() {
   if (currentRole.id === 'hotel_mgr_new') {
     return (
       <Layout title="我的酒店" subtitle="单店详细数据与用户洞察" requiredModule="hotel">
-        <SingleHotelView />
+        <SingleHotelView hotelId={currentRole.hotelId || 'new-1'} />
       </Layout>
     );
   }
@@ -622,11 +624,12 @@ function NewHotelMonitor() {
 }
 
 // ========== 单店视角（酒店店长）==========
-function SingleHotelView({ hotelData, onBack, isNewOpening = false }: { hotelData?: HotelData, onBack?: () => void, isNewOpening?: boolean }) {
+function SingleHotelView({ hotelData, onBack, isNewOpening = false, hotelId }: { hotelData?: HotelData, onBack?: () => void, isNewOpening?: boolean, hotelId?: string }) {
   const [expandedStage, setExpandedStage] = useState<string | null>(null);
   const [showCommentDeepDive, setShowCommentDeepDive] = useState<string | null>(null); // 评论深度查看的需求类别
 
-  const hotel = hotelDetailData;
+  // 根据 hotelId 获取对应的酒店详情数据
+  const hotel = hotelId ? getHotelDetailById(hotelId) : hotelDetailData;
   
   // 新店监测数据（仅新店店长可见）
   const newOpeningMonitorData = {

@@ -554,7 +554,9 @@ export const competitorData = {
 };
 
 // ==================== 单店详情数据 ====================
+// 成熟门店：上海虹桥皇冠假日酒店 (h1)
 export const hotelDetailData = {
+  hotelId: 'h1',
   hotelName: '上海虹桥皇冠假日酒店',
   brand: '皇冠假日',
   tier: 'premium' as BrandTier,
@@ -562,8 +564,8 @@ export const hotelDetailData = {
   rankings: {
     city: { rank: 12, total: 28, name: '上海' },
     region: { rank: 45, total: 156, name: '华东区' },
-    brand: { rank: 8, total: 42, name: '英迪格' },
-    tier: { rank: 15, total: 68, name: 'L&L' },
+    brand: { rank: 8, total: 42, name: '皇冠假日' },
+    tier: { rank: 15, total: 68, name: 'Premium' },
   },
   comparisons: {
     vsCityTier: '+0.10',
@@ -580,17 +582,65 @@ export const hotelDetailData = {
   journeyRisks: [
     { stage: '预订', risk: 'low', issues: ['节假日价格波动大'], count: 12, icon: '📅' },
     { stage: '入住', risk: 'medium', issues: ['周末高峰排队', '升房沟通'], count: 38, icon: '🚪' },
-    { stage: '房间', risk: 'high', issues: ['临街房隔音', '空调出风位置'], count: 52, icon: '🛏️' },
+    { stage: '房间', risk: 'medium', issues: ['临街房隔音', '空调出风位置'], count: 52, icon: '🛏️' },
     { stage: '服务', risk: 'low', issues: ['客房送物响应慢', '早餐高峰等位'], count: 28, icon: '🍳' },
     { stage: '退房', risk: 'low', issues: ['发票开具等待'], count: 8, icon: '✅' },
   ] as Array<{ stage: string; risk: 'low' | 'medium' | 'high'; issues: string[]; count: number; icon: string }>,
   drivers: [
     { dimension: '服务响应', score: 4.7, vsCity: '+0.3', vsBrand: '+0.2', keywords: ['前台热情', '行李员主动', '响应快'], trend: 'stable' },
     { dimension: '位置交通', score: 4.8, vsCity: '+0.4', vsBrand: '+0.3', keywords: ['地铁口', '商圈近', '出行方便'], trend: 'stable' },
-    { dimension: '设计美学', score: 4.6, vsCity: '+0.2', vsBrand: '+0.1', keywords: ['现代', '时尚', '邻里文化'], trend: 'up' },
+    { dimension: '商务设施', score: 4.6, vsCity: '+0.2', vsBrand: '+0.1', keywords: ['会议室', '行政酒廊', '商务中心'], trend: 'up' },
     { dimension: '房间舒适', score: 4.5, vsCity: '+0.1', vsBrand: '0', keywords: ['床软', '枕头舒服'], trend: 'up' },
   ] as Array<{ dimension: string; score: number; vsCity: string; vsBrand: string; keywords: string[]; trend: 'stable' | 'up' | 'down' }>,
 };
+
+// 新店：杭州西湖假日酒店 (new-1)
+export const newHotelDetailData = {
+  hotelId: 'new-1',
+  hotelName: '杭州西湖假日酒店',
+  brand: '假日酒店',
+  tier: 'essentials' as BrandTier,
+  score: 4.42,
+  isNew: true,
+  daysOpen: 58,
+  rankings: {
+    city: { rank: 8, total: 15, name: '杭州' },
+    region: { rank: 35, total: 120, name: '华东区' },
+    brand: { rank: 12, total: 85, name: '假日' },
+    tier: { rank: 18, total: 95, name: 'Essentials' },
+  },
+  comparisons: {
+    vsCityTier: '+0.08',
+    vsRegionTier: '+0.03',
+    vsNationalTier: '-0.05',
+  },
+  platforms: [
+    { name: '携程', score: 4.5, rank: 8, total: 85 },
+    { name: '美团', score: 4.4, rank: 12, total: 85 },
+    { name: '飞猪', score: 4.6, rank: 6, total: 85 },
+    { name: 'Booking', score: 8.5, rank: 10, total: 85 },
+    { name: 'Agoda', score: 8.3, rank: 15, total: 85 },
+  ],
+  journeyRisks: [
+    { stage: '预订', risk: 'low', issues: ['新店价格优惠少'], count: 8, icon: '📅' },
+    { stage: '入住', risk: 'high', issues: ['前台办理慢', '新系统不熟练', '排队等待长'], count: 45, icon: '🚪' },
+    { stage: '房间', risk: 'medium', issues: ['空调温控不稳', '部分设施调试中'], count: 32, icon: '🛏️' },
+    { stage: '服务', risk: 'medium', issues: ['早餐补给不及时', '服务标准不一致'], count: 28, icon: '🍳' },
+    { stage: '退房', risk: 'low', issues: ['退房流程顺畅'], count: 5, icon: '✅' },
+  ] as Array<{ stage: string; risk: 'low' | 'medium' | 'high'; issues: string[]; count: number; icon: string }>,
+  drivers: [
+    { dimension: '新装修', score: 4.7, vsCity: '+0.4', vsBrand: '+0.3', keywords: ['装修新', '设施新', '干净整洁'], trend: 'up' },
+    { dimension: '服务热情', score: 4.6, vsCity: '+0.3', vsBrand: '+0.2', keywords: ['热情', '主动', '有活力'], trend: 'up' },
+    { dimension: '位置便利', score: 4.5, vsCity: '+0.2', vsBrand: '+0.1', keywords: ['西湖近', '景区方便', '交通便利'], trend: 'stable' },
+    { dimension: '早餐丰富', score: 4.3, vsCity: '0', vsBrand: '-0.1', keywords: ['品种多', '本地特色'], trend: 'stable' },
+  ] as Array<{ dimension: string; score: number; vsCity: string; vsBrand: string; keywords: string[]; trend: 'stable' | 'up' | 'down' }>,
+};
+
+// 根据 hotelId 获取酒店详情
+export function getHotelDetailById(hotelId: string) {
+  if (hotelId === 'new-1') return newHotelDetailData;
+  return hotelDetailData; // 默认返回成熟门店数据
+}
 
 // ==================== 评论平台配置 ====================
 export type ReviewPlatform = '携程' | '美团' | '飞猪' | 'Booking' | 'Expedia' | 'Agoda';
