@@ -912,7 +912,6 @@ export const priceData = {
       originalPrice: 1288,
       salePrice: 888,
       validity: '2025-03-31',
-      salesVolume: 2341,
       includes: ['高级大床房1晚', '双人自助早餐', '双人下午茶', '延迟退房至14:00'],
     },
     {
@@ -921,7 +920,6 @@ export const priceData = {
       originalPrice: 1588,
       salePrice: 1088,
       validity: '2025-02-28',
-      salesVolume: 856,
       includes: ['家庭房1晚', '三人自助早餐', '儿童欢迎礼包', '儿童乐园门票2张'],
     },
     {
@@ -930,7 +928,6 @@ export const priceData = {
       originalPrice: 798,
       salePrice: 598,
       validity: '2025-06-30',
-      salesVolume: 1256,
       includes: ['高级大床房1晚', '单人自助早餐', '行政酒廊使用'],
     },
   ],

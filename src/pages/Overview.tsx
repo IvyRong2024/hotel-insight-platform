@@ -1012,27 +1012,18 @@ function RevenueMgrOverview() {
         <Card>
           <div className="grid grid-cols-4 gap-4">
             {[
-              { brand: '万豪', product: '双人周末套餐', price: 828, platform: '抖音', status: '热销' },
-              { brand: '希尔顿', product: '商务住宿券', price: 568, platform: '携程', status: '在售' },
-              { brand: '雅高', product: '圣诞特惠套餐', price: 698, platform: '飞猪', status: '促销中' },
-              { brand: '凯悦', product: '亲子度假券', price: 1188, platform: '抖音', status: '新上架' },
+              { brand: '万豪', product: '双人周末套餐', price: 828, platform: '抖音' },
+              { brand: '希尔顿', product: '商务住宿券', price: 568, platform: '携程' },
+              { brand: '雅高', product: '圣诞特惠套餐', price: 698, platform: '飞猪' },
+              { brand: '凯悦', product: '亲子度假券', price: 1188, platform: '抖音' },
             ].map((item, idx) => (
               <div key={idx} className="p-3 bg-slate-50 rounded-lg">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-medium text-slate-600">{item.brand}</span>
-                  <span className={clsx(
-                    'text-xs px-1.5 py-0.5 rounded',
-                    item.status === '热销' ? 'bg-red-100 text-red-600' :
-                    item.status === '新上架' ? 'bg-blue-100 text-blue-600' :
-                    item.status === '促销中' ? 'bg-amber-100 text-amber-600' :
-                    'bg-slate-200 text-slate-600'
-                  )}>{item.status}</span>
-                </div>
-                <p className="text-sm font-medium text-slate-800 mb-1">{item.product}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-lg font-bold text-slate-700">¥{item.price}</span>
                   <span className="text-xs text-slate-400">{item.platform}</span>
                 </div>
+                <p className="text-sm font-medium text-slate-800 mb-1">{item.product}</p>
+                <span className="text-lg font-bold text-slate-700">¥{item.price}</span>
               </div>
             ))}
           </div>

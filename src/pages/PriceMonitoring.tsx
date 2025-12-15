@@ -121,12 +121,12 @@ const competitorPriceData = {
   ],
 };
 
-// 竞品促销动态
+// 竞品券类产品
 const competitorVouchers = [
-  { group: '万豪国际', product: '双人周末套餐', price: 828, platform: '抖音', status: '热销', includes: ['豪华大床房1晚', '双人自助早餐', '迷你吧饮品', '延迟退房'] },
-  { group: '希尔顿集团', product: '商务住宿券', price: 568, platform: '携程', status: '在售', includes: ['行政大床房1晚', '单人早餐', '行政酒廊', '健身房'] },
-  { group: '雅高集团', product: '圣诞特惠套餐', price: 698, platform: '飞猪', status: '促销中', includes: ['高级房1晚', '双人早餐', '圣诞礼盒', '下午茶'] },
-  { group: '凯悦集团', product: '亲子度假券', price: 1188, platform: '抖音', status: '新上架', includes: ['家庭房1晚', '三人早餐', '儿童礼包', '儿童乐园门票'] },
+  { group: '万豪国际', product: '双人周末套餐', price: 828, platform: '抖音', includes: ['豪华大床房1晚', '双人自助早餐', '迷你吧饮品', '延迟退房'] },
+  { group: '希尔顿集团', product: '商务住宿券', price: 568, platform: '携程', includes: ['行政大床房1晚', '单人早餐', '行政酒廊', '健身房'] },
+  { group: '雅高集团', product: '圣诞特惠套餐', price: 698, platform: '飞猪', includes: ['高级房1晚', '双人早餐', '圣诞礼盒', '下午茶'] },
+  { group: '凯悦集团', product: '亲子度假券', price: 1188, platform: '抖音', includes: ['家庭房1晚', '三人早餐', '儿童礼包', '儿童乐园门票'] },
 ];
 
 type ViewLevel = 'overview' | 'city' | 'tier';
@@ -288,16 +288,7 @@ export function PriceMonitoring() {
             >
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-medium text-slate-600">{voucher.group}</span>
-                <div className="flex items-center gap-2">
-                  <span className={clsx(
-                    'text-xs px-1.5 py-0.5 rounded',
-                    voucher.status === '热销' ? 'bg-red-100 text-red-600' :
-                    voucher.status === '新上架' ? 'bg-blue-100 text-blue-600' :
-                    voucher.status === '促销中' ? 'bg-amber-100 text-amber-600' :
-                    'bg-slate-200 text-slate-600'
-                  )}>{voucher.status}</span>
-                  {expandedVoucher === idx ? <ChevronDown size={14} className="text-slate-400" /> : <ChevronRight size={14} className="text-slate-400" />}
-                </div>
+                {expandedVoucher === idx ? <ChevronDown size={14} className="text-slate-400" /> : <ChevronRight size={14} className="text-slate-400" />}
               </div>
               <p className="text-sm font-medium text-slate-800 mb-2">{voucher.product}</p>
               <div className="flex items-center justify-between">
