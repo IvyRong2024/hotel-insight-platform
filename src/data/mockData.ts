@@ -307,14 +307,40 @@ export const regionHierarchy: RegionData[] = [
 // 携程/飞猪：5分制，4.5分及以上为高分
 // 美团：5星制，4星及以上为高分
 // 境外渠道（Booking/Expedia/Agoda）：10分制，8分及以上为高分
-export const platformScoreStandards = {
+
+export interface PlatformScoreData {
+  name: string;
+  scale: string;
+  highScoreThreshold: number | string;
+  totalReviews: number;
+  highScoreReviews: number;
+  highScoreRatio: number;
+  trend: string;
+  avgScore: number;
+}
+
+export interface PlatformScoreSummary {
+  domestic: Record<string, PlatformScoreData>;
+  overseas: Record<string, PlatformScoreData>;
+  summary: {
+    domesticHighScoreRatio: number;
+    overseasHighScoreRatio: number;
+    overallHighScoreRatio: number;
+    trend: string;
+    totalReviews: number;
+    highScoreReviews: number;
+  };
+}
+
+// 全国品牌级别数据
+export const platformScoreStandards: PlatformScoreSummary = {
   domestic: {
     ctrip: {
       name: '携程',
       scale: '5分制',
       highScoreThreshold: 4.5,
-      totalReviews: 12580,
-      highScoreReviews: 10189,
+      totalReviews: 125800,
+      highScoreReviews: 101898,
       highScoreRatio: 81.0,
       trend: '+2.3%',
       avgScore: 4.52,
@@ -323,8 +349,8 @@ export const platformScoreStandards = {
       name: '美团',
       scale: '5星制',
       highScoreThreshold: '4星',
-      totalReviews: 8920,
-      highScoreReviews: 7493,
+      totalReviews: 89200,
+      highScoreReviews: 74928,
       highScoreRatio: 84.0,
       trend: '+1.8%',
       avgScore: 4.48,
@@ -333,8 +359,8 @@ export const platformScoreStandards = {
       name: '飞猪',
       scale: '5分制',
       highScoreThreshold: 4.5,
-      totalReviews: 5680,
-      highScoreReviews: 4544,
+      totalReviews: 56800,
+      highScoreReviews: 45440,
       highScoreRatio: 80.0,
       trend: '+0.5%',
       avgScore: 4.45,
@@ -345,8 +371,8 @@ export const platformScoreStandards = {
       name: 'Booking',
       scale: '10分制',
       highScoreThreshold: 8.0,
-      totalReviews: 3250,
-      highScoreReviews: 2795,
+      totalReviews: 32500,
+      highScoreReviews: 27950,
       highScoreRatio: 86.0,
       trend: '+1.2%',
       avgScore: 8.6,
@@ -355,8 +381,8 @@ export const platformScoreStandards = {
       name: 'Expedia',
       scale: '10分制',
       highScoreThreshold: 8.0,
-      totalReviews: 1820,
-      highScoreReviews: 1474,
+      totalReviews: 18200,
+      highScoreReviews: 14742,
       highScoreRatio: 81.0,
       trend: '-0.5%',
       avgScore: 8.2,
@@ -365,18 +391,86 @@ export const platformScoreStandards = {
       name: 'Agoda',
       scale: '10分制',
       highScoreThreshold: 8.0,
-      totalReviews: 2150,
-      highScoreReviews: 1849,
+      totalReviews: 21500,
+      highScoreReviews: 18490,
       highScoreRatio: 86.0,
       trend: '+0.8%',
       avgScore: 8.5,
     },
   },
   summary: {
-    domesticHighScoreRatio: 82.0, // 国内渠道加权平均
-    overseasHighScoreRatio: 85.0, // 境外渠道加权平均
-    overallHighScoreRatio: 83.0,  // 综合高分占比
+    domesticHighScoreRatio: 82.0,
+    overseasHighScoreRatio: 85.0,
+    overallHighScoreRatio: 83.0,
     trend: '+1.5%',
+    totalReviews: 344000,
+    highScoreReviews: 283448,
+  },
+};
+
+// 区域级别数据（华东区示例）
+export const regionPlatformScores: PlatformScoreSummary = {
+  domestic: {
+    ctrip: { name: '携程', scale: '5分制', highScoreThreshold: 4.5, totalReviews: 28500, highScoreReviews: 23655, highScoreRatio: 83.0, trend: '+2.8%', avgScore: 4.58 },
+    meituan: { name: '美团', scale: '5星制', highScoreThreshold: '4星', totalReviews: 19800, highScoreReviews: 16830, highScoreRatio: 85.0, trend: '+2.1%', avgScore: 4.52 },
+    fliggy: { name: '飞猪', scale: '5分制', highScoreThreshold: 4.5, totalReviews: 12600, highScoreReviews: 10332, highScoreRatio: 82.0, trend: '+1.2%', avgScore: 4.48 },
+  },
+  overseas: {
+    booking: { name: 'Booking', scale: '10分制', highScoreThreshold: 8.0, totalReviews: 8200, highScoreReviews: 7216, highScoreRatio: 88.0, trend: '+1.5%', avgScore: 8.7 },
+    expedia: { name: 'Expedia', scale: '10分制', highScoreThreshold: 8.0, totalReviews: 4500, highScoreReviews: 3780, highScoreRatio: 84.0, trend: '+0.3%', avgScore: 8.4 },
+    agoda: { name: 'Agoda', scale: '10分制', highScoreThreshold: 8.0, totalReviews: 5200, highScoreReviews: 4576, highScoreRatio: 88.0, trend: '+1.0%', avgScore: 8.6 },
+  },
+  summary: {
+    domesticHighScoreRatio: 83.5,
+    overseasHighScoreRatio: 87.0,
+    overallHighScoreRatio: 84.5,
+    trend: '+1.8%',
+    totalReviews: 78800,
+    highScoreReviews: 66389,
+  },
+};
+
+// 城市级别数据（上海示例）
+export const cityPlatformScores: PlatformScoreSummary = {
+  domestic: {
+    ctrip: { name: '携程', scale: '5分制', highScoreThreshold: 4.5, totalReviews: 8500, highScoreReviews: 7225, highScoreRatio: 85.0, trend: '+3.2%', avgScore: 4.62 },
+    meituan: { name: '美团', scale: '5星制', highScoreThreshold: '4星', totalReviews: 5800, highScoreReviews: 5046, highScoreRatio: 87.0, trend: '+2.5%', avgScore: 4.55 },
+    fliggy: { name: '飞猪', scale: '5分制', highScoreThreshold: 4.5, totalReviews: 3600, highScoreReviews: 3024, highScoreRatio: 84.0, trend: '+1.8%', avgScore: 4.52 },
+  },
+  overseas: {
+    booking: { name: 'Booking', scale: '10分制', highScoreThreshold: 8.0, totalReviews: 2800, highScoreReviews: 2520, highScoreRatio: 90.0, trend: '+2.0%', avgScore: 8.8 },
+    expedia: { name: 'Expedia', scale: '10分制', highScoreThreshold: 8.0, totalReviews: 1500, highScoreReviews: 1290, highScoreRatio: 86.0, trend: '+1.2%', avgScore: 8.5 },
+    agoda: { name: 'Agoda', scale: '10分制', highScoreThreshold: 8.0, totalReviews: 1800, highScoreReviews: 1620, highScoreRatio: 90.0, trend: '+1.5%', avgScore: 8.7 },
+  },
+  summary: {
+    domesticHighScoreRatio: 85.5,
+    overseasHighScoreRatio: 89.0,
+    overallHighScoreRatio: 86.5,
+    trend: '+2.2%',
+    totalReviews: 24000,
+    highScoreReviews: 20725,
+  },
+};
+
+// 单店级别数据（上海外滩英迪格酒店示例）
+export const hotelPlatformScores: PlatformScoreSummary = {
+  domestic: {
+    ctrip: { name: '携程', scale: '5分制', highScoreThreshold: 4.5, totalReviews: 856, highScoreReviews: 710, highScoreRatio: 83.0, trend: '+1.5%', avgScore: 4.55 },
+    meituan: { name: '美团', scale: '5星制', highScoreThreshold: '4星', totalReviews: 423, highScoreReviews: 360, highScoreRatio: 85.0, trend: '+2.0%', avgScore: 4.52 },
+    fliggy: { name: '飞猪', scale: '5分制', highScoreThreshold: 4.5, totalReviews: 289, highScoreReviews: 237, highScoreRatio: 82.0, trend: '+0.8%', avgScore: 4.48 },
+  },
+  overseas: {
+    booking: { name: 'Booking', scale: '10分制', highScoreThreshold: 8.0, totalReviews: 312, highScoreReviews: 281, highScoreRatio: 90.0, trend: '+1.8%', avgScore: 8.8 },
+    expedia: { name: 'Expedia', scale: '10分制', highScoreThreshold: 8.0, totalReviews: 156, highScoreReviews: 134, highScoreRatio: 86.0, trend: '+0.5%', avgScore: 8.4 },
+    agoda: { name: 'Agoda', scale: '10分制', highScoreThreshold: 8.0, totalReviews: 198, highScoreReviews: 178, highScoreRatio: 90.0, trend: '+1.2%', avgScore: 8.7 },
+  },
+  summary: {
+    domesticHighScoreRatio: 83.5,
+    overseasHighScoreRatio: 89.0,
+    overallHighScoreRatio: 85.0,
+    trend: '+1.3%',
+    totalReviews: 2234,
+    highScoreReviews: 1900,
   },
 };
 
