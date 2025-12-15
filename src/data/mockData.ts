@@ -912,12 +912,7 @@ export const priceData = {
       salePrice: 888,
       validity: '2025-03-31',
       salesVolume: 2341,
-      includes: [
-        { item: '高级大床房1晚', value: '¥658' },
-        { item: '双人自助早餐', value: '¥196' },
-        { item: '双人下午茶', value: '¥168' },
-        { item: '延迟退房至14:00', value: '赠送' },
-      ],
+      includes: ['高级大床房1晚', '双人自助早餐', '双人下午茶', '延迟退房至14:00'],
     },
     {
       platform: '携程',
@@ -926,12 +921,7 @@ export const priceData = {
       salePrice: 1088,
       validity: '2025-02-28',
       salesVolume: 856,
-      includes: [
-        { item: '家庭房1晚', value: '¥858' },
-        { item: '三人自助早餐', value: '¥294' },
-        { item: '儿童欢迎礼包', value: '¥128' },
-        { item: '儿童乐园门票2张', value: '¥200' },
-      ],
+      includes: ['家庭房1晚', '三人自助早餐', '儿童欢迎礼包', '儿童乐园门票2张'],
     },
     {
       platform: '直客通',
@@ -940,11 +930,7 @@ export const priceData = {
       salePrice: 598,
       validity: '2025-06-30',
       salesVolume: 1256,
-      includes: [
-        { item: '高级大床房1晚', value: '¥658' },
-        { item: '单人自助早餐', value: '¥98' },
-        { item: '行政酒廊使用', value: '赠送' },
-      ],
+      includes: ['高级大床房1晚', '单人自助早餐', '行政酒廊使用'],
     },
   ],
   trendData: [

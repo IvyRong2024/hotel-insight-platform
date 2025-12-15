@@ -493,12 +493,11 @@ export function PriceMonitoring() {
                 </div>
                 {expandedVoucher === idx && (
                   <div className="mt-3 pt-3 border-t border-slate-100">
-                    <div className="space-y-1">
+                    <div className="flex flex-wrap gap-1">
                       {voucher.includes.map((item, i) => (
-                        <div key={i} className="flex justify-between text-xs">
-                          <span className="text-slate-600">{item.item}</span>
-                          <span className="text-slate-500">{item.value}</span>
-                        </div>
+                        <span key={i} className="text-xs px-2 py-1 bg-slate-100 text-slate-600 rounded">
+                          {item}
+                        </span>
                       ))}
                     </div>
                   </div>
