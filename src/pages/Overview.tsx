@@ -1220,7 +1220,7 @@ function NewHotelMgrOverview() {
           <Card>
             <div className="flex items-center gap-1 mb-1">
               <p className="text-slate-500 text-sm">品牌特色感知</p>
-              <span className="text-xs text-slate-400 cursor-help" title="用户评论中主动提及品牌特色关键词的比例。如假日酒店的"舒适、便捷"，英迪格的"设计感、在地文化"等。">ⓘ</span>
+              <span className="text-xs text-slate-400 cursor-help" title="用户评论中主动提及品牌特色关键词的比例。如假日酒店的'舒适、便捷'，英迪格的'设计感、在地文化'等。">ⓘ</span>
             </div>
             <div className="flex items-end gap-2">
               <p className="text-3xl font-bold text-ihg-navy">{newHotel.brandPerception}%</p>
