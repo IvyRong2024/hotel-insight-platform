@@ -915,6 +915,22 @@ function HotelMgrOverview() {
 
 // ========== 定价团队 Overview ==========
 function RevenueMgrOverview() {
+  // 竞品价格数据
+  const competitorPrices = {
+    byTier: {
+      luxury_lifestyle: { avgPrice: 1650, change: '+2.8%' },
+      premium: { avgPrice: 658, change: '+3.5%' },
+      essentials: { avgPrice: 318, change: '+4.2%' },
+      suites: { avgPrice: 498, change: '+1.5%' },
+    } as Record<BrandTier, { avgPrice: number; change: string }>,
+    byGroup: [
+      { group: '万豪国际', avgPrice: 688, hotels: 1250 },
+      { group: '希尔顿集团', avgPrice: 648, hotels: 980 },
+      { group: '雅高集团', avgPrice: 548, hotels: 1450 },
+      { group: '凯悦集团', avgPrice: 728, hotels: 520 },
+    ],
+  };
+
   return (
     <div className="space-y-6">
       {/* 监测范围说明 */}
@@ -922,138 +938,105 @@ function RevenueMgrOverview() {
         <Card className="bg-gradient-to-r from-ihg-navy to-ihg-navy-light text-white">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-semibold mb-2">价格监测覆盖</h3>
+              <h3 className="text-lg font-semibold mb-2">竞品价格监测</h3>
               <p className="text-white/70 text-sm">监测平台：携程、抖音、直客通</p>
             </div>
             <div className="grid grid-cols-2 gap-6 text-center">
               <div className="px-6 py-3 bg-white/10 rounded-xl">
-                <p className="text-white/60 text-xs mb-1">📦 基础房型监测</p>
-                <p className="text-2xl font-bold">13,000+</p>
-                <p className="text-white/50 text-xs">IHG + 竞品门店</p>
+                <p className="text-white/60 text-xs mb-1">📦 竞品门店</p>
+                <p className="text-2xl font-bold">5,000+</p>
+                <p className="text-white/50 text-xs">基础房型监测</p>
               </div>
               <div className="px-6 py-3 bg-white/10 rounded-xl">
-                <p className="text-white/60 text-xs mb-1">🎫 券类产品监测</p>
+                <p className="text-white/60 text-xs mb-1">🎫 券类产品</p>
                 <p className="text-2xl font-bold">动态</p>
-                <p className="text-white/50 text-xs">各渠道在售产品</p>
+                <p className="text-white/50 text-xs">竞品在售产品</p>
               </div>
             </div>
           </div>
         </Card>
       </section>
 
-      {/* 基础房型价格概览 */}
+      {/* 各档次竞品均价 */}
       <section className="animate-fade-in-up delay-50">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-base font-semibold text-slate-800">📦 基础房型价格（标准大床房）</h3>
-            <p className="text-xs text-slate-500 mt-1">同档次竞品对比</p>
+            <h3 className="text-base font-semibold text-slate-800">📊 各档次竞品均价</h3>
+            <p className="text-xs text-slate-500 mt-1">基础房型 · 标准大床房</p>
           </div>
           <Link to="/price" className="text-sm text-ihg-navy hover:underline flex items-center gap-1">
             查看详情 <ArrowRight size={14} />
           </Link>
         </div>
         <div className="grid grid-cols-4 gap-4">
-          {(Object.entries(priceData.tierPricing) as [BrandTier, typeof priceData.tierPricing.luxury_lifestyle][]).map(([tier, data]) => (
+          {(Object.entries(competitorPrices.byTier) as [BrandTier, { avgPrice: number; change: string }][]).map(([tier, data]) => (
             <Card key={tier}>
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: brandTiers[tier].color }} />
                 <span className="font-medium text-slate-800">{brandTiers[tier].name}</span>
               </div>
-              <div className="flex items-end gap-2 mb-2">
-                <span className="text-2xl font-bold text-slate-800">¥{data.ihg}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-500">同档竞品 ¥{data.competitor}</span>
-                <span className="font-medium text-slate-700">{data.diff}</span>
+              <div className="text-2xl font-bold text-slate-800 mb-2">¥{data.avgPrice}</div>
+              <div className="text-sm">
+                <span className={clsx(
+                  'font-medium',
+                  data.change.startsWith('+') ? 'text-red-600' : 'text-emerald-600'
+                )}>{data.change}</span>
+                <span className="text-slate-400 ml-1">vs 上月</span>
               </div>
             </Card>
           ))}
         </div>
       </section>
 
-      {/* 券类产品动态 */}
+      {/* 各集团竞品价格 */}
       <section className="animate-fade-in-up delay-75">
         <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-base font-semibold text-slate-800">🎫 券类产品动态</h3>
-            <p className="text-xs text-slate-500 mt-1">仅做动态监测，不做跨品牌对比</p>
-          </div>
+          <h3 className="text-base font-semibold text-slate-800">🏢 各竞品集团均价</h3>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <Card>
-            <h4 className="font-medium text-slate-700 mb-3">IHG 在售券类</h4>
-            <div className="space-y-2">
-              {priceData.voucherProducts.slice(0, 3).map((v, idx) => (
-                <div key={idx} className="flex items-center justify-between p-2 bg-slate-50 rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <span className={clsx(
-                      'text-xs px-1.5 py-0.5 rounded',
-                      v.platform === '抖音' ? 'bg-pink-100 text-pink-700' :
-                      v.platform === '携程' ? 'bg-blue-100 text-blue-700' :
-                      'bg-emerald-100 text-emerald-700'
-                    )}>{v.platform}</span>
-                    <span className="text-sm text-slate-700">{v.name}</span>
-                  </div>
-                  <span className="font-bold text-slate-800">¥{v.salePrice}</span>
-                </div>
-              ))}
-            </div>
-          </Card>
-          <Card>
-            <h4 className="font-medium text-slate-700 mb-3">竞品券类动态</h4>
-            <div className="space-y-2">
-              {[
-                { brand: '万豪', product: '双人周末套餐', price: 828, platform: '抖音' },
-                { brand: '希尔顿', product: '商务住宿券', price: 568, platform: '携程' },
-                { brand: '雅高', product: '圣诞特惠套餐', price: 698, platform: '飞猪' },
-              ].map((item, idx) => (
-                <div key={idx} className="flex items-center justify-between p-2 bg-slate-50 rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs px-1.5 py-0.5 rounded bg-slate-200 text-slate-600">{item.brand}</span>
-                    <span className="text-sm text-slate-700">{item.product}</span>
-                  </div>
-                  <span className="font-bold text-slate-800">¥{item.price}</span>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </div>
-      </section>
-
-      {/* 渠道价差监测 */}
-      <section className="animate-fade-in-up delay-100">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-base font-semibold text-slate-800">📊 渠道价差监测</h3>
-          <span className="text-xs text-slate-500">基础房型 · 同档竞品对比</span>
-        </div>
-        <div className="space-y-3">
-          {priceData.channelAlerts.map((alert) => (
-            <Card key={alert.channel} padding="sm">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className={clsx(
-                    'w-12 h-12 rounded-xl flex items-center justify-center font-bold',
-                    alert.channel === '抖音' ? 'bg-pink-100 text-pink-700' : 'bg-blue-100 text-blue-700'
-                  )}>
-                    {alert.channel.slice(0, 2)}
-                  </div>
-                  <div>
-                    <div className="font-medium text-slate-800">{alert.channel}渠道</div>
-                    <div className="text-sm text-slate-500">
-                      IHG ¥{alert.ourPrice} · {alert.competitor} ¥{alert.competitorPrice}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <div className="text-xl font-bold text-slate-700">{alert.diff}</div>
-                    <div className="text-xs text-slate-500">价差</div>
-                  </div>
-                </div>
-              </div>
+        <div className="grid grid-cols-4 gap-4">
+          {competitorPrices.byGroup.map((comp) => (
+            <Card key={comp.group}>
+              <div className="text-sm font-medium text-slate-600 mb-2">{comp.group}</div>
+              <div className="text-2xl font-bold text-slate-800 mb-2">¥{comp.avgPrice}</div>
+              <div className="text-xs text-slate-500">{comp.hotels} 家门店</div>
             </Card>
           ))}
         </div>
+      </section>
+
+      {/* 竞品券类动态 */}
+      <section className="animate-fade-in-up delay-100">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-base font-semibold text-slate-800">🎫 竞品券类动态</h3>
+        </div>
+        <Card>
+          <div className="grid grid-cols-4 gap-4">
+            {[
+              { brand: '万豪', product: '双人周末套餐', price: 828, platform: '抖音', status: '热销' },
+              { brand: '希尔顿', product: '商务住宿券', price: 568, platform: '携程', status: '在售' },
+              { brand: '雅高', product: '圣诞特惠套餐', price: 698, platform: '飞猪', status: '促销中' },
+              { brand: '凯悦', product: '亲子度假券', price: 1188, platform: '抖音', status: '新上架' },
+            ].map((item, idx) => (
+              <div key={idx} className="p-3 bg-slate-50 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-medium text-slate-600">{item.brand}</span>
+                  <span className={clsx(
+                    'text-xs px-1.5 py-0.5 rounded',
+                    item.status === '热销' ? 'bg-red-100 text-red-600' :
+                    item.status === '新上架' ? 'bg-blue-100 text-blue-600' :
+                    item.status === '促销中' ? 'bg-amber-100 text-amber-600' :
+                    'bg-slate-200 text-slate-600'
+                  )}>{item.status}</span>
+                </div>
+                <p className="text-sm font-medium text-slate-800 mb-1">{item.product}</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-lg font-bold text-slate-700">¥{item.price}</span>
+                  <span className="text-xs text-slate-400">{item.platform}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
       </section>
 
       {/* 竞对促销 */}
