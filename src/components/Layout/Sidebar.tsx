@@ -17,10 +17,14 @@ const navItems = [
   { path: '/', icon: LayoutDashboard, label: 'Overview', module: 'overview' },
   { path: '/brand', icon: Building2, label: 'Brand View', module: 'brand' },
   { path: '/hotel', icon: Hotel, label: 'Hotel View', module: 'hotel' },
-  { path: '/new-opening', icon: Sparkles, label: '新店监测', module: 'hotel' },
   { path: '/price', icon: DollarSign, label: 'Price Monitor', module: 'price' },
   { path: '/actions', icon: Zap, label: 'Action Center', module: 'actions' },
   { path: '/config', icon: Settings, label: '监测管理', module: 'overview' },
+];
+
+// 管理层专属：新店管理汇总（仅城市经理及以上角色可见）
+const managerOnlyItems = [
+  { path: '/new-opening', icon: Sparkles, label: '新店管理', roles: ['city_mgr', 'region_vp', 'brand_ops'] },
 ];
 
 export function Sidebar() {
@@ -74,6 +78,25 @@ export function Sidebar() {
             <span>{item.label}</span>
           </NavLink>
         ))}
+        
+        {/* 管理层专属入口 */}
+        {managerOnlyItems
+          .filter(item => item.roles.includes(currentRole?.id || ''))
+          .map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              className={({ isActive }) =>
+                clsx(
+                  'nav-item',
+                  isActive ? 'nav-item-active' : 'nav-item-inactive'
+                )
+              }
+            >
+              <item.icon size={18} />
+              <span>{item.label}</span>
+            </NavLink>
+          ))}
       </nav>
 
       {/* Logout */}

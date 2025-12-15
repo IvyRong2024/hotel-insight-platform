@@ -735,6 +735,34 @@ function CityMgrOverview() {
 function HotelMgrOverview() {
   const hotel = hotelDetailData;
   const myActions = actionsData.filter(a => a.hotelId === 'h3' && a.status !== 'completed');
+  
+  // 模拟：判断是否为新店（开业<=180天）
+  const isNewOpening = hotel.isNew && hotel.daysOpen && hotel.daysOpen <= 180;
+  const daysOpen = hotel.daysOpen || 0;
+  
+  // 新店生命周期阶段
+  const getPhase = () => {
+    if (daysOpen <= 30) return { name: '启动期', range: '0-30天', color: '#ef4444' };
+    if (daysOpen <= 90) return { name: '磨合期', range: '31-90天', color: '#f59e0b' };
+    return { name: '稳定期', range: '91-180天', color: '#22c55e' };
+  };
+  const phase = getPhase();
+
+  // 新店监测数据（模拟）
+  const newOpeningData = {
+    stabilityIndex: 72,
+    maturityScore: 68,
+    brandFulfillment: 75,
+    negativeRatio: 8,
+    barriers: [
+      { factor: '入住等待时间', severity: 'high' as const, frequency: 15, description: '前台办理入住平均等待超10分钟' },
+      { factor: '早餐补给不及时', severity: 'medium' as const, frequency: 8, description: '周末高峰期补餐不及时' },
+    ],
+    phaseActions: [
+      { action: '入住流程优化', priority: 'high' as const, status: 'in_progress' as const },
+      { action: '早餐高峰预案', priority: 'medium' as const, status: 'pending' as const },
+    ],
+  };
 
   return (
     <div className="space-y-6">
@@ -748,6 +776,11 @@ function HotelMgrOverview() {
                 <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: brandTiers[hotel.tier].color + '40' }}>
                   {brandTiers[hotel.tier].name}
                 </span>
+                {isNewOpening && (
+                  <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: phase.color + '40', color: '#fff' }}>
+                    ✨ 新店 · {phase.name}（开业{daysOpen}天）
+                  </span>
+                )}
               </div>
               <div className="flex items-end gap-3">
                 <span className="text-5xl font-bold">{hotel.score}</span>
@@ -779,6 +812,108 @@ function HotelMgrOverview() {
           </div>
         </div>
       </section>
+
+      {/* 新店专属：核心监测指标 */}
+      {isNewOpening && (
+        <section className="animate-fade-in-up delay-25">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-base font-semibold text-slate-800">✨ 新店监测专区</span>
+            <span className="text-xs text-slate-500">（开业180天后将切换为标准视角）</span>
+          </div>
+          <div className="grid grid-cols-4 gap-4">
+            <Card>
+              <p className="text-slate-500 text-sm mb-1">稳定性指数</p>
+              <p className="text-3xl font-bold text-slate-800">{newOpeningData.stabilityIndex}%</p>
+              <p className="text-xs text-slate-400 mt-1">成熟店基准 85%</p>
+            </Card>
+            <Card>
+              <p className="text-slate-500 text-sm mb-1">成熟度评分</p>
+              <p className="text-3xl font-bold text-slate-800">{newOpeningData.maturityScore}</p>
+              <p className="text-xs text-slate-400 mt-1">成熟店基准 88</p>
+            </Card>
+            <Card>
+              <p className="text-slate-500 text-sm mb-1">品牌兑现度</p>
+              <p className="text-3xl font-bold text-ihg-navy">{newOpeningData.brandFulfillment}%</p>
+              <p className="text-xs text-slate-400 mt-1">用户感知品牌主张</p>
+            </Card>
+            <Card>
+              <p className="text-slate-500 text-sm mb-1">负面评论占比</p>
+              <p className="text-3xl font-bold text-red-600">{newOpeningData.negativeRatio}%</p>
+              <p className="text-xs text-slate-400 mt-1">1-2星评论</p>
+            </Card>
+          </div>
+        </section>
+      )}
+
+      {/* 新店专属：早期风险 */}
+      {isNewOpening && (
+        <section className="animate-fade-in-up delay-50">
+          <h3 className="text-base font-semibold text-slate-800 mb-3">⚠️ 新店早期风险</h3>
+          <div className="space-y-3">
+            {newOpeningData.barriers.map((barrier) => (
+              <Card key={barrier.factor} className={clsx(
+                'border-l-4',
+                barrier.severity === 'high' ? 'border-l-red-500 bg-red-50/30' : 'border-l-amber-500 bg-amber-50/30'
+              )} padding="sm">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-medium text-slate-800">{barrier.factor}</span>
+                      <Badge variant={barrier.severity === 'high' ? 'danger' : 'warning'}>
+                        {barrier.severity === 'high' ? '高风险' : '中风险'}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-slate-500">{barrier.description}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-lg font-bold text-slate-800">{barrier.frequency}次</p>
+                    <p className="text-xs text-slate-400">发生频率</p>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* 新店专属：阶段行动 */}
+      {isNewOpening && (
+        <section className="animate-fade-in-up delay-75">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: phase.color }} />
+            <h3 className="text-base font-semibold text-slate-800">{phase.name}行动建议</h3>
+          </div>
+          <div className="space-y-2">
+            {newOpeningData.phaseActions.map((action) => (
+              <Card key={action.action} padding="sm" className="bg-slate-50">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    {action.status === 'in_progress' ? (
+                      <div className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center">
+                        <div className="w-2 h-2 rounded-full bg-amber-500" />
+                      </div>
+                    ) : (
+                      <div className="w-6 h-6 rounded-full border-2 border-slate-300" />
+                    )}
+                    <span className="font-medium text-slate-800">{action.action}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={action.priority === 'high' ? 'danger' : 'warning'}>
+                      {action.priority === 'high' ? '高优' : '中优'}
+                    </Badge>
+                    <span className={clsx(
+                      'text-xs px-2 py-0.5 rounded',
+                      action.status === 'in_progress' ? 'bg-amber-100 text-amber-600' : 'bg-slate-200 text-slate-600'
+                    )}>
+                      {action.status === 'in_progress' ? '进行中' : '待处理'}
+                    </span>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* 单店平台高分占比 */}
       <section className="animate-fade-in-up delay-50">

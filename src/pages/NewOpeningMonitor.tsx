@@ -181,7 +181,7 @@ export function NewOpeningMonitor() {
   const benchmark = newOpeningData.benchmarks[selectedHotel.tier];
 
   return (
-    <Layout title="New Opening Monitor" subtitle="新店表现监测：0-180天运营稳定性与体验成熟度评估" requiredModule="hotel">
+    <Layout title="新店管理汇总" subtitle="管理层视角：区域新店健康度、风险预警与治理优先级（新店店长在各自门店视角自动查看）" requiredModule="hotel">
       <div className="space-y-6">
         {/* 新店选择 */}
         <section className="animate-fade-in-up">

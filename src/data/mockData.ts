@@ -559,6 +559,9 @@ export const hotelDetailData = {
   brand: '英迪格',
   tier: 'luxury_lifestyle' as BrandTier,
   score: 4.55,
+  // 新店标识：设为 true 且 daysOpen <= 180 时触发新店监测视角
+  isNew: true,
+  daysOpen: 45, // 开业45天，处于磨合期
   rankings: {
     city: { rank: 12, total: 28, name: '上海' },
     region: { rank: 45, total: 156, name: '华东区' },
