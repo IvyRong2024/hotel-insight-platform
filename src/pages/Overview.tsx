@@ -1050,22 +1050,24 @@ function NewHotelMgrOverview() {
 
   // 新店平台高分占比数据
   const newHotelPlatformScores: PlatformScoreSummary = {
+    domestic: {
+      ctrip: { name: '携程', scale: '5分制', highScoreThreshold: 4.5, totalReviews: 320, highScoreReviews: 256, highScoreRatio: 80.0, trend: '+2.1%', avgScore: 4.52 },
+      meituan: { name: '美团', scale: '5星制', highScoreThreshold: '4星', totalReviews: 280, highScoreReviews: 230, highScoreRatio: 82.0, trend: '+1.8%', avgScore: 4.48 },
+      fliggy: { name: '飞猪', scale: '5分制', highScoreThreshold: 4.5, totalReviews: 156, highScoreReviews: 123, highScoreRatio: 79.0, trend: '+1.2%', avgScore: 4.45 },
+    },
+    overseas: {
+      booking: { name: 'Booking', scale: '10分制', highScoreThreshold: 8, totalReviews: 45, highScoreReviews: 40, highScoreRatio: 88.0, trend: '+0.8%', avgScore: 8.5 },
+      expedia: { name: 'Expedia', scale: '10分制', highScoreThreshold: 8, totalReviews: 32, highScoreReviews: 27, highScoreRatio: 84.0, trend: '+1.5%', avgScore: 8.3 },
+      agoda: { name: 'Agoda', scale: '10分制', highScoreThreshold: 8, totalReviews: 23, highScoreReviews: 20, highScoreRatio: 86.0, trend: '+1.0%', avgScore: 8.4 },
+    },
     summary: {
       domesticHighScoreRatio: 80,
       overseasHighScoreRatio: 86,
       overallHighScoreRatio: 82,
       trend: '+1.5%',
       totalReviews: 856,
-      highScoreReviews: 702,
+      highScoreReviews: 696,
     },
-    platforms: [
-      { name: '携程', highScoreRatio: 80, trend: '+2.1%' },
-      { name: '美团', highScoreRatio: 82, trend: '+1.8%' },
-      { name: '飞猪', highScoreRatio: 79, trend: '+1.2%' },
-      { name: 'Booking', highScoreRatio: 88, trend: '+0.8%' },
-      { name: 'Expedia', highScoreRatio: 84, trend: '+1.5%' },
-      { name: 'Agoda', highScoreRatio: 86, trend: '+1.0%' },
-    ],
   };
 
   return (
