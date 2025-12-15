@@ -418,7 +418,20 @@ export const hotelDetailData = {
   ] as Array<{ dimension: string; score: number; vsCity: string; vsBrand: string; keywords: string[]; trend: 'stable' | 'up' | 'down' }>,
 };
 
-// ==================== 用户需求数据 ====================
+// ==================== 评论平台配置 ====================
+export type ReviewPlatform = '携程' | '美团' | '飞猪' | 'Booking' | 'Expedia' | 'Agoda';
+
+export const reviewPlatforms: ReviewPlatform[] = ['携程', '美团', '飞猪', 'Booking', 'Expedia', 'Agoda'];
+
+export interface PlatformComment {
+  platform: ReviewPlatform;
+  content: string;
+  date: string;
+  rating: number;
+  sentiment: 'positive' | 'negative' | 'neutral';
+}
+
+// ==================== 用户需求数据（含分平台评论）====================
 export const userNeedsData = [
   { 
     category: '效率需求', 
@@ -428,6 +441,16 @@ export const userNeedsData = [
     trend: '↑',
     positive: ['"自助入住机很方便，2分钟搞定" - 携程', '"前台效率很高，不用排队" - 美团'],
     negative: ['"排队等了20分钟才办好入住" - 携程', '"自助机老是识别不了身份证" - 美团'],
+    platformComments: [
+      { platform: '携程' as ReviewPlatform, content: '自助入住机很方便，2分钟搞定', date: '2024-12-10', rating: 5, sentiment: 'positive' as const },
+      { platform: '携程' as ReviewPlatform, content: '排队等了20分钟才办好入住', date: '2024-12-08', rating: 3, sentiment: 'negative' as const },
+      { platform: '美团' as ReviewPlatform, content: '前台效率很高，不用排队', date: '2024-12-09', rating: 5, sentiment: 'positive' as const },
+      { platform: '美团' as ReviewPlatform, content: '自助机老是识别不了身份证', date: '2024-12-07', rating: 2, sentiment: 'negative' as const },
+      { platform: '飞猪' as ReviewPlatform, content: '入住办理速度很快', date: '2024-12-11', rating: 4, sentiment: 'positive' as const },
+      { platform: 'Booking' as ReviewPlatform, content: 'Quick check-in process', date: '2024-12-10', rating: 5, sentiment: 'positive' as const },
+      { platform: 'Expedia' as ReviewPlatform, content: 'Waited 15 min at front desk', date: '2024-12-06', rating: 3, sentiment: 'negative' as const },
+      { platform: 'Agoda' as ReviewPlatform, content: 'Express check-in was efficient', date: '2024-12-09', rating: 4, sentiment: 'positive' as const },
+    ],
   },
   { 
     category: '舒适需求', 
@@ -437,6 +460,16 @@ export const userNeedsData = [
     trend: '↑',
     positive: ['"床垫很舒服，睡眠质量很好" - 携程', '"房间隔音不错，很安静" - 美团'],
     negative: ['"隔壁说话听得一清二楚" - 携程', '"空调声音太大" - 美团'],
+    platformComments: [
+      { platform: '携程' as ReviewPlatform, content: '床垫很舒服，睡眠质量很好', date: '2024-12-10', rating: 5, sentiment: 'positive' as const },
+      { platform: '携程' as ReviewPlatform, content: '隔壁说话听得一清二楚', date: '2024-12-09', rating: 2, sentiment: 'negative' as const },
+      { platform: '美团' as ReviewPlatform, content: '房间隔音不错，很安静', date: '2024-12-08', rating: 4, sentiment: 'positive' as const },
+      { platform: '美团' as ReviewPlatform, content: '空调声音太大', date: '2024-12-07', rating: 2, sentiment: 'negative' as const },
+      { platform: '飞猪' as ReviewPlatform, content: '床品质量很好，很舒适', date: '2024-12-10', rating: 5, sentiment: 'positive' as const },
+      { platform: 'Booking' as ReviewPlatform, content: 'Room was quiet and comfortable', date: '2024-12-09', rating: 5, sentiment: 'positive' as const },
+      { platform: 'Expedia' as ReviewPlatform, content: 'Could hear noise from corridor', date: '2024-12-08', rating: 3, sentiment: 'negative' as const },
+      { platform: 'Agoda' as ReviewPlatform, content: 'Very comfortable bed', date: '2024-12-07', rating: 5, sentiment: 'positive' as const },
+    ],
   },
   { 
     category: '服务需求', 
@@ -446,6 +479,16 @@ export const userNeedsData = [
     trend: '→',
     positive: ['"前台小姐姐很热情" - 携程', '"客房服务响应很快" - 美团'],
     negative: ['"打了3次电话才送来毛巾" - 携程', '"服务态度一般" - 美团'],
+    platformComments: [
+      { platform: '携程' as ReviewPlatform, content: '前台小姐姐很热情', date: '2024-12-11', rating: 5, sentiment: 'positive' as const },
+      { platform: '携程' as ReviewPlatform, content: '打了3次电话才送来毛巾', date: '2024-12-09', rating: 2, sentiment: 'negative' as const },
+      { platform: '美团' as ReviewPlatform, content: '客房服务响应很快', date: '2024-12-10', rating: 5, sentiment: 'positive' as const },
+      { platform: '美团' as ReviewPlatform, content: '服务态度一般', date: '2024-12-08', rating: 3, sentiment: 'negative' as const },
+      { platform: '飞猪' as ReviewPlatform, content: '服务人员态度非常好', date: '2024-12-09', rating: 5, sentiment: 'positive' as const },
+      { platform: 'Booking' as ReviewPlatform, content: 'Staff was friendly and helpful', date: '2024-12-08', rating: 5, sentiment: 'positive' as const },
+      { platform: 'Expedia' as ReviewPlatform, content: 'Slow response to room service', date: '2024-12-07', rating: 3, sentiment: 'negative' as const },
+      { platform: 'Agoda' as ReviewPlatform, content: 'Excellent concierge service', date: '2024-12-10', rating: 5, sentiment: 'positive' as const },
+    ],
   },
   { 
     category: '早餐需求', 
@@ -455,6 +498,16 @@ export const userNeedsData = [
     trend: '→',
     positive: ['"早餐品种很丰富" - 携程', '"水果很新鲜" - 美团'],
     negative: ['"热菜补餐太慢" - 携程', '"早餐品种太少" - 美团'],
+    platformComments: [
+      { platform: '携程' as ReviewPlatform, content: '早餐品种很丰富', date: '2024-12-11', rating: 5, sentiment: 'positive' as const },
+      { platform: '携程' as ReviewPlatform, content: '热菜补餐太慢', date: '2024-12-09', rating: 3, sentiment: 'negative' as const },
+      { platform: '美团' as ReviewPlatform, content: '水果很新鲜', date: '2024-12-10', rating: 4, sentiment: 'positive' as const },
+      { platform: '美团' as ReviewPlatform, content: '早餐品种太少', date: '2024-12-08', rating: 3, sentiment: 'negative' as const },
+      { platform: '飞猪' as ReviewPlatform, content: '早餐选择多样', date: '2024-12-09', rating: 4, sentiment: 'positive' as const },
+      { platform: 'Booking' as ReviewPlatform, content: 'Great breakfast selection', date: '2024-12-10', rating: 5, sentiment: 'positive' as const },
+      { platform: 'Expedia' as ReviewPlatform, content: 'Breakfast was average', date: '2024-12-07', rating: 3, sentiment: 'neutral' as const },
+      { platform: 'Agoda' as ReviewPlatform, content: 'Good variety at breakfast', date: '2024-12-08', rating: 4, sentiment: 'positive' as const },
+    ],
   },
   { 
     category: '性价比需求', 
@@ -464,6 +517,16 @@ export const userNeedsData = [
     trend: '↑',
     positive: ['"会员价很划算" - 携程', '"活动价性价比超高" - 抖音'],
     negative: ['"节假日涨价太狠" - 携程', '"和OTA价差太大" - 直客通'],
+    platformComments: [
+      { platform: '携程' as ReviewPlatform, content: '会员价很划算', date: '2024-12-11', rating: 5, sentiment: 'positive' as const },
+      { platform: '携程' as ReviewPlatform, content: '节假日涨价太狠', date: '2024-12-05', rating: 2, sentiment: 'negative' as const },
+      { platform: '美团' as ReviewPlatform, content: '价格合理，物有所值', date: '2024-12-10', rating: 4, sentiment: 'positive' as const },
+      { platform: '美团' as ReviewPlatform, content: '周末价格翻倍', date: '2024-12-06', rating: 2, sentiment: 'negative' as const },
+      { platform: '飞猪' as ReviewPlatform, content: '性价比很高', date: '2024-12-09', rating: 5, sentiment: 'positive' as const },
+      { platform: 'Booking' as ReviewPlatform, content: 'Good value for money', date: '2024-12-08', rating: 4, sentiment: 'positive' as const },
+      { platform: 'Expedia' as ReviewPlatform, content: 'Overpriced for the area', date: '2024-12-07', rating: 2, sentiment: 'negative' as const },
+      { platform: 'Agoda' as ReviewPlatform, content: 'Reasonable prices', date: '2024-12-10', rating: 4, sentiment: 'positive' as const },
+    ],
   },
   { 
     category: '文化共鸣', 
@@ -473,6 +536,16 @@ export const userNeedsData = [
     trend: '↑',
     positive: ['"酒店设计很有当地特色" - 携程', '"邻里文化活动很有趣" - Booking'],
     negative: ['"装修风格太普通" - 携程', '"感觉和其他连锁没区别" - 美团'],
+    platformComments: [
+      { platform: '携程' as ReviewPlatform, content: '酒店设计很有当地特色', date: '2024-12-11', rating: 5, sentiment: 'positive' as const },
+      { platform: '携程' as ReviewPlatform, content: '装修风格太普通', date: '2024-12-08', rating: 3, sentiment: 'negative' as const },
+      { platform: '美团' as ReviewPlatform, content: '设计感很强', date: '2024-12-10', rating: 4, sentiment: 'positive' as const },
+      { platform: '美团' as ReviewPlatform, content: '感觉和其他连锁没区别', date: '2024-12-07', rating: 3, sentiment: 'negative' as const },
+      { platform: '飞猪' as ReviewPlatform, content: '装饰有当地文化元素', date: '2024-12-09', rating: 4, sentiment: 'positive' as const },
+      { platform: 'Booking' as ReviewPlatform, content: '邻里文化活动很有趣', date: '2024-12-08', rating: 5, sentiment: 'positive' as const },
+      { platform: 'Expedia' as ReviewPlatform, content: 'Nice local touches in design', date: '2024-12-10', rating: 4, sentiment: 'positive' as const },
+      { platform: 'Agoda' as ReviewPlatform, content: 'Unique boutique style', date: '2024-12-09', rating: 5, sentiment: 'positive' as const },
+    ],
   },
 ];
 

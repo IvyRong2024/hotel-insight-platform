@@ -36,52 +36,66 @@ export function PriceMonitoring() {
           </div>
         </section>
 
-        {/* 品牌类型定价对比 */}
+        {/* 基础房型同档次竞品对比 */}
         <section className="animate-fade-in-up delay-50">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base font-semibold text-slate-800">💰 品牌类型定价 vs 竞品</h3>
+            <div>
+              <h3 className="text-base font-semibold text-slate-800">💰 基础房型价格对比</h3>
+              <p className="text-xs text-slate-500 mt-1">⚠️ 仅对比同档次竞品（如：Essentials vs 万豪万怡/希尔顿花园）</p>
+            </div>
+            <Badge variant="info">标准大床房</Badge>
           </div>
           <Card padding="none">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-100">
-                  <th className="text-left p-4 font-medium text-slate-500">品牌类型</th>
+                  <th className="text-left p-4 font-medium text-slate-500">品牌档次</th>
                   <th className="text-center p-4 font-medium text-slate-500">IHG 均价</th>
-                  <th className="text-center p-4 font-medium text-slate-500">竞品均价</th>
+                  <th className="text-center p-4 font-medium text-slate-500">同档竞品均价</th>
                   <th className="text-center p-4 font-medium text-slate-500">价差</th>
-                  <th className="text-center p-4 font-medium text-slate-500">状态</th>
+                  <th className="text-center p-4 font-medium text-slate-500">竞争状态</th>
+                  <th className="text-left p-4 font-medium text-slate-500">对标竞品</th>
                 </tr>
               </thead>
               <tbody>
-                {(Object.entries(priceData.tierPricing) as [BrandTier, typeof priceData.tierPricing.luxury_lifestyle][]).map(([tier, data]) => (
-                  <tr key={tier} className="border-b border-slate-50 hover:bg-slate-50">
-                    <td className="p-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: brandTiers[tier].color }} />
-                        <span className="font-medium text-slate-800">{brandTiers[tier].name}</span>
-                      </div>
-                    </td>
-                    <td className="text-center p-4 font-bold text-slate-800">¥{data.ihg}</td>
-                    <td className="text-center p-4 text-slate-600">¥{data.competitor}</td>
-                    <td className="text-center p-4">
-                      <span className={clsx(
-                        'font-medium',
-                        data.status === 'good' ? 'text-emerald-600' : data.status === 'warning' ? 'text-amber-600' : 'text-slate-600'
-                      )}>
-                        {data.diff}
-                      </span>
-                    </td>
-                    <td className="text-center p-4">
-                      {data.status === 'good' ? (
-                        <Badge variant="success">有竞争力</Badge>
-                      ) : data.status === 'warning' ? (
-                        <Badge variant="warning">偏高</Badge>
-                      ) : (
-                        <Badge variant="info">持平</Badge>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                {(Object.entries(priceData.tierPricing) as [BrandTier, typeof priceData.tierPricing.luxury_lifestyle][]).map(([tier, data]) => {
+                  const competitorBrands: Record<BrandTier, string> = {
+                    luxury_lifestyle: '万豪酒店、柏悦、康莱德',
+                    premium: '万怡酒店、希尔顿花园',
+                    essentials: 'Hampton、宜必思',
+                    suites: '万豪行政公寓'
+                  };
+                  return (
+                    <tr key={tier} className="border-b border-slate-50 hover:bg-slate-50">
+                      <td className="p-4">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: brandTiers[tier].color }} />
+                          <span className="font-medium text-slate-800">{brandTiers[tier].name}</span>
+                        </div>
+                      </td>
+                      <td className="text-center p-4 font-bold text-slate-800">¥{data.ihg}</td>
+                      <td className="text-center p-4 text-slate-600">¥{data.competitor}</td>
+                      <td className="text-center p-4">
+                        <span className={clsx(
+                          'font-medium',
+                          data.status === 'good' ? 'text-emerald-600' : data.status === 'warning' ? 'text-amber-600' : 'text-slate-600'
+                        )}>
+                          {data.diff}
+                        </span>
+                      </td>
+                      <td className="text-center p-4">
+                        {data.status === 'good' ? (
+                          <Badge variant="success">有竞争力</Badge>
+                        ) : data.status === 'warning' ? (
+                          <Badge variant="warning">偏高</Badge>
+                        ) : (
+                          <Badge variant="info">持平</Badge>
+                        )}
+                      </td>
+                      <td className="p-4 text-xs text-slate-500">{competitorBrands[tier]}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </Card>
@@ -156,16 +170,26 @@ export function PriceMonitoring() {
           </div>
         </section>
 
-        {/* 券类产品监测 */}
+        {/* 券类产品动态监测 */}
         <section className="animate-fade-in-up delay-200">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base font-semibold text-slate-800 flex items-center gap-2">
-              <Tag size={18} />
-              券类产品监测
-            </h3>
+            <div>
+              <h3 className="text-base font-semibold text-slate-800 flex items-center gap-2">
+                <Tag size={18} />
+                券类产品动态监测
+              </h3>
+              <p className="text-xs text-slate-500 mt-1">⚠️ 券类产品因服务内容差异大，仅做动态监测，不做跨品牌对比</p>
+            </div>
             <span className="text-sm text-slate-500">点击查看服务明细</span>
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          
+          {/* IHG 券类产品 */}
+          <div className="mb-4">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-3 h-3 rounded-full bg-ihg-navy" />
+              <span className="text-sm font-medium text-slate-700">IHG 在售券类</span>
+            </div>
+            <div className="grid grid-cols-3 gap-4">
             {priceData.voucherProducts.map((voucher, idx) => (
               <Card 
                 key={idx} 
@@ -224,6 +248,48 @@ export function PriceMonitoring() {
                 )}
               </Card>
             ))}
+            </div>
+          </div>
+
+          {/* 竞品券类动态监测 */}
+          <div className="mt-6">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-3 h-3 rounded-full bg-slate-400" />
+              <span className="text-sm font-medium text-slate-700">竞品券类动态</span>
+              <Badge variant="info">仅监测，不对比</Badge>
+            </div>
+            <Card className="bg-slate-50" padding="sm">
+              <div className="grid grid-cols-4 gap-4">
+                {[
+                  { brand: '万豪', product: '双人周末套餐', price: 828, platform: '抖音', trend: '热销' },
+                  { brand: '希尔顿', product: '商务住宿券', price: 568, platform: '携程', trend: '新上架' },
+                  { brand: '雅高', product: '圣诞特惠套餐', price: 698, platform: '飞猪', trend: '促销中' },
+                  { brand: '凯悦', product: '亲子度假券', price: 1188, platform: '抖音', trend: '热销' },
+                ].map((item, idx) => (
+                  <div key={idx} className="p-3 bg-white rounded-lg border border-slate-200">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-medium text-slate-600">{item.brand}</span>
+                      <span className={clsx(
+                        'text-xs px-1.5 py-0.5 rounded',
+                        item.trend === '热销' ? 'bg-red-100 text-red-600' :
+                        item.trend === '新上架' ? 'bg-blue-100 text-blue-600' :
+                        'bg-amber-100 text-amber-600'
+                      )}>
+                        {item.trend}
+                      </span>
+                    </div>
+                    <p className="text-sm font-medium text-slate-800 mb-1">{item.product}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg font-bold text-slate-700">¥{item.price}</span>
+                      <span className="text-xs text-slate-400">{item.platform}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-slate-400 mt-3 text-center">
+                💡 提示：券类产品包含不同服务组合，价格差异不代表性价比差异
+              </p>
+            </Card>
           </div>
         </section>
 
