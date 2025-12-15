@@ -81,30 +81,31 @@ export function Login() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-ihg-navy via-ihg-navy-light to-ihg-navy flex">
-      {/* Left: Branding */}
-      <div className="flex-1 flex flex-col justify-center px-16">
-        <div className="mb-8">
-          <h1 className="text-5xl font-bold text-white mb-3">IHG Insight</h1>
-          <p className="text-xl text-white/60">酒店品牌洞察分析平台</p>
+      {/* Left: Branding - more compact */}
+      <div className="w-[380px] flex flex-col justify-center px-10 flex-shrink-0">
+        <div className="mb-6">
+          <h1 className="text-4xl font-bold text-white mb-2">IHG Insight</h1>
+          <p className="text-lg text-white/60">酒店品牌洞察分析平台</p>
         </div>
         
-        <div className="space-y-3 text-white/80">
+        <div className="space-y-2.5 text-white/80">
           <FeatureItem icon="🎯" title="品牌视角" desc="全国品牌健康监测与竞对分析" />
           <FeatureItem icon="🏨" title="酒店视角" desc="区域/城市/单店运营诊断" />
           <FeatureItem icon="💰" title="价格监测" desc="竞品价格策略与促销追踪" />
         </div>
 
-        <div className="mt-12 pt-8 border-t border-white/10">
-          <div className="text-white/40 text-sm space-y-2">
-            <p><span className="text-white/60">监测规模：</span>13,000+ 家门店（IHG 2,800+ / 竞品 10,200+）</p>
+        <div className="mt-8 pt-6 border-t border-white/10">
+          <div className="text-white/40 text-xs space-y-1.5">
+            <p><span className="text-white/60">监测规模：</span>13,000+ 家门店</p>
+            <p className="text-white/30 pl-14">IHG 2,800+ / 竞品 10,200+</p>
             <p><span className="text-white/60">评论来源：</span>携程 · 美团 · 飞猪 · Booking · Expedia · Agoda</p>
             <p><span className="text-white/60">价格来源：</span>携程 · 抖音 · 直客通</p>
           </div>
         </div>
       </div>
 
-      {/* Right: Login */}
-      <div className="w-[560px] bg-white flex flex-col justify-center px-12">
+      {/* Right: Login - expanded with two columns */}
+      <div className="flex-1 bg-white flex flex-col justify-center px-12">
         {!selectedViewport ? (
           // 第一步：选择视角
           <>
@@ -113,42 +114,40 @@ export function Login() {
               <p className="text-slate-500">根据您的工作职责选择对应的数据视角</p>
             </div>
 
-            <div className="space-y-4 mb-6">
+            <div className="grid grid-cols-2 gap-4 mb-6">
               {viewportGroups.map((viewport) => (
                 <button
                   key={viewport.id}
                   onClick={() => handleViewportSelect(viewport.id)}
-                  className="w-full group"
+                  className="group"
                 >
                   <div className={clsx(
-                    'p-5 rounded-2xl border-2 transition-all text-left',
+                    'h-full p-4 rounded-xl border-2 transition-all text-left',
                     'hover:border-slate-300 hover:shadow-lg',
                     'border-slate-200 bg-white'
                   )}>
-                    <div className="flex items-start gap-4">
+                    <div className="flex items-center gap-3 mb-3">
                       <div className={clsx(
-                        'w-14 h-14 rounded-xl flex items-center justify-center text-white bg-gradient-to-br',
+                        'w-12 h-12 rounded-xl flex items-center justify-center text-white bg-gradient-to-br flex-shrink-0',
                         viewport.color
                       )}>
                         {viewport.icon}
                       </div>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-lg font-bold text-slate-800">{viewport.name}</span>
-                          <ChevronRight size={20} className="text-slate-400 group-hover:text-slate-600 transition-colors" />
-                        </div>
-                        <p className="text-sm text-slate-500">{viewport.description}</p>
-                        <div className="mt-2 flex flex-wrap gap-1">
-                          {viewport.roles.map(roleId => {
-                            const role = roleConfigs.find(r => r.id === roleId);
-                            return role ? (
-                              <span key={roleId} className="text-xs px-2 py-0.5 bg-slate-100 text-slate-600 rounded">
-                                {role.name}
-                              </span>
-                            ) : null;
-                          })}
-                        </div>
+                      <div>
+                        <span className="text-base font-bold text-slate-800">{viewport.name}</span>
+                        <ChevronRight size={16} className="inline-block ml-1 text-slate-400 group-hover:text-slate-600 transition-colors" />
                       </div>
+                    </div>
+                    <p className="text-xs text-slate-500 mb-2 line-clamp-2">{viewport.description}</p>
+                    <div className="flex flex-wrap gap-1">
+                      {viewport.roles.map(roleId => {
+                        const role = roleConfigs.find(r => r.id === roleId);
+                        return role ? (
+                          <span key={roleId} className="text-xs px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded">
+                            {role.name}
+                          </span>
+                        ) : null;
+                      })}
                     </div>
                   </div>
                 </button>
@@ -251,13 +250,13 @@ export function Login() {
 
 function FeatureItem({ icon, title, desc }: { icon: string; title: string; desc: string }) {
   return (
-    <div className="flex items-center gap-3">
-      <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-lg">
+    <div className="flex items-center gap-2.5">
+      <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-base flex-shrink-0">
         {icon}
       </div>
       <div>
-        <div className="font-medium">{title}</div>
-        <div className="text-sm text-white/50">{desc}</div>
+        <div className="font-medium text-sm">{title}</div>
+        <div className="text-xs text-white/50">{desc}</div>
       </div>
     </div>
   );
