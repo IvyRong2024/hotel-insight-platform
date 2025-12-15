@@ -5,7 +5,6 @@ import {
   promiseFulfillmentData, 
   competitorData,
   brandCompetitorData,
-  cityCompetitorHotels,
   regionHierarchy, 
   brandTiers, 
   hotelDetailData, 
