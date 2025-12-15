@@ -1027,30 +1027,46 @@ function CommentDeepDive({
                   {comment.sentiment === 'positive' ? '👍' : comment.sentiment === 'negative' ? '👎' : '💬'}
                 </div>
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className={clsx(
-                      'text-xs font-medium px-2 py-1 rounded',
-                      comment.platform === '携程' ? 'bg-blue-100 text-blue-700' :
-                      comment.platform === '美团' ? 'bg-yellow-100 text-yellow-700' :
-                      comment.platform === '飞猪' ? 'bg-orange-100 text-orange-700' :
-                      comment.platform === 'Booking' ? 'bg-indigo-100 text-indigo-700' :
-                      comment.platform === 'Expedia' ? 'bg-purple-100 text-purple-700' :
-                      'bg-pink-100 text-pink-700'
-                    )}>
-                      {comment.platform}
-                    </span>
-                    <div className="flex items-center gap-1">
-                      {[...Array(5)].map((_, i) => (
-                        <Star 
-                          key={i} 
-                          size={12} 
-                          className={i < comment.rating ? 'text-ihg-gold fill-ihg-gold' : 'text-slate-200'} 
-                        />
-                      ))}
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-3">
+                      <span className={clsx(
+                        'text-xs font-medium px-2 py-1 rounded',
+                        comment.platform === '携程' ? 'bg-blue-100 text-blue-700' :
+                        comment.platform === '美团' ? 'bg-yellow-100 text-yellow-700' :
+                        comment.platform === '飞猪' ? 'bg-orange-100 text-orange-700' :
+                        comment.platform === 'Booking' ? 'bg-indigo-100 text-indigo-700' :
+                        comment.platform === 'Expedia' ? 'bg-purple-100 text-purple-700' :
+                        'bg-pink-100 text-pink-700'
+                      )}>
+                        {comment.platform}
+                      </span>
+                      <span className="text-sm font-medium text-slate-700">{comment.userName}</span>
+                      <div className="flex items-center gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star 
+                            key={i} 
+                            size={12} 
+                            className={i < comment.rating ? 'text-ihg-gold fill-ihg-gold' : 'text-slate-200'} 
+                          />
+                        ))}
+                      </div>
+                      <span className="text-xs text-slate-400">{comment.date}</span>
                     </div>
-                    <span className="text-xs text-slate-400">{comment.date}</span>
+                    {comment.orderId && (
+                      <span className="text-xs text-slate-400 font-mono">订单号: {comment.orderId}</span>
+                    )}
                   </div>
                   <p className="text-sm text-slate-700 leading-relaxed">"{comment.content}"</p>
+                  {comment.sentiment === 'negative' && (
+                    <div className="mt-2 flex gap-2">
+                      <button className="text-xs px-3 py-1 bg-ihg-navy text-white rounded hover:bg-ihg-navy-light transition-colors">
+                        回复评论
+                      </button>
+                      <button className="text-xs px-3 py-1 bg-slate-100 text-slate-600 rounded hover:bg-slate-200 transition-colors">
+                        查看订单
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
