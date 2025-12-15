@@ -7,7 +7,8 @@ import {
   Zap, 
   LogOut,
   User,
-  Settings
+  Settings,
+  Sparkles
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import clsx from 'clsx';
@@ -16,6 +17,7 @@ const navItems = [
   { path: '/', icon: LayoutDashboard, label: 'Overview', module: 'overview' },
   { path: '/brand', icon: Building2, label: 'Brand View', module: 'brand' },
   { path: '/hotel', icon: Hotel, label: 'Hotel View', module: 'hotel' },
+  { path: '/new-opening', icon: Sparkles, label: '新店监测', module: 'hotel' },
   { path: '/price', icon: DollarSign, label: 'Price Monitor', module: 'price' },
   { path: '/actions', icon: Zap, label: 'Action Center', module: 'actions' },
   { path: '/config', icon: Settings, label: '监测管理', module: 'overview' },
