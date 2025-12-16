@@ -451,7 +451,7 @@ function BrandOpsOverview() {
           </div>
           <div className="grid grid-cols-4 gap-4">
             {/* 当前品牌 */}
-            <div className="bg-white rounded-2xl p-4 ring-2" style={{ ringColor: tierInfo.color, borderColor: tierInfo.color }}>
+            <div className="bg-white rounded-2xl p-4 border-2 shadow-sm" style={{ borderColor: tierInfo.color }}>
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: tierInfo.color }} />
                 <span className="font-medium text-slate-800">{currentBrand.name}</span>
