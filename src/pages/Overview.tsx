@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Layout } from '../components/Layout';
 import { Card, Badge } from '../components/ui';
 import { 
-  brandHealthData, 
   promiseFulfillmentData, 
   competitorData,
   brandCompetitorData,
@@ -452,7 +451,7 @@ function BrandOpsOverview() {
           </div>
           <div className="grid grid-cols-4 gap-4">
             {/* 当前品牌 */}
-            <Card padding="sm" className="ring-2" style={{ borderColor: tierInfo.color }}>
+            <div className="bg-white rounded-2xl p-4 ring-2" style={{ ringColor: tierInfo.color, borderColor: tierInfo.color }}>
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: tierInfo.color }} />
                 <span className="font-medium text-slate-800">{currentBrand.name}</span>
@@ -465,7 +464,7 @@ function BrandOpsOverview() {
                 </span>
               </div>
               <p className="text-xs text-slate-500">{currentBrand.hotelCount}家门店</p>
-            </Card>
+            </div>
             {/* 同类型其他品牌 */}
             {sameTierBrands.slice(0, 3).map(brand => (
               <Card 
