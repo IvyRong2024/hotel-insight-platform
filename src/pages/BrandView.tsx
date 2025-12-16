@@ -8,7 +8,8 @@ import {
   brandCompetitorData,
   brandTiers,
   BrandTier,
-  ihgBrands
+  ihgBrands,
+  IHGBrand
 } from '../data/mockData';
 import { TrendingUp, TrendingDown, AlertTriangle, ChevronDown, ChevronRight } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend, BarChart, Bar } from 'recharts';
@@ -98,7 +99,7 @@ export function BrandView() {
   
   // Get selected brand from auth context or default to first brand
   const selectedBrandId = currentRole?.brand || 'holiday_inn';
-  const selectedBrandInfo = ihgBrands.find(b => b.id === selectedBrandId) || ihgBrands[0];
+  const selectedBrandInfo: IHGBrand = ihgBrands.find((b: IHGBrand) => b.id === selectedBrandId) || ihgBrands[0];
   const selectedBrandName = selectedBrandInfo.name;
   
   // Get brand-specific competitor data

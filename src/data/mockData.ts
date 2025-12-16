@@ -83,6 +83,32 @@ export const brandConfig = {
   ],
 };
 
+// ==================== IHG 品牌列表 ====================
+export interface IHGBrand {
+  id: string;
+  name: string;
+  tier: BrandTier;
+  code: string;
+  hotelCount: number;
+  avgScore: number;
+  trend: string;
+}
+
+export const ihgBrands: IHGBrand[] = [
+  { id: 'intercontinental', name: '洲际酒店', tier: 'luxury_lifestyle', code: 'IC', hotelCount: 85, avgScore: 4.68, trend: '+0.02' },
+  { id: 'regent', name: '丽晶', tier: 'luxury_lifestyle', code: 'REGENT', hotelCount: 12, avgScore: 4.75, trend: '+0.01' },
+  { id: 'six_senses', name: '六善', tier: 'luxury_lifestyle', code: 'SIXSENSES', hotelCount: 8, avgScore: 4.82, trend: '+0.03' },
+  { id: 'kimpton', name: '金普顿', tier: 'luxury_lifestyle', code: 'KIMPTON', hotelCount: 15, avgScore: 4.65, trend: '+0.02' },
+  { id: 'indigo', name: '英迪格', tier: 'luxury_lifestyle', code: 'INDIGO', hotelCount: 120, avgScore: 4.62, trend: '+0.03' },
+  { id: 'crowne_plaza', name: '皇冠假日', tier: 'premium', code: 'CP', hotelCount: 280, avgScore: 4.55, trend: '+0.01' },
+  { id: 'voco', name: 'voco', tier: 'premium', code: 'VOCO', hotelCount: 45, avgScore: 4.58, trend: '+0.02' },
+  { id: 'even', name: 'EVEN Hotels', tier: 'premium', code: 'EVEN', hotelCount: 18, avgScore: 4.52, trend: '+0.01' },
+  { id: 'holiday_inn', name: '假日酒店', tier: 'essentials', code: 'HI', hotelCount: 650, avgScore: 4.45, trend: '+0.01' },
+  { id: 'holiday_inn_express', name: '智选假日', tier: 'essentials', code: 'HIX', hotelCount: 1200, avgScore: 4.42, trend: '+0.02' },
+  { id: 'staybridge', name: '馨乐庭', tier: 'suites', code: 'STAYBRIDGE', hotelCount: 85, avgScore: 4.48, trend: '+0.01' },
+  { id: 'atwell', name: 'Atwell Suites', tier: 'suites', code: 'ATWELL', hotelCount: 25, avgScore: 4.50, trend: '+0.02' },
+];
+
 // ==================== 层级数据结构 ====================
 export interface HotelData {
   id: string;

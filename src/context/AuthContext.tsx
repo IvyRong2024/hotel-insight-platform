@@ -11,6 +11,7 @@ interface RoleConfig {
   city?: string;
   hotel?: string;
   hotelId?: string;
+  brand?: string;
   accessModules: string[];
 }
 
@@ -27,6 +28,7 @@ export const roleConfigs: RoleConfig[] = [
     name: '品牌运营', 
     level: '全国',
     description: '品牌健康监测、品牌承诺验证、品牌级竞品对比，支持按品牌类型筛选',
+    brand: 'holiday_inn',
     accessModules: ['overview', 'brand'],
   },
   { 
