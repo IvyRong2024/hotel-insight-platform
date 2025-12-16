@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Layout } from '../components/Layout';
 import { Card, Badge } from '../components/ui';
 import { 
@@ -28,13 +29,10 @@ export function Overview() {
   
   if (!currentRole) return null;
 
-  // 判断是否是品牌运营角色
-  const isBrandOps = currentRole.id.startsWith('brand_ops');
-
   return (
     <Layout title="Overview" subtitle={currentRole.description} requiredModule="overview">
       {currentRole.id === 'platform_admin' && <PlatformAdminOverview />}
-      {isBrandOps && <BrandOpsOverview brandTier={currentRole.brandTier} />}
+      {currentRole.id === 'brand_ops' && <BrandOpsOverview />}
       {currentRole.id === 'region_vp' && <RegionVPOverview />}
       {currentRole.id === 'city_mgr' && <CityMgrOverview />}
       {currentRole.id === 'hotel_mgr' && <HotelMgrOverview />}
@@ -301,17 +299,19 @@ function PlatformScoreRatioCard({
 }
 
 // ========== 品牌运营 Overview ==========
-function BrandOpsOverview({ brandTier }: { brandTier?: BrandTier | 'all' }) {
-  const isAllBrands = !brandTier || brandTier === 'all';
+function BrandOpsOverview() {
+  const [selectedTier, setSelectedTier] = useState<BrandTier | 'all'>('all');
+  
+  const isAllBrands = selectedTier === 'all';
   
   // 根据品牌类型筛选数据
-  const tierData = isAllBrands ? null : brandHealthData.tierPerformance[brandTier];
-  const tierInfo = isAllBrands ? null : brandTiers[brandTier];
+  const tierData = isAllBrands ? null : brandHealthData.tierPerformance[selectedTier];
+  const tierInfo = isAllBrands ? null : brandTiers[selectedTier];
   
   // 筛选对应档次的竞品数据
   const relevantCompetitors = isAllBrands 
     ? brandCompetitorData 
-    : brandCompetitorData.filter(c => c.tier === brandTier);
+    : brandCompetitorData.filter(c => c.tier === selectedTier);
 
   const gap = (brandHealthData.overallScore - competitorData.metrics.综合评分[1]).toFixed(2);
   const isLeading = parseFloat(gap) > 0;
@@ -319,18 +319,51 @@ function BrandOpsOverview({ brandTier }: { brandTier?: BrandTier | 'all' }) {
 
   return (
     <div className="space-y-6">
-      {/* 品牌类型标识（非全品牌时显示） */}
-      {!isAllBrands && tierInfo && (
-        <div className="flex items-center gap-3 px-4 py-3 rounded-xl" style={{ backgroundColor: tierInfo.color + '15' }}>
-          <div className="w-4 h-4 rounded-full" style={{ backgroundColor: tierInfo.color }} />
-          <span className="font-semibold" style={{ color: tierInfo.color }}>{tierInfo.name}</span>
-          <span className="text-slate-500 text-sm">品牌类型视角</span>
-        </div>
-      )}
+      {/* 品牌类型筛选器 */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-sm text-slate-500 mr-2">品牌类型：</span>
+        <button
+          onClick={() => setSelectedTier('all')}
+          className={clsx(
+            'px-4 py-2 rounded-lg text-sm font-medium transition-all',
+            selectedTier === 'all' 
+              ? 'bg-ihg-navy text-white' 
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+          )}
+        >
+          全部品牌
+        </button>
+        {(Object.keys(brandTiers) as BrandTier[]).map(tier => (
+          <button
+            key={tier}
+            onClick={() => setSelectedTier(tier)}
+            className={clsx(
+              'px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2',
+              selectedTier === tier 
+                ? 'text-white' 
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            )}
+            style={selectedTier === tier ? { backgroundColor: brandTiers[tier].color } : {}}
+          >
+            <div 
+              className="w-2 h-2 rounded-full" 
+              style={{ backgroundColor: selectedTier === tier ? 'white' : brandTiers[tier].color }} 
+            />
+            {brandTiers[tier].name}
+          </button>
+        ))}
+      </div>
 
       {/* 品牌综合评分 */}
       <section className="animate-fade-in-up">
-        <div className="bg-gradient-to-r from-ihg-navy to-ihg-navy-light rounded-2xl p-6 text-white">
+        <div 
+          className="rounded-2xl p-6 text-white"
+          style={{ 
+            background: isAllBrands 
+              ? 'linear-gradient(to right, #003B6F, #1e5a8a)' 
+              : `linear-gradient(to right, ${tierInfo?.color}, ${tierInfo?.color}cc)`
+          }}
+        >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-white/60 text-sm mb-1">
@@ -403,9 +436,9 @@ function BrandOpsOverview({ brandTier }: { brandTier?: BrandTier | 'all' }) {
 
       {/* 品牌故事 Narrative */}
       <section className="animate-fade-in-up delay-100">
-        <Card className="bg-gradient-to-r from-slate-50 to-white border-l-4 border-l-ihg-navy">
+        <Card className="bg-gradient-to-r from-slate-50 to-white border-l-4" style={{ borderLeftColor: isAllBrands ? '#003B6F' : tierInfo?.color }}>
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 bg-ihg-navy/10 rounded-xl flex items-center justify-center text-xl">📊</div>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style={{ backgroundColor: (isAllBrands ? '#003B6F' : tierInfo?.color) + '15' }}>📊</div>
             <div>
               <h3 className="font-semibold text-slate-800 mb-1">
                 {isAllBrands ? '品牌洞察摘要' : `${tierInfo?.name} 洞察摘要`}
@@ -421,7 +454,7 @@ function BrandOpsOverview({ brandTier }: { brandTier?: BrandTier | 'all' }) {
                 </p>
               ) : (
                 <p className="text-slate-600 text-sm leading-relaxed">
-                  {tierInfo?.name} 品牌评分 <span className="text-ihg-navy font-medium">{tierData?.score}</span>，
+                  {tierInfo?.name} 品牌评分 <span className="font-medium" style={{ color: tierInfo?.color }}>{tierData?.score}</span>，
                   趋势 <span className={tierData?.trend.startsWith('+') ? 'text-emerald-600 font-medium' : 'text-red-600 font-medium'}>{tierData?.trend}</span>。
                   核心亮点：{tierData?.highlights.map((h, i) => <span key={i} className="text-emerald-600 font-medium">{h}</span>).reduce((prev, curr, i) => <>{prev}{i > 0 && '、'}{curr}</>, <></>)}。
                   需关注：{tierData?.concerns.map((c, i) => <span key={i} className="text-amber-600 font-medium">{c}</span>).reduce((prev, curr, i) => <>{prev}{i > 0 && '、'}{curr}</>, <></>)}。
