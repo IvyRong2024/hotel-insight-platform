@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
+import { BrandTier } from '../data/mockData';
 
-export type UserRole = 'platform_admin' | 'brand_ops' | 'region_vp' | 'city_mgr' | 'hotel_mgr' | 'hotel_mgr_new' | 'revenue_mgr';
+export type UserRole = 'platform_admin' | 'brand_ops' | 'brand_ops_luxury' | 'brand_ops_premium' | 'brand_ops_essentials' | 'brand_ops_suites' | 'region_vp' | 'city_mgr' | 'hotel_mgr' | 'hotel_mgr_new' | 'revenue_mgr';
 
 interface RoleConfig {
   id: UserRole;
@@ -11,6 +12,7 @@ interface RoleConfig {
   city?: string;
   hotel?: string;
   hotelId?: string;
+  brandTier?: BrandTier | 'all'; // 品牌运营负责的品牌类型
   accessModules: string[];
 }
 
@@ -24,9 +26,42 @@ export const roleConfigs: RoleConfig[] = [
   },
   { 
     id: 'brand_ops', 
-    name: '品牌运营', 
-    level: '全国',
-    description: '为品牌团队提供全国视角的真实品牌感知，含各品牌类型表现与竞品对比',
+    name: '品牌运营总监', 
+    level: '全国 · 全品牌',
+    description: '全品牌视角：洲际、丽晶、六善、金普顿、英迪格、皇冠假日、voco、假日、智选假日等',
+    brandTier: 'all',
+    accessModules: ['overview', 'brand'],
+  },
+  { 
+    id: 'brand_ops_luxury', 
+    name: '品牌运营 - Luxury & Lifestyle', 
+    level: '全国 · 奢华及生活方式',
+    description: '负责品牌：洲际酒店、丽晶、六善、金普顿、英迪格',
+    brandTier: 'luxury_lifestyle',
+    accessModules: ['overview', 'brand'],
+  },
+  { 
+    id: 'brand_ops_premium', 
+    name: '品牌运营 - Premium', 
+    level: '全国 · 高端',
+    description: '负责品牌：皇冠假日、voco、EVEN Hotels',
+    brandTier: 'premium',
+    accessModules: ['overview', 'brand'],
+  },
+  { 
+    id: 'brand_ops_essentials', 
+    name: '品牌运营 - Essentials', 
+    level: '全国 · 精选服务',
+    description: '负责品牌：假日酒店、智选假日',
+    brandTier: 'essentials',
+    accessModules: ['overview', 'brand'],
+  },
+  { 
+    id: 'brand_ops_suites', 
+    name: '品牌运营 - Suites', 
+    level: '全国 · 长住',
+    description: '负责品牌：馨乐庭、Atwell Suites',
+    brandTier: 'suites',
     accessModules: ['overview', 'brand'],
   },
   { 

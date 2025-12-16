@@ -12,7 +12,7 @@ const viewportGroups = [
     icon: <Building2 size={24} />,
     color: 'from-violet-500 to-purple-600',
     description: '全国品牌健康监测、品牌承诺验证、竞品对比分析',
-    roles: ['brand_ops'],
+    roles: ['brand_ops', 'brand_ops_luxury', 'brand_ops_premium', 'brand_ops_essentials', 'brand_ops_suites'],
   },
   {
     id: 'hotel',
@@ -43,6 +43,10 @@ const viewportGroups = [
 const roleIcons: Record<UserRole, React.ReactNode> = {
   platform_admin: <Settings size={18} />,
   brand_ops: <TrendingUp size={18} />,
+  brand_ops_luxury: <Building2 size={18} />,
+  brand_ops_premium: <Building2 size={18} />,
+  brand_ops_essentials: <Building2 size={18} />,
+  brand_ops_suites: <Building2 size={18} />,
   region_vp: <Users size={18} />,
   city_mgr: <MapPin size={18} />,
   hotel_mgr: <Hotel size={18} />,

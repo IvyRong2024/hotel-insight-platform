@@ -28,10 +28,13 @@ export function Overview() {
   
   if (!currentRole) return null;
 
+  // 判断是否是品牌运营角色
+  const isBrandOps = currentRole.id.startsWith('brand_ops');
+
   return (
     <Layout title="Overview" subtitle={currentRole.description} requiredModule="overview">
       {currentRole.id === 'platform_admin' && <PlatformAdminOverview />}
-      {currentRole.id === 'brand_ops' && <BrandOpsOverview />}
+      {isBrandOps && <BrandOpsOverview brandTier={currentRole.brandTier} />}
       {currentRole.id === 'region_vp' && <RegionVPOverview />}
       {currentRole.id === 'city_mgr' && <CityMgrOverview />}
       {currentRole.id === 'hotel_mgr' && <HotelMgrOverview />}
@@ -298,53 +301,104 @@ function PlatformScoreRatioCard({
 }
 
 // ========== 品牌运营 Overview ==========
-function BrandOpsOverview() {
+function BrandOpsOverview({ brandTier }: { brandTier?: BrandTier | 'all' }) {
+  const isAllBrands = !brandTier || brandTier === 'all';
+  
+  // 根据品牌类型筛选数据
+  const tierData = isAllBrands ? null : brandHealthData.tierPerformance[brandTier];
+  const tierInfo = isAllBrands ? null : brandTiers[brandTier];
+  
+  // 筛选对应档次的竞品数据
+  const relevantCompetitors = isAllBrands 
+    ? brandCompetitorData 
+    : brandCompetitorData.filter(c => c.tier === brandTier);
+
   const gap = (brandHealthData.overallScore - competitorData.metrics.综合评分[1]).toFixed(2);
   const isLeading = parseFloat(gap) > 0;
   const vsHilton = (brandHealthData.overallScore - competitorData.metrics.综合评分[2]).toFixed(2);
 
   return (
     <div className="space-y-6">
+      {/* 品牌类型标识（非全品牌时显示） */}
+      {!isAllBrands && tierInfo && (
+        <div className="flex items-center gap-3 px-4 py-3 rounded-xl" style={{ backgroundColor: tierInfo.color + '15' }}>
+          <div className="w-4 h-4 rounded-full" style={{ backgroundColor: tierInfo.color }} />
+          <span className="font-semibold" style={{ color: tierInfo.color }}>{tierInfo.name}</span>
+          <span className="text-slate-500 text-sm">品牌类型视角</span>
+        </div>
+      )}
+
       {/* 品牌综合评分 */}
       <section className="animate-fade-in-up">
         <div className="bg-gradient-to-r from-ihg-navy to-ihg-navy-light rounded-2xl p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-white/60 text-sm mb-1">IHG 品牌综合评分</p>
+              <p className="text-white/60 text-sm mb-1">
+                {isAllBrands ? 'IHG 品牌综合评分' : `${tierInfo?.name} 品牌评分`}
+              </p>
               <div className="flex items-end gap-3">
-                <span className="text-5xl font-bold">{brandHealthData.overallScore}</span>
-                <div className="flex gap-2 mb-1">
+                <span className="text-5xl font-bold">
+                  {isAllBrands ? brandHealthData.overallScore : tierData?.score}
+                </span>
+                {isAllBrands ? (
+                  <div className="flex gap-2 mb-1">
+                    <span className={clsx(
+                      'flex items-center gap-1 px-3 py-1 rounded-full text-sm',
+                      isLeading ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-300'
+                    )}>
+                      {isLeading ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                      vs万豪 {gap}
+                    </span>
+                    <span className={clsx(
+                      'flex items-center gap-1 px-3 py-1 rounded-full text-sm',
+                      parseFloat(vsHilton) >= 0 ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-300'
+                    )}>
+                      vs希尔顿 {vsHilton}
+                    </span>
+                  </div>
+                ) : (
                   <span className={clsx(
-                    'flex items-center gap-1 px-3 py-1 rounded-full text-sm',
-                    isLeading ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-300'
+                    'flex items-center gap-1 px-3 py-1 rounded-full text-sm mb-1',
+                    tierData?.trend.startsWith('+') ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-300'
                   )}>
-                    {isLeading ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                    vs万豪 {gap}
+                    {tierData?.trend.startsWith('+') ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                    {tierData?.trend}
                   </span>
-                  <span className={clsx(
-                    'flex items-center gap-1 px-3 py-1 rounded-full text-sm',
-                    parseFloat(vsHilton) >= 0 ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-300'
-                  )}>
-                    vs希尔顿 {vsHilton}
-                  </span>
-                </div>
+                )}
               </div>
             </div>
-            <div className="grid grid-cols-4 gap-4">
-              {competitorData.brands.map((brand, idx) => (
-                <div key={brand} className="text-center px-4 py-2 bg-white/10 rounded-xl">
-                  <p className="text-white/50 text-xs mb-1">{brand}</p>
-                  <p className="text-xl font-bold">{competitorData.metrics.综合评分[idx]}</p>
-                </div>
-              ))}
-            </div>
+            {isAllBrands ? (
+              <div className="grid grid-cols-4 gap-4">
+                {competitorData.brands.map((brand, idx) => (
+                  <div key={brand} className="text-center px-4 py-2 bg-white/10 rounded-xl">
+                    <p className="text-white/50 text-xs mb-1">{brand}</p>
+                    <p className="text-xl font-bold">{competitorData.metrics.综合评分[idx]}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-3 gap-4">
+                {relevantCompetitors[0]?.competitors.slice(0, 3).map((comp) => (
+                  <div key={comp.brand} className="text-center px-4 py-2 bg-white/10 rounded-xl">
+                    <p className="text-white/50 text-xs mb-1">{comp.brand}</p>
+                    <p className="text-xl font-bold">{comp.score}</p>
+                    <p className={clsx(
+                      'text-xs',
+                      comp.diff.startsWith('+') ? 'text-emerald-300' : 'text-red-300'
+                    )}>
+                      {comp.diff.startsWith('+') ? '领先' : '落后'} {comp.diff.replace(/[+-]/, '')}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>
 
       {/* 各平台高分占比 - 总分依据 */}
       <section className="animate-fade-in-up delay-50">
-        <PlatformScoreRatioCard data={platformScoreStandards} title="全国各平台高分评论占比" />
+        <PlatformScoreRatioCard data={platformScoreStandards} title={isAllBrands ? "全国各平台高分评论占比" : `${tierInfo?.name} 各平台高分评论占比`} />
       </section>
 
       {/* 品牌故事 Narrative */}
@@ -353,15 +407,27 @@ function BrandOpsOverview() {
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 bg-ihg-navy/10 rounded-xl flex items-center justify-center text-xl">📊</div>
             <div>
-              <h3 className="font-semibold text-slate-800 mb-1">品牌洞察摘要</h3>
-              <p className="text-slate-600 text-sm leading-relaxed">
-                IHG整体表现稳健，综合评分<span className="text-emerald-600 font-medium">领先万豪</span>但
-                <span className="text-red-600 font-medium">略落后希尔顿</span>。
-                各平台高分占比达<span className="text-ihg-navy font-medium">{platformScoreStandards.summary.overallHighScoreRatio}%</span>，
-                其中境外渠道表现更优（{platformScoreStandards.summary.overseasHighScoreRatio}%）。
-                「<span className="text-red-600 font-medium">智能体验</span>」承诺感知度仅45%，是当前最大短板。
-                <span className="text-amber-600 font-medium">万豪双12促销力度大（5折起）</span>，注意价格敏感用户流失风险。
-              </p>
+              <h3 className="font-semibold text-slate-800 mb-1">
+                {isAllBrands ? '品牌洞察摘要' : `${tierInfo?.name} 洞察摘要`}
+              </h3>
+              {isAllBrands ? (
+                <p className="text-slate-600 text-sm leading-relaxed">
+                  IHG整体表现稳健，综合评分<span className="text-emerald-600 font-medium">领先万豪</span>但
+                  <span className="text-red-600 font-medium">略落后希尔顿</span>。
+                  各平台高分占比达<span className="text-ihg-navy font-medium">{platformScoreStandards.summary.overallHighScoreRatio}%</span>，
+                  其中境外渠道表现更优（{platformScoreStandards.summary.overseasHighScoreRatio}%）。
+                  「<span className="text-red-600 font-medium">智能体验</span>」承诺感知度仅45%，是当前最大短板。
+                  <span className="text-amber-600 font-medium">万豪双12促销力度大（5折起）</span>，注意价格敏感用户流失风险。
+                </p>
+              ) : (
+                <p className="text-slate-600 text-sm leading-relaxed">
+                  {tierInfo?.name} 品牌评分 <span className="text-ihg-navy font-medium">{tierData?.score}</span>，
+                  趋势 <span className={tierData?.trend.startsWith('+') ? 'text-emerald-600 font-medium' : 'text-red-600 font-medium'}>{tierData?.trend}</span>。
+                  核心亮点：{tierData?.highlights.map((h, i) => <span key={i} className="text-emerald-600 font-medium">{h}</span>).reduce((prev, curr, i) => <>{prev}{i > 0 && '、'}{curr}</>, <></>)}。
+                  需关注：{tierData?.concerns.map((c, i) => <span key={i} className="text-amber-600 font-medium">{c}</span>).reduce((prev, curr, i) => <>{prev}{i > 0 && '、'}{curr}</>, <></>)}。
+                  重点关注领域：{tierInfo?.focusAreas.join('、')}。
+                </p>
+              )}
             </div>
           </div>
         </Card>
@@ -405,53 +471,59 @@ function BrandOpsOverview() {
         </div>
       </section>
 
-      {/* 各品牌类型表现 */}
-      <section className="animate-fade-in-up delay-150">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-base font-semibold text-slate-800">📊 各品牌类型全国表现</h3>
-        </div>
-        <div className="grid grid-cols-4 gap-4">
-          {(Object.entries(brandHealthData.tierPerformance) as [BrandTier, typeof brandHealthData.tierPerformance.luxury_lifestyle][]).map(([tier, data]) => (
-            <Card key={tier} padding="sm">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: brandTiers[tier].color }} />
-                <span className="font-medium text-slate-800">{brandTiers[tier].name}</span>
-              </div>
-              <div className="flex items-end gap-2 mb-2">
-                <span className="text-2xl font-bold text-slate-800">{data.score}</span>
-                <span className={clsx(
-                  'text-sm',
-                  data.trend.startsWith('+') ? 'text-emerald-600' : 'text-red-600'
-                )}>
-                  {data.trend}
-                </span>
-              </div>
-              <div className="space-y-1">
-                {data.highlights.map((h, i) => (
-                  <p key={i} className="text-xs text-emerald-600">✓ {h}</p>
-                ))}
-                {data.concerns.map((c, i) => (
-                  <p key={i} className="text-xs text-amber-600">⚠ {c}</p>
-                ))}
-              </div>
-            </Card>
-          ))}
-        </div>
-      </section>
+      {/* 各品牌类型表现（仅全品牌视角显示） */}
+      {isAllBrands && (
+        <section className="animate-fade-in-up delay-150">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base font-semibold text-slate-800">📊 各品牌类型全国表现</h3>
+          </div>
+          <div className="grid grid-cols-4 gap-4">
+            {(Object.entries(brandHealthData.tierPerformance) as [BrandTier, typeof brandHealthData.tierPerformance.luxury_lifestyle][]).map(([tier, data]) => (
+              <Card key={tier} padding="sm">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: brandTiers[tier].color }} />
+                  <span className="font-medium text-slate-800">{brandTiers[tier].name}</span>
+                </div>
+                <div className="flex items-end gap-2 mb-2">
+                  <span className="text-2xl font-bold text-slate-800">{data.score}</span>
+                  <span className={clsx(
+                    'text-sm',
+                    data.trend.startsWith('+') ? 'text-emerald-600' : 'text-red-600'
+                  )}>
+                    {data.trend}
+                  </span>
+                </div>
+                <div className="space-y-1">
+                  {data.highlights.map((h, i) => (
+                    <p key={i} className="text-xs text-emerald-600">✓ {h}</p>
+                  ))}
+                  {data.concerns.map((c, i) => (
+                    <p key={i} className="text-xs text-amber-600">⚠ {c}</p>
+                  ))}
+                </div>
+              </Card>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* 品牌级别竞品对比（非集团层面） */}
       <section className="animate-fade-in-up delay-200">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-base font-semibold text-slate-800">🎯 品牌级别竞品对比</h3>
-            <p className="text-xs text-slate-500 mt-0.5">按品牌档次对标同类竞品品牌，而非集团层面</p>
+            <h3 className="text-base font-semibold text-slate-800">
+              🎯 {isAllBrands ? '品牌级别竞品对比' : `${tierInfo?.name} 竞品品牌对比`}
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">
+              {isAllBrands ? '按品牌档次对标同类竞品品牌，而非集团层面' : `对标同档次竞品品牌表现`}
+            </p>
           </div>
           <Link to="/brand" className="text-sm text-ihg-navy hover:underline flex items-center gap-1">
             查看详情 <ArrowRight size={14} />
           </Link>
         </div>
         <div className="space-y-3">
-          {brandCompetitorData.slice(0, 4).map((item) => (
+          {relevantCompetitors.map((item) => (
             <Card key={item.ihgBrand} padding="sm">
               <div className="flex items-center gap-4">
                 {/* IHG品牌 */}
