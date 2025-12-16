@@ -436,7 +436,10 @@ function BrandOpsOverview() {
 
       {/* 品牌故事 Narrative */}
       <section className="animate-fade-in-up delay-100">
-        <Card className="bg-gradient-to-r from-slate-50 to-white border-l-4" style={{ borderLeftColor: isAllBrands ? '#003B6F' : tierInfo?.color }}>
+        <div 
+          className="bg-gradient-to-r from-slate-50 to-white border-l-4 rounded-2xl p-5" 
+          style={{ borderLeftColor: isAllBrands ? '#003B6F' : tierInfo?.color }}
+        >
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style={{ backgroundColor: (isAllBrands ? '#003B6F' : tierInfo?.color) + '15' }}>📊</div>
             <div>
@@ -463,7 +466,7 @@ function BrandOpsOverview() {
               )}
             </div>
           </div>
-        </Card>
+        </div>
       </section>
 
       {/* 品牌承诺兑现 */}
