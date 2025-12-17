@@ -224,28 +224,33 @@ export function BrandView() {
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-base font-semibold text-slate-800">✅ 品牌驱动因素</h3>
             </div>
-            <Card>
+            <Card className="h-full">
               <div className="space-y-4">
-                {brandDriversData.map((driver) => (
-                  <div key={driver.driver} className="flex items-center gap-4">
-                    <div className="w-24 text-sm font-medium text-slate-700">{driver.driver}</div>
-                    <div className="flex-1">
+                {brandDriversData.map((driver, idx) => (
+                  <div key={driver.driver} className={clsx(
+                    'flex items-center gap-4 pb-4',
+                    idx !== brandDriversData.length - 1 && 'border-b border-slate-100'
+                  )}>
+                    <div className="w-20 text-sm font-medium text-slate-700 shrink-0">{driver.driver}</div>
+                    <div className="flex-1 min-w-0">
                       <ProgressBar value={driver.score} color="green" size="md" />
                     </div>
-                    <div className="w-12 text-right font-bold text-emerald-600">{driver.score}</div>
-                    <div className="w-16 text-right text-sm text-emerald-600">{driver.impact}</div>
+                    <div className="w-10 text-right font-bold text-emerald-600 text-lg shrink-0">{driver.score}</div>
+                    <div className="w-14 text-right text-sm text-emerald-500 shrink-0">{driver.impact}</div>
                   </div>
                 ))}
               </div>
-              <div className="mt-4 pt-4 border-t border-slate-100">
-                <p className="text-sm text-slate-600">
-                  <span className="font-medium">热词云：</span>
-                  {brandDriversData.flatMap(d => d.keywords).slice(0, 8).map((kw, i) => (
-                    <span key={i} className="inline-block mx-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded text-xs">
-                      {kw}
-                    </span>
-                  ))}
-                </p>
+              <div className="mt-4 pt-4 border-t border-slate-200">
+                <div className="flex items-start gap-2">
+                  <span className="text-sm font-medium text-slate-600 shrink-0">热词云：</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {brandDriversData.flatMap(d => d.keywords).slice(0, 8).map((kw, i) => (
+                      <span key={i} className="inline-block px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded text-xs font-medium">
+                        {kw}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
             </Card>
           </section>
@@ -255,37 +260,54 @@ export function BrandView() {
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-base font-semibold text-slate-800">🚨 品牌障碍因素</h3>
             </div>
-            <Card>
+            <Card className="h-full">
               <div className="space-y-3">
-                {brandBarriersData.map((barrier) => (
+                {brandBarriersData.map((barrier, idx) => (
                   <div key={barrier.barrier} className={clsx(
-                    'p-3 rounded-xl',
-                    barrier.severity === 'high' ? 'bg-red-50' : 
-                    barrier.severity === 'medium' ? 'bg-amber-50' : 'bg-slate-50'
+                    'flex items-center gap-3 pb-3',
+                    idx !== brandBarriersData.length - 1 && 'border-b border-slate-100'
                   )}>
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-slate-800">{barrier.barrier}</span>
+                    {/* 左侧风险指示条 */}
+                    <div className={clsx(
+                      'w-1 h-12 rounded-full shrink-0',
+                      barrier.severity === 'high' ? 'bg-red-500' : 
+                      barrier.severity === 'medium' ? 'bg-amber-500' : 'bg-slate-300'
+                    )} />
+                    
+                    {/* 中间信息 */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-semibold text-slate-800">{barrier.barrier}</span>
                         <Badge variant={barrier.severity === 'high' ? 'danger' : barrier.severity === 'medium' ? 'warning' : 'info'}>
                           {barrier.severity === 'high' ? '高风险' : barrier.severity === 'medium' ? '中风险' : '低风险'}
                         </Badge>
-                        <span className="text-xs px-2 py-0.5 rounded" style={{ 
-                          backgroundColor: brandTiers[barrier.affectedTier as BrandTier].color + '20', 
+                        <span className="text-xs px-2 py-0.5 rounded font-medium" style={{ 
+                          backgroundColor: brandTiers[barrier.affectedTier as BrandTier].color + '15', 
                           color: brandTiers[barrier.affectedTier as BrandTier].color 
                         }}>
                           {brandTiers[barrier.affectedTier as BrandTier].name}
                         </span>
                       </div>
-                      <span className={clsx(
-                        'text-sm font-bold',
-                        barrier.impact < -0.2 ? 'text-red-600' : 'text-amber-600'
-                      )}>
-                        {barrier.impact}
-                      </span>
+                      <div className="flex items-center gap-3 text-xs text-slate-500">
+                        <span>{barrier.mentions.toLocaleString()} 次提及</span>
+                        <span className="flex items-center gap-1">
+                          趋势 
+                          <span className={clsx(
+                            barrier.trend === '↑' ? 'text-red-500' : 
+                            barrier.trend === '↓' ? 'text-emerald-500' : 'text-slate-400'
+                          )}>
+                            {barrier.trend}
+                          </span>
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-4 text-sm text-slate-500">
-                      <span>{barrier.mentions.toLocaleString()} 次提及</span>
-                      <span>趋势 {barrier.trend}</span>
+                    
+                    {/* 右侧影响分数 */}
+                    <div className={clsx(
+                      'text-lg font-bold shrink-0 w-14 text-right',
+                      barrier.impact < -0.2 ? 'text-red-600' : 'text-amber-600'
+                    )}>
+                      {barrier.impact}
                     </div>
                   </div>
                 ))}
