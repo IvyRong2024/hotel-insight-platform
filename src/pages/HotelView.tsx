@@ -13,11 +13,13 @@ import {
   cityCompetitorHotels,
   brandCompetitorData,
   reviewAppealsData,
+  negativeReviewsData,
   BrandTier,
   HotelData,
   CityData,
   ReviewPlatform,
-  ReviewAppeal
+  ReviewAppeal,
+  NegativeReview
 } from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
 import { 
@@ -36,7 +38,8 @@ import {
   FileText,
   Upload,
   MessageSquare,
-  XCircle
+  XCircle,
+  Search
 } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -1719,41 +1722,82 @@ function AddToWatchlistModal({
 
 // ========== 差评申诉管理 ==========
 function ReviewAppealSection({ hotelId }: { hotelId: string }) {
-  const [showAppealForm, setShowAppealForm] = useState(false);
+  const [showAppealModal, setShowAppealModal] = useState(false);
+  const [currentStep, setCurrentStep] = useState<'search' | 'appeal'>('search');
+  const [selectedReview, setSelectedReview] = useState<NegativeReview | null>(null);
   const [appeals, setAppeals] = useState<ReviewAppeal[]>(
     reviewAppealsData.filter(a => a.hotelId === hotelId)
   );
-  const [formData, setFormData] = useState({
-    reviewId: '',
-    platform: '携程' as ReviewPlatform,
-    reviewContent: '',
-    reviewerName: '',
-    reviewDate: '',
-    reviewScore: 1,
-    appealReason: '',
-    proofUrl: '',
+  
+  // 搜索相关状态
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [searchPlatform, setSearchPlatform] = useState<ReviewPlatform | 'all'>('all');
+  const [searchDateFrom, setSearchDateFrom] = useState('');
+  const [searchDateTo, setSearchDateTo] = useState('');
+  
+  // 申诉表单状态
+  const [appealReason, setAppealReason] = useState('');
+  const [proofUrl, setProofUrl] = useState('');
+
+  // 获取本酒店的负面评论
+  const hotelNegativeReviews = negativeReviewsData.filter(r => r.hotelId === hotelId);
+
+  // 搜索过滤
+  const filteredReviews = hotelNegativeReviews.filter(review => {
+    // 关键词过滤（评论内容、用户名、评论ID）
+    const matchesKeyword = !searchKeyword || 
+      review.content.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+      review.reviewerName.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+      review.id.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+      review.orderId.toLowerCase().includes(searchKeyword.toLowerCase());
+    
+    // 平台过滤
+    const matchesPlatform = searchPlatform === 'all' || review.platform === searchPlatform;
+    
+    // 日期过滤
+    const reviewDate = new Date(review.date);
+    const matchesDateFrom = !searchDateFrom || reviewDate >= new Date(searchDateFrom);
+    const matchesDateTo = !searchDateTo || reviewDate <= new Date(searchDateTo);
+    
+    return matchesKeyword && matchesPlatform && matchesDateFrom && matchesDateTo;
   });
 
-  const handleSubmit = () => {
+  const handleSelectReview = (review: NegativeReview) => {
+    setSelectedReview(review);
+    setCurrentStep('appeal');
+  };
+
+  const handleSubmitAppeal = () => {
+    if (!selectedReview) return;
+    
     const newAppeal: ReviewAppeal = {
       id: `appeal-${Date.now()}`,
-      ...formData,
+      reviewId: selectedReview.id,
+      platform: selectedReview.platform,
+      reviewContent: selectedReview.content,
+      reviewerName: selectedReview.reviewerName,
+      reviewDate: selectedReview.date,
+      reviewScore: selectedReview.score,
       appealDate: new Date().toISOString().split('T')[0],
+      appealReason,
+      proofUrl: proofUrl || undefined,
       status: 'pending',
       hotelId,
     };
     setAppeals([newAppeal, ...appeals]);
-    setShowAppealForm(false);
-    setFormData({
-      reviewId: '',
-      platform: '携程',
-      reviewContent: '',
-      reviewerName: '',
-      reviewDate: '',
-      reviewScore: 1,
-      appealReason: '',
-      proofUrl: '',
-    });
+    handleCloseModal();
+  };
+
+  const handleCloseModal = () => {
+    setShowAppealModal(false);
+    setCurrentStep('search');
+    setSelectedReview(null);
+    setSearchKeyword('');
+    setSearchPlatform('all');
+    setSearchDateFrom('');
+    setSearchDateTo('');
+    setAppealReason('');
+    setProofUrl('');
   };
 
   const getStatusBadge = (status: ReviewAppeal['status']) => {
@@ -1767,6 +1811,18 @@ function ReviewAppealSection({ hotelId }: { hotelId: string }) {
     }
   };
 
+  const getReviewStatusBadge = (review: NegativeReview) => {
+    if (!review.isAppealed) return null;
+    switch (review.appealStatus) {
+      case 'approved':
+        return <Badge variant="success">已剔除</Badge>;
+      case 'rejected':
+        return <Badge variant="danger">申诉驳回</Badge>;
+      default:
+        return <Badge variant="warning">审核中</Badge>;
+    }
+  };
+
   return (
     <section className="animate-fade-in-up">
       <div className="flex items-center justify-between mb-4">
@@ -1775,7 +1831,7 @@ function ReviewAppealSection({ hotelId }: { hotelId: string }) {
           <span className="text-xs text-slate-500">申诉通过后，负面评价将从洞察分析中剔除，次日刷新评分</span>
         </div>
         <button
-          onClick={() => setShowAppealForm(true)}
+          onClick={() => setShowAppealModal(true)}
           className="px-4 py-2 bg-ihg-navy text-white text-sm rounded-lg hover:bg-ihg-navy-light transition-colors flex items-center gap-2"
         >
           <Plus size={16} />
@@ -1783,157 +1839,225 @@ function ReviewAppealSection({ hotelId }: { hotelId: string }) {
         </button>
       </div>
 
-      {/* 申诉表单弹窗 */}
-      {showAppealForm && (
+      {/* 申诉弹窗 - 两步流程 */}
+      {showAppealModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="w-[600px] max-h-[90vh] overflow-y-auto">
+          <Card className="w-[700px] max-h-[90vh] overflow-y-auto">
+            {/* 步骤指示器 */}
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-slate-800">提交差评申诉</h3>
-              <button onClick={() => setShowAppealForm(false)} className="text-slate-400 hover:text-slate-600">
+              <div className="flex items-center gap-4">
+                <div className={clsx(
+                  'flex items-center gap-2 px-3 py-1 rounded-full text-sm',
+                  currentStep === 'search' ? 'bg-ihg-navy text-white' : 'bg-slate-100 text-slate-500'
+                )}>
+                  <Search size={14} />
+                  <span>1. 查找评论</span>
+                </div>
+                <ChevronRight size={16} className="text-slate-300" />
+                <div className={clsx(
+                  'flex items-center gap-2 px-3 py-1 rounded-full text-sm',
+                  currentStep === 'appeal' ? 'bg-ihg-navy text-white' : 'bg-slate-100 text-slate-500'
+                )}>
+                  <FileText size={14} />
+                  <span>2. 提交申诉</span>
+                </div>
+              </div>
+              <button onClick={handleCloseModal} className="text-slate-400 hover:text-slate-600">
                 <X size={20} />
               </button>
             </div>
 
-            <div className="space-y-4">
-              {/* 评论ID */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  评论ID <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.reviewId}
-                  onChange={(e) => setFormData({ ...formData, reviewId: e.target.value })}
-                  placeholder="请输入平台评论ID，如 REV-2024121501"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-ihg-navy"
-                />
-              </div>
+            {/* 步骤1: 查找评论 */}
+            {currentStep === 'search' && (
+              <div className="space-y-4">
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                  <p className="text-sm text-blue-800">
+                    <b>💡 提示：</b>请通过关键词、平台、日期等条件查找需要申诉的差评，获取评论ID后进行申诉提交。
+                  </p>
+                </div>
 
-              {/* 平台选择 */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  评论平台 <span className="text-red-500">*</span>
-                </label>
-                <select
-                  value={formData.platform}
-                  onChange={(e) => setFormData({ ...formData, platform: e.target.value as ReviewPlatform })}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-ihg-navy"
+                {/* 搜索条件 */}
+                <div className="grid grid-cols-4 gap-3">
+                  <div className="col-span-2">
+                    <label className="block text-xs text-slate-500 mb-1">关键词搜索</label>
+                    <div className="relative">
+                      <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        type="text"
+                        value={searchKeyword}
+                        onChange={(e) => setSearchKeyword(e.target.value)}
+                        placeholder="评论内容、用户名、评论ID、订单号"
+                        className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-ihg-navy"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-slate-500 mb-1">评论平台</label>
+                    <select
+                      value={searchPlatform}
+                      onChange={(e) => setSearchPlatform(e.target.value as ReviewPlatform | 'all')}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-ihg-navy"
+                    >
+                      <option value="all">全部平台</option>
+                      {reviewPlatforms.map(p => (
+                        <option key={p} value={p}>{p}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-slate-500 mb-1">评论日期</label>
+                    <input
+                      type="date"
+                      value={searchDateFrom}
+                      onChange={(e) => setSearchDateFrom(e.target.value)}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-ihg-navy"
+                    />
+                  </div>
+                </div>
+
+                {/* 搜索结果 */}
+                <div className="border border-slate-200 rounded-xl overflow-hidden">
+                  <div className="bg-slate-50 px-4 py-2 border-b border-slate-200">
+                    <span className="text-sm font-medium text-slate-700">
+                      搜索结果 ({filteredReviews.length} 条差评)
+                    </span>
+                  </div>
+                  <div className="max-h-[400px] overflow-y-auto">
+                    {filteredReviews.length > 0 ? (
+                      <div className="divide-y divide-slate-100">
+                        {filteredReviews.map(review => (
+                          <div key={review.id} className={clsx(
+                            'p-4 hover:bg-slate-50 transition-colors',
+                            review.isAppealed && 'opacity-60'
+                          )}>
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs font-mono bg-slate-100 px-2 py-0.5 rounded">{review.id}</span>
+                                <Badge variant="info">{review.platform}</Badge>
+                                <div className="flex items-center gap-0.5">
+                                  {[...Array(5)].map((_, i) => (
+                                    <Star key={i} size={10} className={i < review.score ? 'text-amber-400 fill-amber-400' : 'text-slate-200'} />
+                                  ))}
+                                </div>
+                                {getReviewStatusBadge(review)}
+                              </div>
+                              <span className="text-xs text-slate-400">{review.date}</span>
+                            </div>
+                            <p className="text-sm text-slate-700 mb-2">{review.content}</p>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-4 text-xs text-slate-500">
+                                <span>用户: {review.reviewerName}</span>
+                                <span>订单: {review.orderId}</span>
+                              </div>
+                              {!review.isAppealed ? (
+                                <button
+                                  onClick={() => handleSelectReview(review)}
+                                  className="px-3 py-1 bg-ihg-navy text-white text-xs rounded-lg hover:bg-ihg-navy-light transition-colors"
+                                >
+                                  选择申诉
+                                </button>
+                              ) : (
+                                <span className="text-xs text-slate-400">已申诉</span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="py-12 text-center">
+                        <Search size={32} className="mx-auto text-slate-300 mb-3" />
+                        <p className="text-slate-500 text-sm">没有找到匹配的差评</p>
+                        <p className="text-xs text-slate-400 mt-1">请尝试调整搜索条件</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 步骤2: 提交申诉 */}
+            {currentStep === 'appeal' && selectedReview && (
+              <div className="space-y-4">
+                <button
+                  onClick={() => setCurrentStep('search')}
+                  className="text-sm text-ihg-navy hover:underline flex items-center gap-1"
                 >
-                  {reviewPlatforms.map(p => (
-                    <option key={p} value={p}>{p}</option>
-                  ))}
-                </select>
-              </div>
+                  ← 返回查找评论
+                </button>
 
-              {/* 评论日期和评分 */}
-              <div className="grid grid-cols-2 gap-4">
+                {/* 选中的评论 */}
+                <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-mono bg-white px-2 py-0.5 rounded border">{selectedReview.id}</span>
+                      <Badge variant="info">{selectedReview.platform}</Badge>
+                      <div className="flex items-center gap-0.5">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} size={10} className={i < selectedReview.score ? 'text-amber-400 fill-amber-400' : 'text-slate-200'} />
+                        ))}
+                      </div>
+                    </div>
+                    <span className="text-xs text-slate-500">{selectedReview.date}</span>
+                  </div>
+                  <p className="text-sm text-slate-800 mb-2">{selectedReview.content}</p>
+                  <div className="flex items-center gap-4 text-xs text-slate-600">
+                    <span>用户: {selectedReview.reviewerName}</span>
+                    <span>订单: {selectedReview.orderId}</span>
+                  </div>
+                </div>
+
+                {/* 申诉表单 */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">
-                    评论日期 <span className="text-red-500">*</span>
+                    申诉理由 <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="date"
-                    value={formData.reviewDate}
-                    onChange={(e) => setFormData({ ...formData, reviewDate: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-ihg-navy"
+                  <textarea
+                    value={appealReason}
+                    onChange={(e) => setAppealReason(e.target.value)}
+                    placeholder="请说明申诉理由，如：已与客人沟通达成一致，平台已删除/折叠该评论"
+                    rows={3}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-ihg-navy resize-none"
                   />
                 </div>
+
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">
-                    评论评分 <span className="text-red-500">*</span>
+                    平台处理证明
                   </label>
-                  <select
-                    value={formData.reviewScore}
-                    onChange={(e) => setFormData({ ...formData, reviewScore: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-ihg-navy"
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={proofUrl}
+                      onChange={(e) => setProofUrl(e.target.value)}
+                      placeholder="请输入证明截图链接或上传"
+                      className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-ihg-navy"
+                    />
+                    <button className="px-4 py-2 border border-slate-200 rounded-lg text-sm text-slate-600 hover:bg-slate-50 flex items-center gap-1">
+                      <Upload size={14} />
+                      上传
+                    </button>
+                  </div>
+                  <p className="text-xs text-slate-400 mt-1">请提供平台处理完成的截图或链接作为证明</p>
+                </div>
+
+                {/* 提交按钮 */}
+                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                  <button
+                    onClick={handleCloseModal}
+                    className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg text-sm transition-colors"
                   >
-                    <option value={1}>1分</option>
-                    <option value={2}>2分</option>
-                    <option value={3}>3分</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* 发帖人名称 */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  发帖人名称 <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.reviewerName}
-                  onChange={(e) => setFormData({ ...formData, reviewerName: e.target.value })}
-                  placeholder="请输入评论发帖人名称"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-ihg-navy"
-                />
-              </div>
-
-              {/* 评论内容 */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  评论内容 <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  value={formData.reviewContent}
-                  onChange={(e) => setFormData({ ...formData, reviewContent: e.target.value })}
-                  placeholder="请粘贴完整的差评内容"
-                  rows={3}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-ihg-navy resize-none"
-                />
-              </div>
-
-              {/* 申诉理由 */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  申诉理由 <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  value={formData.appealReason}
-                  onChange={(e) => setFormData({ ...formData, appealReason: e.target.value })}
-                  placeholder="请说明申诉理由，如：已与客人沟通达成一致，平台已删除/折叠该评论"
-                  rows={2}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-ihg-navy resize-none"
-                />
-              </div>
-
-              {/* 平台处理证明 */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  平台处理证明
-                </label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={formData.proofUrl}
-                    onChange={(e) => setFormData({ ...formData, proofUrl: e.target.value })}
-                    placeholder="请输入证明截图链接或上传"
-                    className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-ihg-navy"
-                  />
-                  <button className="px-4 py-2 border border-slate-200 rounded-lg text-sm text-slate-600 hover:bg-slate-50 flex items-center gap-1">
-                    <Upload size={14} />
-                    上传
+                    取消
+                  </button>
+                  <button
+                    onClick={handleSubmitAppeal}
+                    disabled={!appealReason}
+                    className="px-6 py-2 bg-ihg-navy text-white rounded-lg text-sm hover:bg-ihg-navy-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    提交申诉
                   </button>
                 </div>
-                <p className="text-xs text-slate-400 mt-1">请提供平台处理完成的截图或链接作为证明</p>
               </div>
-            </div>
-
-            {/* 提交按钮 */}
-            <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-100">
-              <button
-                onClick={() => setShowAppealForm(false)}
-                className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg text-sm transition-colors"
-              >
-                取消
-              </button>
-              <button
-                onClick={handleSubmit}
-                disabled={!formData.reviewId || !formData.reviewContent || !formData.reviewerName || !formData.appealReason}
-                className="px-6 py-2 bg-ihg-navy text-white rounded-lg text-sm hover:bg-ihg-navy-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                提交申诉
-              </button>
-            </div>
+            )}
           </Card>
         </div>
       )}

@@ -1502,6 +1502,36 @@ export const cityPriceHierarchy: CityPriceData[] = [
   },
 ];
 
+// ==================== 负面评论库（可搜索） ====================
+export interface NegativeReview {
+  id: string;
+  platform: ReviewPlatform;
+  content: string;
+  reviewerName: string;
+  date: string;
+  score: number;
+  hotelId: string;
+  orderId: string;
+  isAppealed: boolean;
+  appealStatus?: 'pending' | 'approved' | 'rejected';
+}
+
+export const negativeReviewsData: NegativeReview[] = [
+  // 上海虹桥皇冠假日酒店 (h1)
+  { id: 'REV-2024121501', platform: '携程', content: '空调坏了一晚上没人修，前台态度很差，要求退款也不给。', reviewerName: '匿名用户', date: '2024-12-10', score: 2, hotelId: 'h1', orderId: 'ORD-CT-20241210-001', isAppealed: true, appealStatus: 'approved' },
+  { id: 'REV-2024121502', platform: '美团', content: '隔壁房间太吵了，打电话给前台也没人管。', reviewerName: '旅行者小王', date: '2024-12-08', score: 3, hotelId: 'h1', orderId: 'ORD-MT-20241208-002', isAppealed: true, appealStatus: 'pending' },
+  { id: 'REV-2024121503', platform: '飞猪', content: '早餐种类太少，而且补餐很慢。', reviewerName: '飞猪用户', date: '2024-12-05', score: 3, hotelId: 'h1', orderId: 'ORD-FZ-20241205-003', isAppealed: true, appealStatus: 'rejected' },
+  { id: 'REV-2024121504', platform: '携程', content: '热水器水温不稳定，洗澡体验很差。', reviewerName: '商务出差人', date: '2024-12-12', score: 2, hotelId: 'h1', orderId: 'ORD-CT-20241212-004', isAppealed: false },
+  { id: 'REV-2024121505', platform: '美团', content: '房间有异味，像是烟味，换了房间还是一样。', reviewerName: '带娃旅行', date: '2024-12-11', score: 2, hotelId: 'h1', orderId: 'ORD-MT-20241211-005', isAppealed: false },
+  { id: 'REV-2024121506', platform: 'Booking', content: 'Check-in took over 30 minutes, very slow service.', reviewerName: 'TravellerMike', date: '2024-12-09', score: 2, hotelId: 'h1', orderId: 'ORD-BK-20241209-006', isAppealed: false },
+  { id: 'REV-2024121507', platform: '携程', content: '隔音太差了，走廊说话都能听见。', reviewerName: '轻度睡眠者', date: '2024-12-07', score: 3, hotelId: 'h1', orderId: 'ORD-CT-20241207-007', isAppealed: false },
+  { id: 'REV-2024121508', platform: '飞猪', content: '电视遥控器没电，打了两次电话才有人来换。', reviewerName: '周末度假', date: '2024-12-06', score: 3, hotelId: 'h1', orderId: 'ORD-FZ-20241206-008', isAppealed: false },
+  // 杭州西湖假日酒店 (new-1) - 新店
+  { id: 'REV-2024121601', platform: '携程', content: '新开的酒店入住流程很慢，等了20分钟。', reviewerName: '杭州本地人', date: '2024-12-14', score: 3, hotelId: 'new-1', orderId: 'ORD-CT-20241214-101', isAppealed: false },
+  { id: 'REV-2024121602', platform: '美团', content: '早餐品种少，而且高峰期补餐跟不上。', reviewerName: '出差达人', date: '2024-12-13', score: 3, hotelId: 'new-1', orderId: 'ORD-MT-20241213-102', isAppealed: false },
+  { id: 'REV-2024121603', platform: '携程', content: '空调制热效果不好，晚上有点冷。', reviewerName: '冬季出行', date: '2024-12-12', score: 2, hotelId: 'new-1', orderId: 'ORD-CT-20241212-103', isAppealed: false },
+];
+
 // ==================== 差评申诉 ====================
 export interface ReviewAppeal {
   id: string;
