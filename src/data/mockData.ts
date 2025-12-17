@@ -1502,6 +1502,68 @@ export const cityPriceHierarchy: CityPriceData[] = [
   },
 ];
 
+// ==================== 差评申诉 ====================
+export interface ReviewAppeal {
+  id: string;
+  reviewId: string;
+  platform: ReviewPlatform;
+  reviewContent: string;
+  reviewerName: string;
+  reviewDate: string;
+  reviewScore: number;
+  appealDate: string;
+  appealReason: string;
+  proofUrl?: string;
+  status: 'pending' | 'approved' | 'rejected';
+  statusNote?: string;
+  hotelId: string;
+}
+
+export const reviewAppealsData: ReviewAppeal[] = [
+  {
+    id: 'appeal-1',
+    reviewId: 'REV-2024121501',
+    platform: '携程',
+    reviewContent: '空调坏了一晚上没人修，前台态度很差，要求退款也不给。',
+    reviewerName: '匿名用户',
+    reviewDate: '2024-12-10',
+    reviewScore: 2,
+    appealDate: '2024-12-12',
+    appealReason: '经与客人沟通，已全额退款并致歉，客人同意删评',
+    proofUrl: 'https://example.com/proof1.jpg',
+    status: 'approved',
+    statusNote: '已核实平台处理记录，评论已剔除',
+    hotelId: 'h1',
+  },
+  {
+    id: 'appeal-2',
+    reviewId: 'REV-2024121502',
+    platform: '美团',
+    reviewContent: '隔壁房间太吵了，打电话给前台也没人管。',
+    reviewerName: '旅行者小王',
+    reviewDate: '2024-12-08',
+    reviewScore: 3,
+    appealDate: '2024-12-14',
+    appealReason: '已与客人沟通并补偿，平台已折叠该评论',
+    status: 'pending',
+    hotelId: 'h1',
+  },
+  {
+    id: 'appeal-3',
+    reviewId: 'REV-2024121503',
+    platform: '飞猪',
+    reviewContent: '早餐种类太少，而且补餐很慢。',
+    reviewerName: '飞猪用户',
+    reviewDate: '2024-12-05',
+    reviewScore: 3,
+    appealDate: '2024-12-10',
+    appealReason: '申诉理由不充分',
+    status: 'rejected',
+    statusNote: '评论内容属实，无法剔除',
+    hotelId: 'h1',
+  },
+];
+
 // ==================== 关注清单 ====================
 export const watchlistData = [
   { hotelId: 'h9', name: '上海浦东假日酒店', reason: '评分持续下滑', score: 4.28, trend: '-0.08', tier: 'essentials' as BrandTier },

@@ -12,10 +12,12 @@ import {
   reviewPlatforms,
   cityCompetitorHotels,
   brandCompetitorData,
+  reviewAppealsData,
   BrandTier,
   HotelData,
   CityData,
-  ReviewPlatform
+  ReviewPlatform,
+  ReviewAppeal
 } from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
 import { 
@@ -30,7 +32,11 @@ import {
   Clock, 
   CheckCircle,
   Building,
-  Filter
+  Filter,
+  FileText,
+  Upload,
+  MessageSquare,
+  XCircle
 } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -1013,6 +1019,9 @@ function SingleHotelView({ hotelData, onBack, isNewOpening = false, hotelId }: {
         </div>
       </section>
 
+      {/* ===== 差评申诉管理 ===== */}
+      <ReviewAppealSection hotelId={hotelId || 'h1'} />
+
       {/* ===== 新店监测模块（仅新店店长可见）===== */}
       {isNewOpening && (
         <>
@@ -1705,5 +1714,313 @@ function AddToWatchlistModal({
         </div>
       </Card>
     </div>
+  );
+}
+
+// ========== 差评申诉管理 ==========
+function ReviewAppealSection({ hotelId }: { hotelId: string }) {
+  const [showAppealForm, setShowAppealForm] = useState(false);
+  const [appeals, setAppeals] = useState<ReviewAppeal[]>(
+    reviewAppealsData.filter(a => a.hotelId === hotelId)
+  );
+  const [formData, setFormData] = useState({
+    reviewId: '',
+    platform: '携程' as ReviewPlatform,
+    reviewContent: '',
+    reviewerName: '',
+    reviewDate: '',
+    reviewScore: 1,
+    appealReason: '',
+    proofUrl: '',
+  });
+
+  const handleSubmit = () => {
+    const newAppeal: ReviewAppeal = {
+      id: `appeal-${Date.now()}`,
+      ...formData,
+      appealDate: new Date().toISOString().split('T')[0],
+      status: 'pending',
+      hotelId,
+    };
+    setAppeals([newAppeal, ...appeals]);
+    setShowAppealForm(false);
+    setFormData({
+      reviewId: '',
+      platform: '携程',
+      reviewContent: '',
+      reviewerName: '',
+      reviewDate: '',
+      reviewScore: 1,
+      appealReason: '',
+      proofUrl: '',
+    });
+  };
+
+  const getStatusBadge = (status: ReviewAppeal['status']) => {
+    switch (status) {
+      case 'approved':
+        return <Badge variant="success">已通过</Badge>;
+      case 'rejected':
+        return <Badge variant="danger">已驳回</Badge>;
+      default:
+        return <Badge variant="warning">审核中</Badge>;
+    }
+  };
+
+  return (
+    <section className="animate-fade-in-up">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <h3 className="text-base font-semibold text-slate-800">📝 差评申诉管理</h3>
+          <span className="text-xs text-slate-500">申诉通过后，负面评价将从洞察分析中剔除，次日刷新评分</span>
+        </div>
+        <button
+          onClick={() => setShowAppealForm(true)}
+          className="px-4 py-2 bg-ihg-navy text-white text-sm rounded-lg hover:bg-ihg-navy-light transition-colors flex items-center gap-2"
+        >
+          <Plus size={16} />
+          提交新申诉
+        </button>
+      </div>
+
+      {/* 申诉表单弹窗 */}
+      {showAppealForm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="w-[600px] max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-slate-800">提交差评申诉</h3>
+              <button onClick={() => setShowAppealForm(false)} className="text-slate-400 hover:text-slate-600">
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {/* 评论ID */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  评论ID <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.reviewId}
+                  onChange={(e) => setFormData({ ...formData, reviewId: e.target.value })}
+                  placeholder="请输入平台评论ID，如 REV-2024121501"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-ihg-navy"
+                />
+              </div>
+
+              {/* 平台选择 */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  评论平台 <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={formData.platform}
+                  onChange={(e) => setFormData({ ...formData, platform: e.target.value as ReviewPlatform })}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-ihg-navy"
+                >
+                  {reviewPlatforms.map(p => (
+                    <option key={p} value={p}>{p}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 评论日期和评分 */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    评论日期 <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.reviewDate}
+                    onChange={(e) => setFormData({ ...formData, reviewDate: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-ihg-navy"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    评论评分 <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={formData.reviewScore}
+                    onChange={(e) => setFormData({ ...formData, reviewScore: Number(e.target.value) })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-ihg-navy"
+                  >
+                    <option value={1}>1分</option>
+                    <option value={2}>2分</option>
+                    <option value={3}>3分</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* 发帖人名称 */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  发帖人名称 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.reviewerName}
+                  onChange={(e) => setFormData({ ...formData, reviewerName: e.target.value })}
+                  placeholder="请输入评论发帖人名称"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-ihg-navy"
+                />
+              </div>
+
+              {/* 评论内容 */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  评论内容 <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  value={formData.reviewContent}
+                  onChange={(e) => setFormData({ ...formData, reviewContent: e.target.value })}
+                  placeholder="请粘贴完整的差评内容"
+                  rows={3}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-ihg-navy resize-none"
+                />
+              </div>
+
+              {/* 申诉理由 */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  申诉理由 <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  value={formData.appealReason}
+                  onChange={(e) => setFormData({ ...formData, appealReason: e.target.value })}
+                  placeholder="请说明申诉理由，如：已与客人沟通达成一致，平台已删除/折叠该评论"
+                  rows={2}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-ihg-navy resize-none"
+                />
+              </div>
+
+              {/* 平台处理证明 */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  平台处理证明
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={formData.proofUrl}
+                    onChange={(e) => setFormData({ ...formData, proofUrl: e.target.value })}
+                    placeholder="请输入证明截图链接或上传"
+                    className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-ihg-navy"
+                  />
+                  <button className="px-4 py-2 border border-slate-200 rounded-lg text-sm text-slate-600 hover:bg-slate-50 flex items-center gap-1">
+                    <Upload size={14} />
+                    上传
+                  </button>
+                </div>
+                <p className="text-xs text-slate-400 mt-1">请提供平台处理完成的截图或链接作为证明</p>
+              </div>
+            </div>
+
+            {/* 提交按钮 */}
+            <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-100">
+              <button
+                onClick={() => setShowAppealForm(false)}
+                className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg text-sm transition-colors"
+              >
+                取消
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={!formData.reviewId || !formData.reviewContent || !formData.reviewerName || !formData.appealReason}
+                className="px-6 py-2 bg-ihg-navy text-white rounded-lg text-sm hover:bg-ihg-navy-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                提交申诉
+              </button>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* 申诉列表 */}
+      <Card>
+        {appeals.length > 0 ? (
+          <div className="space-y-4">
+            {appeals.map((appeal) => (
+              <div key={appeal.id} className={clsx(
+                'p-4 rounded-xl border',
+                appeal.status === 'approved' ? 'border-emerald-200 bg-emerald-50/50' :
+                appeal.status === 'rejected' ? 'border-red-200 bg-red-50/50' :
+                'border-amber-200 bg-amber-50/50'
+              )}>
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className={clsx(
+                      'w-10 h-10 rounded-full flex items-center justify-center',
+                      appeal.status === 'approved' ? 'bg-emerald-100 text-emerald-600' :
+                      appeal.status === 'rejected' ? 'bg-red-100 text-red-600' :
+                      'bg-amber-100 text-amber-600'
+                    )}>
+                      {appeal.status === 'approved' ? <CheckCircle size={20} /> :
+                       appeal.status === 'rejected' ? <XCircle size={20} /> :
+                       <Clock size={20} />}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-slate-800">{appeal.platform}</span>
+                        <span className="text-xs text-slate-400">评论ID: {appeal.reviewId}</span>
+                        {getStatusBadge(appeal.status)}
+                      </div>
+                      <div className="text-xs text-slate-500 mt-0.5">
+                        评论日期: {appeal.reviewDate} · 申诉日期: {appeal.appealDate}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} size={12} className={i < appeal.reviewScore ? 'text-amber-400 fill-amber-400' : 'text-slate-200'} />
+                    ))}
+                  </div>
+                </div>
+
+                {/* 评论内容 */}
+                <div className="mb-3 p-3 bg-white rounded-lg border border-slate-100">
+                  <div className="flex items-center gap-2 mb-1">
+                    <MessageSquare size={14} className="text-slate-400" />
+                    <span className="text-xs text-slate-500">评论者: {appeal.reviewerName}</span>
+                  </div>
+                  <p className="text-sm text-slate-700">{appeal.reviewContent}</p>
+                </div>
+
+                {/* 申诉理由 */}
+                <div className="flex items-start gap-2 mb-2">
+                  <FileText size={14} className="text-slate-400 mt-0.5" />
+                  <div>
+                    <span className="text-xs text-slate-500">申诉理由: </span>
+                    <span className="text-sm text-slate-700">{appeal.appealReason}</span>
+                  </div>
+                </div>
+
+                {/* 审核结果 */}
+                {appeal.statusNote && (
+                  <div className={clsx(
+                    'text-xs p-2 rounded-lg mt-2',
+                    appeal.status === 'approved' ? 'bg-emerald-100 text-emerald-700' :
+                    appeal.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                    'bg-amber-100 text-amber-700'
+                  )}>
+                    <strong>审核意见: </strong>{appeal.statusNote}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="py-12 text-center">
+            <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <FileText size={24} className="text-slate-400" />
+            </div>
+            <p className="text-slate-500">暂无申诉记录</p>
+            <p className="text-xs text-slate-400 mt-1">当您完成平台差评申诉后，可在此提交剔除申请</p>
+          </div>
+        )}
+      </Card>
+    </section>
   );
 }
