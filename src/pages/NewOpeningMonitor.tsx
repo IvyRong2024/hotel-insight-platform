@@ -174,7 +174,7 @@ export function NewOpeningMonitor() {
     { id: 'experience', label: '体验成熟度', icon: BarChart3 },
     { id: 'drivers', label: '正向驱动', icon: TrendingUp },
     { id: 'barriers', label: '障碍与风险', icon: AlertTriangle },
-    { id: 'brand', label: '品牌兑现', icon: Target },
+    { id: 'brand', label: '品牌感知', icon: Target },
     { id: 'actions', label: '行动建议', icon: Zap },
   ];
 
@@ -445,18 +445,18 @@ export function NewOpeningMonitor() {
           </div>
         )}
 
-        {/* 品牌兑现 */}
+        {/* 品牌感知 */}
         {activeTab === 'brand' && (
           <div className="space-y-6 animate-fade-in-up">
             <div className="grid grid-cols-3 gap-4">
               <Card className="bg-gradient-to-br from-ihg-navy to-ihg-navy-light text-white">
-                <p className="text-white/60 text-sm mb-1">品牌兑现度</p>
+                <p className="text-white/60 text-sm mb-1">品牌感知度</p>
                 <p className="text-4xl font-bold">{selectedHotel.brandFulfillment}%</p>
-                <p className="text-white/50 text-xs mt-2">用户是否感知到品牌核心主张</p>
+                <p className="text-white/50 text-xs mt-2">用户对品牌核心主张的感知程度</p>
               </Card>
             </div>
             <Card>
-              <h4 className="font-semibold text-slate-800 mb-4">🎯 品牌承诺验证</h4>
+              <h4 className="font-semibold text-slate-800 mb-4">🎯 品牌特色用户感知</h4>
               <div className="space-y-4">
                 {selectedHotel.brandValidation.gaps.map((gap, idx) => (
                   <div key={idx} className={clsx(
@@ -471,7 +471,7 @@ export function NewOpeningMonitor() {
                       )}
                       <span className="font-medium text-slate-800">{gap.promise}</span>
                       <Badge variant={gap.fulfilled ? 'success' : 'warning'}>
-                        {gap.fulfilled ? '已兑现' : '待改进'}
+                        {gap.fulfilled ? '高感知' : '待提升'}
                       </Badge>
                     </div>
                     <p className="text-sm text-slate-600 ml-8">{gap.feedback}</p>

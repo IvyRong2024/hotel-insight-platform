@@ -490,10 +490,10 @@ function BrandOpsOverview() {
         </section>
       )}
 
-      {/* 品牌承诺兑现 */}
+      {/* 品牌特色用户感知 */}
       <section className="animate-fade-in-up delay-125">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-base font-semibold text-slate-800">🎯 {currentBrand.name} 品牌承诺感知</h3>
+          <h3 className="text-base font-semibold text-slate-800">🎯 {currentBrand.name} 品牌特色用户感知</h3>
           <Link to="/brand" className="text-sm text-ihg-navy hover:underline flex items-center gap-1">
             查看详情 <ArrowRight size={14} />
           </Link>

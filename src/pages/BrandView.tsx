@@ -140,10 +140,10 @@ export function BrandView() {
           </Card>
         </section>
 
-        {/* 品牌承诺验证详情 */}
+        {/* 品牌特色用户感知度 */}
         <section className="animate-fade-in-up delay-50">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base font-semibold text-slate-800">🎯 品牌承诺验证详情</h3>
+            <h3 className="text-base font-semibold text-slate-800">🎯 品牌特色用户感知</h3>
             <span className="text-sm text-slate-500">点击查看改善建议</span>
           </div>
           <div className="space-y-3">
@@ -168,8 +168,8 @@ export function BrandView() {
                           item.status === 'fulfilled' ? 'success' : 
                           item.status === 'partial' ? 'warning' : 'danger'
                         }>
-                          {item.status === 'fulfilled' ? '已兑现' : 
-                           item.status === 'partial' ? '部分兑现' : '未兑现'}
+                          {item.status === 'fulfilled' ? '高感知' : 
+                           item.status === 'partial' ? '中感知' : '低感知'}
                         </Badge>
                       </div>
                       <p className="text-sm text-slate-500">{item.mentions.toLocaleString()} 次用户提及</p>
