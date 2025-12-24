@@ -528,7 +528,7 @@ export const brandHealthData = {
   },
 };
 
-// ==================== 品牌承诺验证 ====================
+// ==================== 品牌特色用户感知 ====================
 export const promiseFulfillmentData = [
   { promise: '高效入住', score: 85, status: 'fulfilled', mentions: 2341, icon: '⚡', action: null },
   { promise: '温暖服务', score: 72, status: 'partial', mentions: 1856, icon: '❤️', action: '强化服务培训' },

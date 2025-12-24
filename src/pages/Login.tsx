@@ -11,7 +11,7 @@ const viewportGroups = [
     name: '品牌视角',
     icon: <Building2 size={24} />,
     color: 'from-violet-500 to-purple-600',
-    description: '全国品牌健康监测、品牌承诺验证、竞品对比分析',
+    description: '全国品牌健康监测、品牌特色感知分析、竞品对比分析',
     roles: ['brand_ops'],
   },
   {

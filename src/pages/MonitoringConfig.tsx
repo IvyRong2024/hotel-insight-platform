@@ -79,7 +79,7 @@ const permissionMatrix = [
     roleId: 'brand_ops',
     scope: '全国',
     modules: ['Brand View', 'Price Monitoring', 'Action Center'],
-    focusMetrics: ['品牌健康指数', '承诺达成率', '竞品对比'],
+    focusMetrics: ['品牌健康指数', '用户感知度', '竞品对比'],
     dataAccess: '全品牌、全区域汇总数据',
   },
   {
